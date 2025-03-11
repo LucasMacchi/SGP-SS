@@ -1,0 +1,22 @@
+{
+    "users": [
+        {
+            "username": "SolucionesMarcos2341",
+            "first_name": "Marcos",
+            "last_name": "Gomez",
+            "rol": 2
+        },
+        {
+            "username": "JuanHopsVidal",
+            "first_name": "Roman",
+            "last_name": "Riquelme",
+            "rol": 2
+        },
+        {
+            "username": "Cole15Sarmiento",
+            "first_name": "Tobias",
+            "last_name": "Caseres",
+            "rol": 2
+        }
+    ]
+}

@@ -1,0 +1,124 @@
+{
+    "pedidos":[
+        {
+            "state": "Pendiente",
+            "numero": 1,
+            "date_to_deliver": "2024-12-30",
+            "date_requested": "2024-12-20",
+            "date_delivered": "2024-12-27",
+            "requester": "SolucionesMarcos2341",
+            "cco": "Hospital Vidal",
+            "insumos": [
+                {
+                    "name": "Remera azul",
+                    "amount": 6
+                },
+                {
+                    "name": "Lavandina 450cc",
+                    "amount": 3
+                }
+            ]
+
+        },
+        {
+            "state": "Pendiente",
+            "numero": 2,
+            "date_to_deliver": "2024-8-30",
+            "date_requested": "2024-8-20",
+            "date_delivered": "2024-8-27",
+            "requester": "SolucionesMarcos2341",
+            "cco": "Hospital Vidal",
+            "insumos": [
+                {
+                    "name": "Remera azul",
+                    "amount": 6
+                },
+                {
+                    "name": "Lavandina 450cc",
+                    "amount": 3
+                }
+            ]
+
+        },
+        {
+            "state": "Pendiente",
+            "numero": 3,
+            "date_to_deliver": "2024-2-10",
+            "date_requested": "2024-2-2",
+            "date_delivered": "2024-2-7",
+            "requester": "SolucionesMarcos2341",
+            "cco": "Hospital Vidal",
+            "insumos": [
+                {
+                    "name": "Remera azul",
+                    "amount": 6
+                },
+                {
+                    "name": "Lavandina 450cc",
+                    "amount": 3
+                }
+            ]
+
+        },
+        {
+            "state": "Aprobado",
+            "numero": 4,
+            "date_to_deliver": "2024-5-30",
+            "date_requested": "2024-5-20",
+            "date_delivered": "2024-5-27",
+            "requester": "JuanHopsVidal",
+            "cco": "Hospital Vidal",
+            "insumos": [
+                {
+                    "name": "Remera azul",
+                    "amount": 6
+                },
+                {
+                    "name": "Lavandina 450cc",
+                    "amount": 3
+                }
+            ]
+
+        },
+        {
+            "state": "Pendiente",
+            "numero": 5,
+            "date_to_deliver": "2024-1-30",
+            "date_requested": "2024-1-10",
+            "date_delivered": "2024-1-27",
+            "requester": "JuanHopsVidal",
+            "cco": "Hospital Vidal",
+            "insumos": [
+                {
+                    "name": "Remera azul",
+                    "amount": 6
+                },
+                {
+                    "name": "Lavandina 450cc",
+                    "amount": 3
+                }
+            ]
+
+        },
+        {
+            "state": "Rechazado",
+            "numero": 1,
+            "date_to_deliver": "2024-4-30",
+            "date_requested": "2024-4-20",
+            "date_delivered": "2024-4-27",
+            "requester": "JuanHopsVidal",
+            "cco": "Hospital Vidal",
+            "insumos": [
+                {
+                    "name": "Remera azul",
+                    "amount": 6
+                },
+                {
+                    "name": "Lavandina 450cc",
+                    "amount": 3
+                }
+            ]
+
+        }   
+    ] 
+}
