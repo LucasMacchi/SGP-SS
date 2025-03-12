@@ -94,17 +94,23 @@ export default function GlobalState (props: IPropsChildren) {
     }
 
     //Funcion para conseguir todos los pedidos
-    function pedidosFn (username: string, rol: number) {
+    function pedidosFn ( rol: number) {
         if(use_mock === "1") {
-            console.log(2)
             if(rol === 2){
-                console.log(1)
+                const username = localStorage.getItem('usrname')
                 const pedidos: IPedido[] = pedidosMock.pedidos.filter(p => p.requester === username)
                 dispatch({
                     type: ac.GET_PEDIDOS,
                     payload: pedidos
                 })
                 if(use_logs === "1") console.log(pedidos)
+            }
+            else if(rol !== 3){
+                dispatch({
+                    type: ac.GET_PEDIDOS,
+                    payload: pedidosMock.pedidos
+                })
+                if(use_logs === "1") console.log(pedidosMock.pedidos)
             }
 
         }
@@ -140,5 +146,5 @@ interface IGlobalContext{
     loginFn: (username: string) => void,
     logoutFn: () => void,
     sessionFn: () => void,
-    pedidosFn: (username: string, rol: number) => void,
+    pedidosFn: (rol: number) => void,
 }

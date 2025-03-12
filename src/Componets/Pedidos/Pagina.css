@@ -1,0 +1,43 @@
+.div-list {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.pedido-component {
+    max-width: 300px;
+    width: 300px;
+    display: flex;
+    justify-content: space-evenly;
+    background-color: #666666;
+    color: white;
+}
+.pedido-component:hover {
+    background-color: #969696;
+}
+
+.pedido-component, div {
+    margin: 5px;
+}
+
+.btn-big {
+    color: white;
+    background-color: #3399ff;
+    border-color: #3399ff;
+    font-size: xx-large;
+}
+
+.select-small {
+    font-size: medium;
+    border-color: #3399ff;
+}
+
+.div-filter {
+display: flex;
+justify-content: flex-start;
+}
+
+.filter-sub {
+    margin: 5px;
+    color: #3399ff;
+}
