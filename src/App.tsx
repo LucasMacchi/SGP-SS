@@ -17,6 +17,7 @@ function App() {
 
   const loginAction = () => {
     global?.loginFn(username)
+    setUsername('')
   }
 
   return (

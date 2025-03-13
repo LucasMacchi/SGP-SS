@@ -36,9 +36,11 @@ export default function GlobalState (props: IPropsChildren) {
 
     //Funcion para hacer login
     function loginFn (username: string) {
+        let status = false
         if(use_mock === "1"){
             usersMock.users.forEach(u => {
                 if(username === u.username){
+                    status = true
                     dispatch({
                         payload: true,
                         type: ac.LOGSTATUS_CHN
@@ -50,6 +52,7 @@ export default function GlobalState (props: IPropsChildren) {
                 }
             });
         }
+        if(!status) alert("Error a iniciar sesion: usuario incorrecto")
     }
     //Funcion para hacer logout
     function logoutFn () {
@@ -58,15 +61,17 @@ export default function GlobalState (props: IPropsChildren) {
             type: ac.LOGSTATUS_CHN
         })
         dispatch({
-            payload: { nombre: "", apellido: "", mail: "", rol: 0 },
+            payload: { nombre: "", apellido: "", mail: "", rol: 3 },
             type: ac.GET_USER
         })
         try {
             localStorage.removeItem('jwToken')
+            localStorage.removeItem('usrname')
             window.location.reload()
         } catch (error) {
             console.log(error)
             localStorage.removeItem('jwToken')
+            localStorage.removeItem('usrname')
             window.location.reload()
         }
     }
@@ -76,6 +81,7 @@ export default function GlobalState (props: IPropsChildren) {
             if(use_mock === "1"){
                 usersMock.users.forEach(u => {
                     if(u.username === localStorage.getItem('usrname')){
+                        console.log("USER: ",u)
                         dispatch({
                             payload: {username: u.username, first_name: u.first_name, last_name: u.last_name, rol: u.rol},
                             type: ac.GET_USER
@@ -84,7 +90,7 @@ export default function GlobalState (props: IPropsChildren) {
                 });
             }
 
-            if(use_logs === "1") console.log("User logged in by session")
+            if(use_logs === "1") console.log("User logged in by session ")
             navigation('/pedidos')
         }
         else {
@@ -95,6 +101,7 @@ export default function GlobalState (props: IPropsChildren) {
 
     //Funcion para conseguir todos los pedidos
     function pedidosFn ( rol: number) {
+        console.log('ROL ',rol)
         if(use_mock === "1") {
             if(rol === 2){
                 const username = localStorage.getItem('usrname')
@@ -103,21 +110,22 @@ export default function GlobalState (props: IPropsChildren) {
                     type: ac.GET_PEDIDOS,
                     payload: pedidos
                 })
-                if(use_logs === "1") console.log(pedidos)
+                if(use_logs === "1") console.log("Pedidos rol 2",pedidos)
             }
-            else if(rol !== 3){
+            else if(rol === 1 || rol === 0){
                 dispatch({
                     type: ac.GET_PEDIDOS,
                     payload: pedidosMock.pedidos
                 })
-                if(use_logs === "1") console.log(pedidosMock.pedidos)
+                if(use_logs === "1") console.log("Pedidos ",pedidosMock.pedidos)
             }
+        else console.log("No role")
 
         }
     }
 
     const innitialState: IGlobalContext = {
-        user: {username: '', first_name: '', last_name: '', rol: 2},
+        user: {username: '', first_name: '', last_name: '', rol: 3},
         login: false,
         pedidos: [],
         loginFn,

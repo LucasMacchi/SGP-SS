@@ -1,8 +1,24 @@
+.div-pedidos {
+    display: flex;
+    justify-content: center;
+}
 .div-list {
     margin-top: 20px;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
+}
+.div-header-pedidos {
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
+}
+.div-header-pedidos , button {
+    margin-right: 20px;
+    margin-left: 20px;
+}
+.hr-line {
+    width: 320px;
 }
 .pedido-component {
     max-width: 300px;
@@ -26,18 +42,28 @@
     border-color: #3399ff;
     font-size: xx-large;
 }
-
+.btn-small-logout {
+    color: white;
+    background-color: #3399ff;
+    border-color: #3399ff;
+    font-size: x-small;
+    height: 40px;
+}
 .select-small {
     font-size: medium;
     border-color: #3399ff;
 }
-
-.div-filter {
-display: flex;
-justify-content: flex-start;
-}
-
 .filter-sub {
     margin: 5px;
     color: #3399ff;
+}
+.textfield-search    {
+    font-size: small;
+    border-color: #3399ff;
+    width: 40px;
+}
+.date-input {
+    font-size: small;
+    border-color: #3399ff;
+    width: 80px;
 }

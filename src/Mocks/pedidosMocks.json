@@ -362,12 +362,72 @@
         },
         {
             "state": "Pendiente",
-            "numero": 19,
+            "numero": 30,
             "date_to_deliver": "2024-12-30",
             "date_requested": "2024-12-20",
             "date_delivered": "2024-12-27",
-            "requester": "SolucionesMarcos2341",
-            "cco": "Hospital Jose",
+            "requester": "Cole15Sarmiento",
+            "cco": "Bnc Ctes",
+            "insumos": [
+                {
+                    "name": "Remera azul",
+                    "amount": 6
+                },
+                {
+                    "name": "Lavandina 450cc",
+                    "amount": 3
+                }
+            ]
+
+        },
+        {
+            "state": "Pendiente",
+            "numero": 29,
+            "date_to_deliver": "2024-12-30",
+            "date_requested": "2024-12-20",
+            "date_delivered": "2024-12-27",
+            "requester": "Cole15Sarmiento",
+            "cco": "Bnc Ctes",
+            "insumos": [
+                {
+                    "name": "Remera azul",
+                    "amount": 6
+                },
+                {
+                    "name": "Lavandina 450cc",
+                    "amount": 3
+                }
+            ]
+
+        },
+        {
+            "state": "Pendiente",
+            "numero": 28,
+            "date_to_deliver": "2024-12-30",
+            "date_requested": "2024-12-20",
+            "date_delivered": "2024-12-27",
+            "requester": "Cole15Sarmiento",
+            "cco": "Bnc Ctes",
+            "insumos": [
+                {
+                    "name": "Remera azul",
+                    "amount": 6
+                },
+                {
+                    "name": "Lavandina 450cc",
+                    "amount": 3
+                }
+            ]
+
+        },
+        {
+            "state": "Pendiente",
+            "numero": 27,
+            "date_to_deliver": "2024-12-30",
+            "date_requested": "2024-12-20",
+            "date_delivered": "2024-12-27",
+            "requester": "Cole15Sarmiento",
+            "cco": "Bnc Ctes",
             "insumos": [
                 {
                     "name": "Remera azul",
@@ -488,6 +548,26 @@
             "date_delivered": "2024-4-27",
             "requester": "JuanHopsVidal",
             "cco": "Hospital Vidal",
+            "insumos": [
+                {
+                    "name": "Remera azul",
+                    "amount": 6
+                },
+                {
+                    "name": "Lavandina 450cc",
+                    "amount": 3
+                }
+            ]
+
+        },
+        {
+            "state": "Pendiente",
+            "numero": 31,
+            "date_to_deliver": "2024-12-30",
+            "date_requested": "2024-12-20",
+            "date_delivered": "2024-12-27",
+            "requester": "JuanHopsVidal",
+            "cco": "Hospital Jose",
             "insumos": [
                 {
                     "name": "Remera azul",

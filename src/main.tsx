@@ -5,6 +5,9 @@ import App from './App.tsx'
 import GlobalState from './Context/GlobalContext.tsx'
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import PaginaPedidos from './Componets/Pedidos/Pagina.tsx'
+import AdminPagina from './Componets/Admin/AdminPage.tsx'
+import AddOrder from './Componets/AddOrder/AddOrder.tsx'
+import DetailsPage from './Componets/Details/DetailsPage.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -13,6 +16,9 @@ createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path='/' element={<App />}></Route>
           <Route path='/pedidos' element={<PaginaPedidos />} />
+          <Route path='/pedidos/:orderId' element={<DetailsPage />}/>
+          <Route path='/admin' element={<AdminPagina/>}/>
+          <Route path='/add' element={<AddOrder/>}/>
         </Routes>
       </StrictMode>
     </GlobalState>

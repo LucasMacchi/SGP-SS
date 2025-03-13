@@ -17,6 +17,12 @@
             "first_name": "Tobias",
             "last_name": "Caseres",
             "rol": 2
+        },
+        {
+            "username": "lmacchi",
+            "first_name": "Lucas",
+            "last_name": "Macchi",
+            "rol": 1
         }
     ]
 }
