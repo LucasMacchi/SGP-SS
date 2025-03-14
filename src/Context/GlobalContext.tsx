@@ -3,9 +3,11 @@ import { createContext, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
 import { IAction, IPedido, IPropsChildren, IUser } from "../Utils/Interfaces"
 import ac from "./Actions"
+//Mocks
 import usersMock from "../Mocks/usersMock.json"
 import pedidosMock from "../Mocks/pedidosMocks.json"
-
+import insumosMock from "../Mocks/insumosMock.json"
+import ccosMock from "../Mocks/ccoMock.json"
 
 export const GlobalContext = createContext<IGlobalContext | null>(null)
 const use_mock = import.meta.env.VITE_USE_MOCK
@@ -18,6 +20,10 @@ const globalReducer = (state: IGlobalContext, action: IAction): IGlobalContext =
     const {type, payload} = action
 
     switch(type){
+        case ac.GET_CCOS:
+            return {...state, ccos: payload}
+        case ac.GET_INSUMOS:
+            return {...state, insumos: payload}
         case ac.GET_USER:
             return {...state, user: payload}
         case ac.GET_PEDIDOS:
@@ -124,14 +130,37 @@ export default function GlobalState (props: IPropsChildren) {
         }
     }
 
+    function insumosFn () {
+        if(use_mock === "1") {
+            dispatch({
+                type: ac.GET_INSUMOS,
+                payload: insumosMock.array
+            })
+        }
+        if(use_logs === "1") console.log("Insumos Cargados",insumosMock.array)
+    }
+    function ccosFn () {
+        if(use_mock === "1") {
+            dispatch({
+                type: ac.GET_CCOS,
+                payload: ccosMock.ccos
+            })
+        }
+        if(use_logs === "1") console.log("Ccos Cargados",ccosMock.ccos)
+    }
+
     const innitialState: IGlobalContext = {
         user: {username: '', first_name: '', last_name: '', rol: 3},
         login: false,
         pedidos: [],
+        ccos: [],
+        insumos: [],
         loginFn,
         logoutFn,
         sessionFn,
-        pedidosFn
+        pedidosFn,
+        insumosFn,
+        ccosFn
     }
 
 
@@ -151,8 +180,12 @@ interface IGlobalContext{
     user: IUser,
     login: boolean,
     pedidos: IPedido[],
+    insumos: string[],
+    ccos: string[],
     loginFn: (username: string) => void,
     logoutFn: () => void,
     sessionFn: () => void,
     pedidosFn: (rol: number) => void,
+    insumosFn: () => void,
+    ccosFn: () => void
 }

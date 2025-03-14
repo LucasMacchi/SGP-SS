@@ -5,6 +5,7 @@ import "./Pagina.css"
 import dateParser from '../../Utils/dateParser'
 import { useNavigate } from 'react-router-dom'
 const use_logs = import.meta.env.VITE_USE_LOGS
+const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
 export default function PaginaPedidos () {
 
@@ -23,7 +24,7 @@ export default function PaginaPedidos () {
     useEffect(() => {
         setTimeout(() => {
             global?.pedidosFn( global.user.rol)
-        }, 2000);
+        }, waitTime);
     },[global?.user])
 
     
@@ -124,8 +125,6 @@ export default function PaginaPedidos () {
                     </button>
                 </div>
             </div>
-
-
             <hr color='#3399ff' className='hr-line'/>
             <button className='btn-big' onClick={() => navigator('/add')}>
                 Nuevo Pedido
@@ -163,11 +162,11 @@ export default function PaginaPedidos () {
                 </div>
                 <div>
                     <h5 className='filter-sub'>Fecha de inicio y Final</h5>
-                    <input disabled={nro ||  global?.user.rol === 2 ? true : false} 
+                    <input disabled={nro ? true : false} 
                     type='date' id='date_start' className='date-input'
                     value={dateStart} onChange={e => setDateStart(e.target.value)}/>
                     <a> - </a>
-                    <input disabled={nro ||  global?.user.rol === 2 ? true : false} 
+                    <input disabled={nro ? true : false} 
                     type='date' id='date_end' className='date-input'
                     value={dateEnd} onChange={e => setDateEnd(e.target.value)}/>
                 </div>
@@ -175,7 +174,6 @@ export default function PaginaPedidos () {
                     Filtrar
                 </button>
             </div>
-
             <div className='div-list'>
                 {
                 global?.pedidos.length && global?.pedidos.length >= 0 ? displayPedidos() : displayLoading()

@@ -1,0 +1,57 @@
+.data-div-add {
+    display: flex;
+    color: #666666;
+    text-align: left;
+    height: 50px;
+}
+.data-div-add-date {
+    font-size: small;
+    border-color: #3399ff;
+    width: 80px;
+    align-self: center;
+    margin-left: 10px;
+}
+.data-div-select {
+    font-size: small;
+    border-color: #3399ff;
+    width: 170px;
+    align-self: center;
+    margin-left: 10px;
+}
+.data-div-texfield {
+    font-size: small;
+    border-color: #3399ff;
+    width: 30px;
+    align-self: center;
+    margin-left: 10px;
+}
+.data-div-btn-insumo {
+    display: flex;
+    justify-content: end;
+}
+.data-add-btn-insumo {
+    color: white;
+    background-color: #3399ff;
+    border-color: #3399ff;
+    font-size: small;
+    height: 30px;
+    width: 60px;
+}
+.data-del-btn-insumo {
+    color: white;
+    background-color: #ff0000;
+    border-color: #ff0000;
+    font-size: small;
+    height: 30px;
+    width: 60px;
+}
+.add-form-page {
+    margin-bottom: 50px;
+}
+.btn-big-forms {
+    margin-top: 30px;
+    color: white;
+    background-color: #3399ff;
+    border-color: #3399ff;
+    font-size: xx-large;
+}

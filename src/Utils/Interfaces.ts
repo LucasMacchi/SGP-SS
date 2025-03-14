@@ -1,5 +1,6 @@
 import { JSX } from "react"
 
+export type TEstado = 'Pendiente' | 'Aprobado' | 'Cancelado' | 'Rechazado' | 'Entregado';
 export interface IToken {
     token: string
 };
@@ -12,13 +13,12 @@ export interface IAction {
     type: string,
     payload: any
 }
-
 export interface IPedido {
     state: 'Pendiente' | 'Aprobado' | 'Cancelado' | 'Rechazado' | 'Entregado' | string,
-    numero: number,
-    date_to_deliver: string,
+    numero?: number,
+    date_aproved?: string,
     date_requested: string,
-    date_delivered: string,
+    date_delivered?: string,
     requester: string,
     cco: string,
     insumos: IInsumo[]
