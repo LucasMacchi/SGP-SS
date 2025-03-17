@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
-import { IPedido } from '../../Utils/Interfaces'
+import { IPedido, rolesNum } from '../../Utils/Interfaces'
 import "./Pagina.css"
 import dateParser from '../../Utils/dateParser'
 import { useNavigate } from 'react-router-dom'
@@ -19,11 +19,13 @@ export default function PaginaPedidos () {
     const [dateEnd, setDateEnd] = useState('')
 
     useEffect(() => {
-        global?.sessionFn()
+        if(!global?.login) global?.sessionFn()
     },[])
     useEffect(() => {
         setTimeout(() => {
-            global?.pedidosFn( global.user.rol)
+            if(global){
+                if(global.pedidos.length === 0) global?.pedidosFn( global.user.rol)
+            }
         }, waitTime);
     },[global?.user])
 
@@ -119,9 +121,10 @@ export default function PaginaPedidos () {
                     <h1 className='title-Homepage' >
                         Pedidos
                     </h1>
-                    <button className='btn-small-logout' disabled={global?.user.rol !== 1 ? true : false}
+                    <button className='btn-small-logout' 
+                    disabled={global?.user.rol === rolesNum.admin ? false : true}
                     onClick={() => navigator('/admin')}>
-                        Usuarios
+                        Admin
                     </button>
                 </div>
             </div>
@@ -150,7 +153,7 @@ export default function PaginaPedidos () {
                 </div>
                 <div>
                     <h5 className='filter-sub'>Solicitante</h5>
-                    <select defaultValue={''} disabled={nro ||  global?.user.rol === 2 ? true : false}
+                    <select defaultValue={''} disabled={nro ||  global?.user.rol === rolesNum.encargado ? true : false}
                     value={req} onChange={(e) => setReq(e.target.value)} className='select-small'>
                         <option value={''}>---</option>
                         {

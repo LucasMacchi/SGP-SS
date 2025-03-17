@@ -1,5 +1,11 @@
 import { JSX } from "react"
 
+export const rolesNum = {
+    admin: 1,
+    administrativo: 2,
+    encargado: 3
+}
+
 export type TEstado = 'Pendiente' | 'Aprobado' | 'Cancelado' | 'Rechazado' | 'Entregado';
 export interface IToken {
     token: string
@@ -35,5 +41,6 @@ export interface IUser {
     last_name: string,
     rol: number,
     cuil?: number,
-    dni?: number
+    dni?: number,
+    activated: boolean
 }

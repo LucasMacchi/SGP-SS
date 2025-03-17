@@ -2,7 +2,7 @@ import './Details.css'
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
 import { useNavigate, useParams } from 'react-router-dom'
-import { IPedido } from '../../Utils/Interfaces'
+import { IPedido, rolesNum } from '../../Utils/Interfaces'
 //const use_logs = import.meta.env.VITE_USE_LOGS
 
 export default function DetailsPage () {
@@ -31,41 +31,45 @@ export default function DetailsPage () {
     },[])
 
     const btnDisplay = () => {
-        if(global?.user.rol === 2 && order?.state === 'Pendiente'){
+        if(global?.user.rol === rolesNum.encargado 
+            && order?.state === 'Pendiente'){
             return(
                 <div className='div-btns'>
-                    <button className='btn-neutral'>Editar</button>
-                    <button className='btn-negative'>Cancelar</button>
+                    <button className='btn-neutral' onClick={() => global.orderEditFn()}>Editar</button>
+                    <button className='btn-negative' onClick={() => global.orderCancelFn()}>Cancelar</button>
                 </div>
             )
         }
-        else if (global?.user.rol === 2 && order?.state === 'Aprobado') {
+        else if (global?.user.rol === rolesNum.encargado 
+            && order?.state === 'Aprobado') {
             return(
                 <div className='div-btns'>
-                    <button className='btn-accept'>RECIBIDO</button>
+                    <button className='btn-accept' onClick={() => global.orderDeliveredFn()}>RECIBIDO</button>
                 </div>
             )
         }
-        else if (global?.user.rol === 2) {
+        else if (global?.user.rol === rolesNum.encargado) {
             return(
                 <div className='div-btns'>
-                    <button className='btn-neutral'>REPETIR</button>
+                    <button className='btn-neutral' onClick={() => global.orderRepFn()}>REPETIR</button>
                 </div>
             )
         } 
-        else if(global?.user.rol === 1 || global?.user.rol === 0 && order?.state === 'Pendiente') {
+        else if(global?.user.rol === rolesNum.administrativo 
+            || global?.user.rol === rolesNum.admin 
+            && order?.state === 'Pendiente') {
             return(
                 <div className='div-btns'>
-                    <button className='btn-accept'>Aprobar</button>
-                    <button className='btn-negative'>Rechazar</button>
+                    <button className='btn-accept' onClick={() => global.orderAproveFn()}>Aprobar</button>
+                    <button className='btn-negative' onClick={() => global.orderRejectFn()}>Rechazar</button>
                 </div>
             )
         }
-        else if(global?.user.rol === 1 || global?.user.rol === 0) {
+        else if(global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin) {
             return(
                 <div className='div-btns'>
-                    <button className='btn-accept'>Archivar</button>
-                    <button className='btn-negative'>Rechazar</button>
+                    <button className='btn-accept' onClick={() => global.orderArchFn()}>Archivar</button>
+                    <button className='btn-negative' onClick={() => global.orderRejectFn()}>Rechazar</button>
                 </div>
             ) 
         }

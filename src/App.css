@@ -3,7 +3,12 @@
   text-align: center;
   display: flex;
   justify-content: center;
-  max-width: 300px;
+}
+
+@media (max-width: 600px) {
+  #root {
+    max-width: 300px;
+  }
 }
 
 .logo-big-home {

@@ -1,0 +1,15 @@
+.div-header-pedidos{
+    justify-content: flex-start;
+}
+.tr-user:hover {
+    background-color: rgb(150, 148, 148);
+}
+.data-div-texfield {
+    width: 150px;
+}
+.input-label-add-usr {
+    width: 90px;
+}
+.table-users, th {
+    font-size: xx-small !important; 
+}
