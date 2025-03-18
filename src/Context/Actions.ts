@@ -5,7 +5,8 @@ export default {
     GET_USER: 'get_user',
     GET_ALL_USERS: 'get_all_users',
     GET_INSUMOS: 'get_insumos',
-    GET_PEDIDOS: 'get_pedidos', 
+    GET_PEDIDOS: 'get_pedidos',
+    GET_UNIQUE_PEDIDO: "get_un_pd",
     POST_PEDIDO: 'post_pedido',
     ADD_USER: 'add_user',
     DEL_USER: 'del_user'

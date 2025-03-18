@@ -1,7 +1,7 @@
 {
     "pedidos":[
         {
-            "state": "Pendiente",
+            "state": "Aprobado",
             "numero": 1,
             "date_aproved": "",
             "date_requested": "2024-12-20",

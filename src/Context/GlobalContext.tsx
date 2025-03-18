@@ -10,16 +10,19 @@ import insumosMock from "../Mocks/insumosMock.json"
 import ccosMock from "../Mocks/ccoMock.json"
 
 export const GlobalContext = createContext<IGlobalContext | null>(null)
-const use_mock = import.meta.env.VITE_USE_MOCK
-const use_logs = import.meta.env.VITE_USE_LOGS
+const MOCK = import.meta.env.VITE_USE_MOCK
+const LOGS = import.meta.env.VITE_USE_LOGS
+const SERVER = import.meta.env.VITE_SERVER
 
-console.log('MOCK STATUS: ', use_mock)
-console.log('MOCK LOGS: ', use_logs)
+console.log('MOCK STATUS: ', MOCK)
+console.log('MOCK LOGS: ', LOGS)
 
 const globalReducer = (state: IGlobalContext, action: IAction): IGlobalContext => {
     const {type, payload} = action
 
     switch(type){
+        case ac.GET_UNIQUE_PEDIDO:
+            return {...state, pedidoDetail: payload}
         case ac.GET_ALL_USERS:
             return {...state, sysUsers: payload}
         case ac.GET_CCOS:
@@ -45,7 +48,7 @@ export default function GlobalState (props: IPropsChildren) {
     //Funcion para hacer login
     function loginFn (username: string) {
         let status = false
-        if(use_mock === "1"){
+        if(MOCK === "1"){
             usersMock.users.forEach(u => {
                 if(username === u.username){
                     status = true
@@ -53,7 +56,7 @@ export default function GlobalState (props: IPropsChildren) {
                         payload: true,
                         type: ac.LOGSTATUS_CHN
                     })
-                    if(use_logs === "1") console.log("User " +username+ " logged in")
+                    if(LOGS === "1") console.log("User " +username+ " logged in")
                     localStorage.setItem('jwToken', '1')
                     localStorage.setItem("usrname", u.username)
                     window.location.reload()
@@ -86,7 +89,7 @@ export default function GlobalState (props: IPropsChildren) {
     //Funcion para la sesion
     function sessionFn () {
         if(localStorage.getItem('jwToken') && localStorage.getItem('usrname')){
-            if(use_mock === "1"){
+            if(MOCK === "1"){
                 usersMock.users.forEach(u => {
                     if(u.username === localStorage.getItem('usrname')){
                         console.log("USER: ",u)
@@ -103,19 +106,19 @@ export default function GlobalState (props: IPropsChildren) {
                 });
             }
 
-            if(use_logs === "1") console.log("User logged in by session ")
+            if(LOGS === "1") console.log("User logged in by session ")
                 navigation("/pedidos")
         }
         else {
-            if(use_logs === "1") console.log("No session detected")
+            if(LOGS === "1") console.log("No session detected")
             navigation('/')
         }
     }
 
     //Funcion para conseguir todos los pedidos
     function pedidosFn ( rol: number) {
-        if(use_logs === "1") console.log('ROL ',rol)
-        if(use_mock === "1") {
+        if(LOGS === "1") console.log('ROL ',rol)
+        if(MOCK === "1") {
             if(rol === rolesNum.encargado){
                 const username = localStorage.getItem('usrname')
                 const pedidos: IPedido[] = pedidosMock.pedidos.filter(p => p.requester === username)
@@ -123,14 +126,14 @@ export default function GlobalState (props: IPropsChildren) {
                     type: ac.GET_PEDIDOS,
                     payload: pedidos
                 })
-                if(use_logs === "1") console.log("Pedidos rol 2",pedidos)
+                if(LOGS === "1") console.log("Pedidos rol 2",pedidos)
             }
             else if(rol === rolesNum.administrativo || rol === rolesNum.admin){
                 dispatch({
                     type: ac.GET_PEDIDOS,
                     payload: pedidosMock.pedidos
                 })
-                if(use_logs === "1") console.log("Pedidos ",pedidosMock.pedidos)
+                if(LOGS === "1") console.log("Pedidos ",pedidosMock.pedidos)
             }
         else console.log("No role")
 
@@ -138,27 +141,27 @@ export default function GlobalState (props: IPropsChildren) {
     }
     //Trae todos los insumos para la creacion de nuevos pedidos
     function insumosFn () {
-        if(use_mock === "1") {
+        if(MOCK === "1") {
             dispatch({
                 type: ac.GET_INSUMOS,
                 payload: insumosMock.array
             })
         }
-        if(use_logs === "1") console.log("Insumos Cargados",insumosMock.array)
+        if(MOCK === "1") console.log("Insumos Cargados",insumosMock.array)
     }
     //Trae los Centros de Costos para la creacion de pedidos
     function ccosFn () {
-        if(use_mock === "1") {
+        if(MOCK === "1") {
             dispatch({
                 type: ac.GET_CCOS,
                 payload: ccosMock.ccos
             })
         }
-        if(use_logs === "1") console.log("Ccos Cargados",ccosMock.ccos)
+        if(LOGS === "1") console.log("Ccos Cargados",ccosMock.ccos)
     }
     //Trae todos los usuarios
     function sysUsersFn () {
-        if(use_mock === "1") {
+        if(MOCK === "1") {
             const users: IUser[] = usersMock.users
             dispatch({
                 type: ac.GET_ALL_USERS,
@@ -168,59 +171,81 @@ export default function GlobalState (props: IPropsChildren) {
     }
     //Aprueba pedido
     function orderAproveFn () {
-        if(use_logs === "1") console.log("Orden Aprobada")
+        if(LOGS === "1") console.log("Orden Aprobada")
         return 0;
     }
     //Rechaza pedido
     function orderRejectFn () {
-        if(use_logs === "1") console.log("Orden Rechazada")
+        if(LOGS === "1") console.log("Orden Rechazada")
         return 0;
     }
     //Cancela pedido
     function orderCancelFn () {
-        if(use_logs === "1") console.log("Orden Cancelada")
+        if(LOGS === "1") console.log("Orden Cancelada")
         return 0;
     }
     //Entrega pedido
     function orderDeliveredFn () {
-        if(use_logs === "1") console.log("Orden Entregada")
+        if(LOGS === "1") console.log("Orden Entregada")
         return 0;
     }
     //Edita pedido
     function orderEditFn () {
-        if(use_logs === "1") console.log("Orden a Editar")
+        if(LOGS === "1") console.log("Orden a Editar")
         return 0;
     }
     //Repetir pedido
     function orderRepFn () {
-        if(use_logs === "1") console.log("Orden a Editar")
+        if(LOGS === "1") console.log("Orden a Editar")
         return 0;
     }
     //AArchivar pedido
     function orderArchFn () {
-        if(use_logs === "1") console.log("Orden a Archivar")
+        if(LOGS === "1") console.log("Orden a Archivar")
         return 0;
     }
     //Eliminar/activar Usuario
     function delUser (username: string, state: boolean) {
         if(state) {
-            if(use_logs === "1") console.log("Usuario Activado: "+username)
+            if(LOGS === "1") console.log("Usuario Activado: "+username)
             
         }
         else{
-            if(use_logs === "1") console.log("Usuario elminado: "+username)
+            if(LOGS === "1") console.log("Usuario elminado: "+username)
         }
         
         return 0;
     }
     //Da de alta a un nuevo usuario
     function addUser (user: IUser) {
-        if(use_logs === "1") console.log("Nuevo usuario: ",user)
-            return 0
+        if(LOGS === "1") console.log("Nuevo usuario: ",user)
+        return 0
+    }
+
+    //Retorna un pedido especifico
+    function uniqPedido (id: number, pedidos: IPedido[], empty: boolean) {
+        if(empty) {
+            dispatch({
+                type: ac.GET_UNIQUE_PEDIDO,
+                payload: {requester: '', date_requested: '', insumos: [], state: 'Pendiente', cco: ''}
+            })
+        }
+        if(LOGS) console.log("STATE PEDIDO ",pedidos)
+        pedidos.forEach(p => {
+            if(p.numero === id) {
+                if(LOGS) console.log("ORDER TO RETURN ",p)
+                dispatch({
+                    type: ac.GET_UNIQUE_PEDIDO,
+                    payload: p
+                })
+            }
+        });
+        
     }
 
     const innitialState: IGlobalContext = {
         user: {username: '', first_name: '', last_name: '', rol: 3, activated: false},
+        pedidoDetail: {requester: '', date_requested: '', insumos: [], state: 'Pendiente', cco: ''},
         sysUsers: [],
         login: false,
         pedidos: [],
@@ -241,7 +266,8 @@ export default function GlobalState (props: IPropsChildren) {
         orderRepFn,
         orderArchFn,
         delUser,
-        addUser
+        addUser,
+        uniqPedido
     }
 
 
@@ -259,6 +285,7 @@ export default function GlobalState (props: IPropsChildren) {
 
 interface IGlobalContext{
     user: IUser,
+    pedidoDetail: IPedido,
     login: boolean,
     pedidos: IPedido[],
     insumos: string[],
@@ -280,4 +307,5 @@ interface IGlobalContext{
     orderArchFn: () => void,
     delUser: (username: string, state: boolean) => void,
     addUser: (user: IUser) => void,
+    uniqPedido: (id: number, pedidos: IPedido[],empty: boolean) => void
 }

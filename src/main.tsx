@@ -21,6 +21,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path='/admin' element={<AdminPagina/>}/>
           <Route path='/admin/users' element={<UsersPagina/>}/>
           <Route path='/add' element={<AddOrder/>}/>
+          <Route path='/add/:orderId' element={<AddOrder/>}/>
         </Routes>
       </StrictMode>
     </GlobalState>

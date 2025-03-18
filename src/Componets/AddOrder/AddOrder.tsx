@@ -1,16 +1,18 @@
 import "./AddOrder.css"
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { IPedido, IInsumo } from '../../Utils/Interfaces'
 
-//const use_logs = import.meta.env.VITE_USE_LOGS
+const LOGS = import.meta.env.VITE_USE_LOGS
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
 
 export default function AddOrder () {
     const navigator = useNavigate()
     const global = useContext(GlobalContext)
+    const params = useParams()
+    const id = params.orderId
     const [btn, setBtn] = useState(true)
     const [insumos, setInsumos] = useState('')
     const [amount, setAmount] = useState(0)
@@ -27,11 +29,19 @@ export default function AddOrder () {
         if(global) {
             if(global.insumos.length === 0) global?.insumosFn()
             if(global.ccos.length === 0) global?.ccosFn()
+            if(global.pedidos.length === 0 ) global.pedidosFn(global.user.rol)
             setTimeout(() => {
                 setShowForm(true)
             }, waitTime);
+            if(id){
+                global.uniqPedido(parseInt(id), global.pedidos, false)
+            }
         }
     },[])
+
+    useEffect(() => {
+        if(global?.pedidoDetail) setOrder(global?.pedidoDetail)
+    },[global?.pedidoDetail])
 
     const handleData = (data: string, prop: string) => {
         setOrder({

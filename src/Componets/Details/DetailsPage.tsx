@@ -44,14 +44,14 @@ export default function DetailsPage () {
             && order?.state === 'Aprobado') {
             return(
                 <div className='div-btns'>
-                    <button className='btn-accept' onClick={() => global.orderDeliveredFn()}>RECIBIDO</button>
+                    <button className='btn-accept' onClick={() => navigator('/add/'+id)}>RECIBIDO</button>
                 </div>
             )
         }
         else if (global?.user.rol === rolesNum.encargado) {
             return(
                 <div className='div-btns'>
-                    <button className='btn-neutral' onClick={() => global.orderRepFn()}>REPETIR</button>
+                    <button className='btn-neutral' onClick={() => navigator('/add/'+id)}>REPETIR</button>
                 </div>
             )
         } 
