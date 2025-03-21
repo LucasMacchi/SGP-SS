@@ -19,22 +19,38 @@ export interface IAction {
     type: string,
     payload: any
 }
+export interface IAddPedido {
+    requester: string,
+    service_id: number,
+    client_id: number,
+    user_id: number,
+    insumos: IInsumo[]
+
+}
 export interface IPedido {
     state: 'Pendiente' | 'Aprobado' | 'Cancelado' | 'Rechazado' | 'Entregado' | string,
-    numero?: number,
-    date_aproved?: string,
-    date_requested: string,
-    date_delivered?: string,
+    order_id: number,
+    numero: string,
+    date_aproved?: string | null,
+    date_requested: string ,
+    date_delivered?: string | null,
     requester: string,
-    cco: string,
+    service_id: number,
+    user_id: number,
+    client_id: number,
+    archive: boolean | number,
     insumos: IInsumo[]
 }
 
 export interface IInsumo {
-    name: string,
-    amount: number
+    detail_id?: number,
+    amount: number,
+    cod_insumo?: number,
+    order_id?: number,
+    insumo_des: string
 }
-// 0 Admin / 2 encargado / 1 administrativo / 3 invitado
+// 1 admin / 2 administrativo / 3 encargado
+
 export interface IUser {
     username: string,
     first_name: string,
@@ -43,4 +59,10 @@ export interface IUser {
     cuil?: number,
     dni?: number,
     activated: boolean
+}
+
+export interface IServicio {
+    service_id: number,
+    client_id: number,
+    service_des: number
 }

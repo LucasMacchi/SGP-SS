@@ -2,7 +2,7 @@ import "./AddOrder.css"
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
 import { useNavigate, useParams } from 'react-router-dom'
-import { IPedido, IInsumo } from '../../Utils/Interfaces'
+import { IPedido, IInsumo, IAddPedido } from '../../Utils/Interfaces'
 
 const LOGS = import.meta.env.VITE_USE_LOGS
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
@@ -17,12 +17,12 @@ export default function AddOrder () {
     const [insumos, setInsumos] = useState('')
     const [amount, setAmount] = useState(0)
     const [showForm, setShowForm] = useState(false)
-    const [newOrder, setOrder] = useState<IPedido>({
+    const [newOrder, setOrder] = useState<IAddPedido>({
         requester: '',
-        date_requested: '',
-        cco: '',
+        service_id: 0,
+        client_id: 0,
         insumos: [],
-        state: "Pendiente"
+        user_id: 0
     })
 
     useEffect(() => {
@@ -34,7 +34,7 @@ export default function AddOrder () {
                 setShowForm(true)
             }, waitTime);
             if(id){
-                global.uniqPedido(parseInt(id), global.pedidos, false)
+                global.uniqPedido(id, global.pedidos, false)
             }
         }
     },[])
@@ -51,7 +51,7 @@ export default function AddOrder () {
     }
 
     useEffect(() => {
-        if(newOrder.cco && newOrder.date_requested && newOrder.insumos.length > 0){
+        if(newOrder.service_id && newOrder.insumos.length > 0){
             setBtn(false)
         }
         else setBtn(true)
@@ -59,7 +59,7 @@ export default function AddOrder () {
 
     const addIns = () => {
         if(amount && insumos) {
-            const insu: IInsumo = {name: insumos, amount: amount ? amount : 1}
+            const insu: IInsumo = {insumo_des: insumos, amount: amount ? amount : 1}
             newOrder.insumos.push(insu)
             setOrder({...newOrder})
             setAmount(0)
@@ -75,33 +75,27 @@ export default function AddOrder () {
         if(showForm) {
             return(
                 <div className="add-form-page">
-                    <div className='data-div-add'>
-                        <h4>Fecha de Entrega: </h4>
-                        <input type='date' id='date_start' className='data-div-add-date'
-                        value={newOrder.date_requested} onChange={e => handleData(e.target.value, 'date_requested')}/>
-                    </div>
                     <hr color='#666666' className='hr-line'/>
                     <div className='data-div-add'>
                         <h4>Centro de Costo: </h4>
-                        <select defaultValue={''} value={newOrder.cco} className="data-div-select"
+                        <select defaultValue={''} value={newOrder.service_id} className="data-div-select"
                         onChange={e => handleData(e.target.value, 'cco')}>
                         <option value={''}>---</option>
                         {
                             global?.ccos.map((c) => (
-                                <option key={c} value={c}>{c}</option>
+                                <option key={c.service_id} value={c.service_id}>{c.service_des}</option>
                             ))
                         }
                         </select>
                     </div>
-                    <hr color='#666666' className='hr-line'/>
                     <div className='data-div-add'>
                         <h4>Insumos: </h4>
                         <select defaultValue={''} value={insumos} className="data-div-select"
                         onChange={e => setInsumos(e.target.value)}>
                         <option value={''}>---</option>
                         {
-                            global?.insumos.map((c) => (
-                                <option key={c} value={c}>{c}</option>
+                            global?.insumos.map((i, index) => (
+                                <option key={index} value={i.insumo_des}>{i.insumo_des}</option>
                             ))
                         }
                         </select>
@@ -125,7 +119,7 @@ export default function AddOrder () {
                             </tr>
                             {newOrder.insumos.map((i, index) => (
                                 <tr key={index}>
-                                    <th>{i.name}</th>
+                                    <th>{i.insumo_des}</th>
                                     <th>{i.amount}</th>
                                 </tr>
                             ))}

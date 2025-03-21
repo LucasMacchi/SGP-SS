@@ -1,13 +1,14 @@
 //import { useReducer } from "react";
 import { createContext, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
-import { IAction, IPedido, IPropsChildren, IUser, rolesNum } from "../Utils/Interfaces"
+import { IAction, IInsumo, IPedido, IPropsChildren, IServicio, IUser, rolesNum } from "../Utils/Interfaces"
 import ac from "./Actions"
 //Mocks
 import usersMock from "../Mocks/usersMock.json"
 import pedidosMock from "../Mocks/pedidosMocks.json"
 import insumosMock from "../Mocks/insumosMock.json"
 import ccosMock from "../Mocks/ccoMock.json"
+import axios from "axios";
 
 export const GlobalContext = createContext<IGlobalContext | null>(null)
 const MOCK = import.meta.env.VITE_USE_MOCK
@@ -46,7 +47,7 @@ export default function GlobalState (props: IPropsChildren) {
     const navigation = useNavigate()
 
     //Funcion para hacer login
-    function loginFn (username: string) {
+    async function loginFn (username: string) {
         let status = false
         if(MOCK === "1"){
             usersMock.users.forEach(u => {
@@ -62,6 +63,11 @@ export default function GlobalState (props: IPropsChildren) {
                     window.location.reload()
                 }
             });
+        }
+        else {
+            const token = axios.post<string>(SERVER+'/user/login', {username: username})
+            // WIP localStorage.setItem('jwToken', token)
+
         }
         if(!status) alert("Error a iniciar sesion: usuario incorrecto")
     }
@@ -223,7 +229,7 @@ export default function GlobalState (props: IPropsChildren) {
     }
 
     //Retorna un pedido especifico
-    function uniqPedido (id: number, pedidos: IPedido[], empty: boolean) {
+    function uniqPedido (id: string, pedidos: IPedido[], empty: boolean) {
         if(empty) {
             dispatch({
                 type: ac.GET_UNIQUE_PEDIDO,
@@ -245,7 +251,7 @@ export default function GlobalState (props: IPropsChildren) {
 
     const innitialState: IGlobalContext = {
         user: {username: '', first_name: '', last_name: '', rol: 3, activated: false},
-        pedidoDetail: {requester: '', date_requested: '', insumos: [], state: 'Pendiente', cco: ''},
+        pedidoDetail: {order_id: 0, requester: '', date_requested: '', insumos: [], state: '', service_id: 0, client_id: 0, archive: false, numero: '', user_id: 0},
         sysUsers: [],
         login: false,
         pedidos: [],
@@ -288,9 +294,9 @@ interface IGlobalContext{
     pedidoDetail: IPedido,
     login: boolean,
     pedidos: IPedido[],
-    insumos: string[],
+    insumos: IInsumo[],
     sysUsers: IUser[],
-    ccos: string[],
+    ccos: IServicio[],
     loginFn: (username: string) => void,
     logoutFn: () => void,
     sessionFn: () => void,
@@ -307,5 +313,5 @@ interface IGlobalContext{
     orderArchFn: () => void,
     delUser: (username: string, state: boolean) => void,
     addUser: (user: IUser) => void,
-    uniqPedido: (id: number, pedidos: IPedido[],empty: boolean) => void
+    uniqPedido: (id: string, pedidos: IPedido[],empty: boolean) => void
 }

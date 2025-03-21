@@ -12,8 +12,8 @@ export default function PaginaPedidos () {
     const navigator = useNavigate()
     const global = useContext(GlobalContext)
     const [fpedidos, setFpedidos] = useState<IPedido[]>([])
-    const [cco, setCco] = useState('')
-    const [nro, setNro] = useState(0)
+    const [cco, setCco] = useState(0)
+    const [nro, setNro] = useState('')
     const [req, setReq] = useState('')
     const [dateStart, setDateStart] = useState('')
     const [dateEnd, setDateEnd] = useState('')
@@ -25,6 +25,7 @@ export default function PaginaPedidos () {
         setTimeout(() => {
             if(global){
                 if(global.pedidos.length === 0) global?.pedidosFn( global.user.rol)
+                if(global.ccos.length === 0 ) global.ccosFn()
             }
         }, waitTime);
     },[global?.user])
@@ -46,7 +47,7 @@ export default function PaginaPedidos () {
             }
             else {
                 if(cco){
-                    array = array.filter(a => a.cco === cco)
+                    array = array.filter(a => a.service_id === cco)
                     if(use_logs === "1") console.log('cco '+cco,array)
                 }
                 if(req) {
@@ -69,8 +70,8 @@ export default function PaginaPedidos () {
             setFpedidos(array)
             setDateEnd('')
             setDateStart('')
-            setCco('')
-            setNro(0)
+            setCco(0)
+            setNro('')
             setReq('')
 
         }
@@ -99,7 +100,7 @@ export default function PaginaPedidos () {
     )
 
     const ccoSearch = (): Array<string> => {
-        const ccoSet = new Set<string>(global?.pedidos.map(p => p.cco))
+        const ccoSet = new Set<string>(global?.ccos.map(p => p.service_id+'-'+p.service_des))
         const arr = Array.from(ccoSet)
         return arr
     }
@@ -137,12 +138,12 @@ export default function PaginaPedidos () {
                 <div>
                     <h5 className='filter-sub'>Nro Pedido</h5>
                     <input type='number' id='nro_pedido' className='textfield-search'
-                    value={nro} onChange={e => setNro(parseInt(e.target.value))}/>
+                    value={nro} onChange={e => setNro(e.target.value)}/>
                 </div>
                 <div>
                     <h5 className='filter-sub'>CCO</h5>
                     <select defaultValue={''} disabled={nro ? true : false}
-                    value={cco} onChange={(e) => setCco(e.target.value)} className='select-small'>
+                    value={cco} onChange={(e) => setCco(parseInt(e.target.value))} className='select-small'>
                         <option value={''}>---</option>
                         {
                             ccoSearch().map((cco) => (
