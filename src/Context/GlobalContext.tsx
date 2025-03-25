@@ -49,11 +49,11 @@ export default function GlobalState (props: IPropsChildren) {
 
     //Funcion para hacer login
     async function loginFn (username: string) {
-        let status = false
+        let status1 = false
         if(MOCK === "1"){
             usersMock.users.forEach(u => {
                 if(username === u.username){
-                    status = true
+                    status1 = true
                     dispatch({
                         payload: true,
                         type: ac.LOGSTATUS_CHN

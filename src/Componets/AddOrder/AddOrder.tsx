@@ -2,11 +2,11 @@ import "./AddOrder.css"
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
 import { useNavigate, useParams } from 'react-router-dom'
-import { IPedido, IInsumo, IAddPedido, IToken } from '../../Utils/Interfaces'
+import { IInsumo, IAddPedido, IToken } from '../../Utils/Interfaces'
 import clientSearcher from "../../Utils/clientSearcher"
 import { jwtDecode } from "jwt-decode"
 
-const LOGS = import.meta.env.VITE_USE_LOGS
+//const LOGS = import.meta.env.VITE_USE_LOGS
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
 
