@@ -12,7 +12,6 @@ function App() {
 
   const handleUsername = (event: any) => {
     setUsername(event.target.value)
-    console.log(event.target.value)
   }
 
   const loginAction = () => {

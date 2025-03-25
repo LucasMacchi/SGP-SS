@@ -27,6 +27,15 @@ export interface IAddPedido {
     insumos: IInsumo[]
 
 }
+export interface IToken {
+    user: string,
+    rol: number,
+    first_name: string,
+    last_name: string,
+    exp: number,
+    iat: number,
+    usuario_id: number
+}
 export interface IPedido {
     state: 'Pendiente' | 'Aprobado' | 'Cancelado' | 'Rechazado' | 'Entregado' | string,
     order_id: number,
@@ -49,6 +58,11 @@ export interface IInsumo {
     order_id?: number,
     insumo_des: string
 }
+
+export interface IResponseInsumo {
+    insumo: string
+}
+
 // 1 admin / 2 administrativo / 3 encargado
 
 export interface IUser {
@@ -56,13 +70,21 @@ export interface IUser {
     first_name: string,
     last_name: string,
     rol: number,
-    cuil?: number,
-    dni?: number,
-    activated: boolean
+    activated?: boolean,
+    date_creation?: string
+    email?: string
 }
 
 export interface IServicio {
     service_id: number,
     client_id: number,
     service_des: number
+}
+
+export interface IPedidoRequest {
+    usuario_id: number,
+    requester: string,
+    service_id: number,
+    client_id: number,
+    insumos: IInsumo[]
 }

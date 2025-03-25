@@ -3,6 +3,9 @@
     text-align: left;
     height: 50px;
 }
+.data-div-add, h4 {
+    margin: 5px;
+}
 .data-div-add-date {
     font-size: small;
     border-color: #3399ff;
@@ -17,7 +20,7 @@
     align-self: center;
     margin-left: 10px;
 }
-.data-div-texfield {
+.data-div-textfield-amount {
     font-size: small;
     border-color: #3399ff;
     width: 30px;
@@ -53,4 +56,8 @@
     background-color: #3399ff;
     border-color: #3399ff;
     font-size: xx-large;
+}
+
+.data-row-insumo:hover {
+    background-color: rgb(150, 148, 148);
 }

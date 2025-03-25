@@ -3,6 +3,8 @@ import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
 import { useNavigate, useParams } from 'react-router-dom'
 import { IPedido, rolesNum } from '../../Utils/Interfaces'
+import dbDateParser from '../../Utils/dbDateParser'
+
 //const use_logs = import.meta.env.VITE_USE_LOGS
 
 export default function DetailsPage () {
@@ -18,7 +20,7 @@ export default function DetailsPage () {
             console.log(id)
             console.log(global?.pedidos)
             global.pedidos.forEach(p => {
-                if(p.numero === parseInt(id)) {
+                if(p.numero === id) {
                     console.log(p)
                     setOrder(p)
                 }
@@ -35,8 +37,7 @@ export default function DetailsPage () {
             && order?.state === 'Pendiente'){
             return(
                 <div className='div-btns'>
-                    <button className='btn-neutral' onClick={() => global.orderEditFn()}>Editar</button>
-                    <button className='btn-negative' onClick={() => global.orderCancelFn()}>Cancelar</button>
+                    <button className='btn-negative' onClick={() => global.orderCancelFn(order.order_id)}>CANCELAR</button>
                 </div>
             )
         }
@@ -44,7 +45,7 @@ export default function DetailsPage () {
             && order?.state === 'Aprobado') {
             return(
                 <div className='div-btns'>
-                    <button className='btn-accept' onClick={() => navigator('/add/'+id)}>RECIBIDO</button>
+                    <button className='btn-accept' onClick={() => global.orderDeliveredFn(order.order_id)}>RECIBIDO</button>
                 </div>
             )
         }
@@ -60,20 +61,27 @@ export default function DetailsPage () {
             && order?.state === 'Pendiente') {
             return(
                 <div className='div-btns'>
-                    <button className='btn-accept' onClick={() => global.orderAproveFn()}>Aprobar</button>
-                    <button className='btn-negative' onClick={() => global.orderRejectFn()}>Rechazar</button>
+                    <button className='btn-accept' onClick={() => global.orderAproveFn(order ? order.order_id : 0)}>APROBAR</button>
+                    <button className='btn-negative' onClick={() => global.orderRejectFn(order? order.order_id : 0)}>RECHAZAR</button>
                 </div>
             )
         }
         else if(global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin) {
             return(
                 <div className='div-btns'>
-                    <button className='btn-accept' onClick={() => global.orderArchFn()}>Archivar</button>
-                    <button className='btn-negative' onClick={() => global.orderRejectFn()}>Rechazar</button>
+                    <button className='btn-neutral' onClick={() => global.orderArchFn(order? order.order_id : 0)}>ARCHIVAR</button>
                 </div>
             ) 
         }
         else navigator('/')
+    }
+
+    const serviceDisplayer = (id: number): string => {
+        let srv = 'Servicio'
+        global?.ccos.forEach(s => {
+            if(id === s.service_id) srv= s.service_id+'-'+s.service_des
+        });
+        return srv
     }
     const dataDisplay = () => {
         if(order) {
@@ -83,15 +91,15 @@ export default function DetailsPage () {
                     <h4>{order.state}</h4>
                     <hr color='#666666' className='hr-details'/>
                     <h3>CCO: </h3>
-                    <h4>{order.cco}</h4>
+                    <h4>{serviceDisplayer(order.service_id)}</h4>
                     <hr color='#666666' className='hr-details'/>
                     <h3>Solicitante: </h3>
                     <h4>{order.requester}</h4>
                     <hr color='#666666' className='hr-details'/>
                     <h3>Fecha:</h3>
-                    <h4>{"Ordenado: "+order.date_delivered}</h4>
-                    <h4>{order.date_aproved ? 'Aprobado: '+order.date_aproved : 'Aprobacion pendiente'}</h4>
-                    <h4>{"Recibido: "+order.date_delivered}</h4>
+                    <h4>{'Ordenado: '+dbDateParser(order.date_requested, false)}</h4>
+                    <h4>{order.date_aproved ? 'Aprobado: '+dbDateParser(order.date_aproved, false) : 'Aprobacion pendiente'}</h4>
+                    <h4>{order.date_delivered ? "Recibido: "+dbDateParser(order.date_delivered,false) : 'Entrega pendiente'}</h4>
                     <hr color='#666666' className='hr-details'/>
                     <table>
                         <tbody>
@@ -100,8 +108,8 @@ export default function DetailsPage () {
                                 <th>Cantidad</th>
                             </tr>
                             {order.insumos.map((i) => (
-                                <tr key={i.name}>
-                                    <th>{i.name}</th>
+                                <tr key={i.cod_insumo}>
+                                    <th>{i.insumo_des}</th>
                                     <th>{i.amount}</th>
                                 </tr>
                             ))}

@@ -53,6 +53,10 @@
     font-size: medium;
     border-color: #3399ff;
 }
+.select-small-cco {
+    font-size: small;
+    border-color: #3399ff;
+}
 .filter-sub {
     margin: 5px;
     color: #3399ff;
@@ -60,7 +64,7 @@
 .textfield-search    {
     font-size: small;
     border-color: #3399ff;
-    width: 40px;
+    width: 60px;
 }
 .date-input {
     font-size: small;

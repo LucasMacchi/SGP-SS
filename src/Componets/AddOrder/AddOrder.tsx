@@ -2,7 +2,9 @@ import "./AddOrder.css"
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
 import { useNavigate, useParams } from 'react-router-dom'
-import { IPedido, IInsumo, IAddPedido } from '../../Utils/Interfaces'
+import { IPedido, IInsumo, IAddPedido, IToken } from '../../Utils/Interfaces'
+import clientSearcher from "../../Utils/clientSearcher"
+import { jwtDecode } from "jwt-decode"
 
 const LOGS = import.meta.env.VITE_USE_LOGS
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
@@ -29,7 +31,7 @@ export default function AddOrder () {
         if(global) {
             if(global.insumos.length === 0) global?.insumosFn()
             if(global.ccos.length === 0) global?.ccosFn()
-            if(global.pedidos.length === 0 ) global.pedidosFn(global.user.rol)
+            if(global.pedidos.length === 0 ) global.pedidosFn(global.user.rol, global.user.username)
             setTimeout(() => {
                 setShowForm(true)
             }, waitTime);
@@ -48,6 +50,7 @@ export default function AddOrder () {
             ...newOrder,
             [prop]: data
         })
+
     }
 
     useEffect(() => {
@@ -71,6 +74,22 @@ export default function AddOrder () {
         setOrder({...newOrder})
     }
 
+    const createOrder = async () => {
+        const token = localStorage.getItem('jwToken')
+        const dataUser: IToken = jwtDecode(token ?? "")
+        global?.addPedido(dataUser.usuario_id, dataUser.user, newOrder.service_id, clientSearcher(global.ccos, newOrder.service_id), newOrder.insumos)
+        
+    }
+
+    const deleteInsumoRow = (index: number, insumo: string) => {
+        
+        if(confirm('¿Quiere eliminar el insumo '+insumo+ "?")){
+            newOrder.insumos.splice(index, 1)
+            setOrder({...newOrder})
+        }
+
+    }
+
     const displayForms = () => {
         if(showForm) {
             return(
@@ -78,8 +97,8 @@ export default function AddOrder () {
                     <hr color='#666666' className='hr-line'/>
                     <div className='data-div-add'>
                         <h4>Centro de Costo: </h4>
-                        <select defaultValue={''} value={newOrder.service_id} className="data-div-select"
-                        onChange={e => handleData(e.target.value, 'cco')}>
+                        <select disabled={id ? true : false} defaultValue={''} value={newOrder.service_id} className="data-div-select"
+                        onChange={e => handleData(e.target.value, 'service_id')}>
                         <option value={''}>---</option>
                         {
                             global?.ccos.map((c) => (
@@ -95,13 +114,13 @@ export default function AddOrder () {
                         <option value={''}>---</option>
                         {
                             global?.insumos.map((i, index) => (
-                                <option key={index} value={i.insumo_des}>{i.insumo_des}</option>
+                                <option key={index} value={i}>{i}</option>
                             ))
                         }
                         </select>
                         <input type="number" id='amount' defaultValue={0}
                         value={amount} onChange={(e) => setAmount(parseInt(e.target.value))}
-                        className="data-div-texfield"/>
+                        className="data-div-textfield-amount"/>
                     </div>
                     <div className="data-div-btn-insumo">
                         <button className='data-del-btn-insumo' onClick={() => delIns()}>
@@ -118,7 +137,7 @@ export default function AddOrder () {
                                 <th>Cantidad</th>
                             </tr>
                             {newOrder.insumos.map((i, index) => (
-                                <tr key={index}>
+                                <tr className="data-row-insumo" key={index} onClick={() => deleteInsumoRow(index, i.insumo_des)}>
                                     <th>{i.insumo_des}</th>
                                     <th>{i.amount}</th>
                                 </tr>
@@ -126,7 +145,7 @@ export default function AddOrder () {
                         </tbody>
                     </table>
                     <button className='btn-big-forms' disabled={btn}
-                    onClick={() => console.log('asdas')}>
+                    onClick={() => createOrder()}>
                         Nuevo Pedido
                     </button>
                 </div>
@@ -140,7 +159,16 @@ export default function AddOrder () {
             <img src="/logo_big.webp" alt="" 
             className='logo-big-home'/>
             <div className='div-header-pedidos'>
-                <button className='btn-small-logout' onClick={() => navigator('/pedidos')}>
+                <button className='btn-small-logout' onClick={() => {
+                    setOrder({
+                        requester: '',
+                        service_id: 0,
+                        client_id: 0,
+                        insumos: newOrder.insumos.splice(0, newOrder.insumos.length),
+                        user_id: 0
+                    })
+                    navigator('/pedidos')
+                    }}>
                     Volver
                 </button>
                 <h1 className='title-Homepage' >

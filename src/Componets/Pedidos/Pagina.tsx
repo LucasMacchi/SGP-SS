@@ -24,7 +24,7 @@ export default function PaginaPedidos () {
     useEffect(() => {
         setTimeout(() => {
             if(global){
-                if(global.pedidos.length === 0) global?.pedidosFn( global.user.rol)
+                if(global.pedidos.length === 0) global?.pedidosFn( global.user.rol, global.user.username)
                 if(global.ccos.length === 0 ) global.ccosFn()
             }
         }, waitTime);
@@ -143,11 +143,11 @@ export default function PaginaPedidos () {
                 <div>
                     <h5 className='filter-sub'>CCO</h5>
                     <select defaultValue={''} disabled={nro ? true : false}
-                    value={cco} onChange={(e) => setCco(parseInt(e.target.value))} className='select-small'>
+                    value={cco} onChange={(e) => setCco(parseInt(e.target.value))} className='select-small-cco'>
                         <option value={''}>---</option>
                         {
-                            ccoSearch().map((cco) => (
-                                <option key={cco} value={cco}>{cco}</option>
+                            global?.ccos.map((cco) => (
+                                <option key={cco.service_id} value={cco.service_id}>{cco.service_id+'-'+cco.service_des}</option>
                             ))
                         }
                     </select>

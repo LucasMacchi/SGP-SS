@@ -1,14 +1,16 @@
 //import { useReducer } from "react";
 import { createContext, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
-import { IAction, IInsumo, IPedido, IPropsChildren, IServicio, IUser, rolesNum } from "../Utils/Interfaces"
+import { IAction, IInsumo, IPedido, IPedidoRequest, IPropsChildren, IResponseInsumo, IServicio, IToken, IUser, rolesNum } from "../Utils/Interfaces"
 import ac from "./Actions"
+import { jwtDecode } from "jwt-decode";
 //Mocks
 import usersMock from "../Mocks/usersMock.json"
 import pedidosMock from "../Mocks/pedidosMocks.json"
 import insumosMock from "../Mocks/insumosMock.json"
 import ccosMock from "../Mocks/ccoMock.json"
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
+import authReturner from "../Utils/authReturner";
 
 export const GlobalContext = createContext<IGlobalContext | null>(null)
 const MOCK = import.meta.env.VITE_USE_MOCK
@@ -43,7 +45,6 @@ const globalReducer = (state: IGlobalContext, action: IAction): IGlobalContext =
 }
 
 export default function GlobalState (props: IPropsChildren) {
-
     const navigation = useNavigate()
 
     //Funcion para hacer login
@@ -65,11 +66,14 @@ export default function GlobalState (props: IPropsChildren) {
             });
         }
         else {
-            const token = axios.post<string>(SERVER+'/user/login', {username: username})
-            // WIP localStorage.setItem('jwToken', token)
-
+            try {
+                const token: AxiosResponse = await axios.post(SERVER+'/user/login', {username: username})
+                localStorage.setItem('jwToken', token.data)
+                window.location.reload()
+            } catch (error) {
+                alert("Error a iniciar sesion: usuario incorrecto")
+            }
         }
-        if(!status) alert("Error a iniciar sesion: usuario incorrecto")
     }
     //Funcion para hacer logout
     function logoutFn () {
@@ -94,7 +98,8 @@ export default function GlobalState (props: IPropsChildren) {
     }
     //Funcion para la sesion
     function sessionFn () {
-        if(localStorage.getItem('jwToken') && localStorage.getItem('usrname')){
+        const token = localStorage.getItem('jwToken')
+        if(token){
             if(MOCK === "1"){
                 usersMock.users.forEach(u => {
                     if(u.username === localStorage.getItem('usrname')){
@@ -111,6 +116,25 @@ export default function GlobalState (props: IPropsChildren) {
                     }
                 });
             }
+            else{
+
+                dispatch({
+                    payload: true,
+                    type: ac.LOGSTATUS_CHN
+                })
+                const dataUser: IToken = jwtDecode(token)
+                const currentDateTime = Math.floor(Date.now() / 1000)
+                if(dataUser.exp < currentDateTime) {
+                    logoutFn()
+                    return 0
+                }  
+                else{
+                    dispatch({
+                        payload: {username: dataUser.user, first_name: dataUser.first_name, last_name: dataUser.last_name, rol: dataUser.rol},
+                        type: ac.GET_USER
+                    })
+                }
+            }
 
             if(LOGS === "1") console.log("User logged in by session ")
                 navigation("/pedidos")
@@ -122,7 +146,7 @@ export default function GlobalState (props: IPropsChildren) {
     }
 
     //Funcion para conseguir todos los pedidos
-    function pedidosFn ( rol: number) {
+    async function pedidosFn ( rol: number, username: string) {
         if(LOGS === "1") console.log('ROL ',rol)
         if(MOCK === "1") {
             if(rol === rolesNum.encargado){
@@ -141,32 +165,69 @@ export default function GlobalState (props: IPropsChildren) {
                 })
                 if(LOGS === "1") console.log("Pedidos ",pedidosMock.pedidos)
             }
-        else console.log("No role")
+            else console.log("No role")
 
+        }
+        else {
+            const token = localStorage.getItem('jwToken')
+            const dataUser: IToken = jwtDecode(token ?? "")
+            if(rol === rolesNum.encargado){
+                console.log("USERNER ",dataUser.user)
+                const pedidos: AxiosResponse<IPedido[]> = await axios.get(SERVER+'/pedido/all', authReturner())
+                const pedidosFiltered = pedidos.data.filter(p => p.requester === dataUser.user)
+                dispatch({
+                    type: ac.GET_PEDIDOS,
+                    payload: pedidosFiltered
+                })
+            }
+            else if(rol === rolesNum.admin || rol === rolesNum.administrativo){
+                const pedidos: AxiosResponse<IPedido[]> = await axios.get(SERVER+'/pedido/all', authReturner())
+                console.log(pedidos)
+                dispatch({
+                    type: ac.GET_PEDIDOS,
+                    payload: pedidos.data
+                })
+            }
+            else alert('No valid rol')
         }
     }
     //Trae todos los insumos para la creacion de nuevos pedidos
-    function insumosFn () {
+    async function insumosFn () {
         if(MOCK === "1") {
             dispatch({
                 type: ac.GET_INSUMOS,
                 payload: insumosMock.array
             })
         }
-        if(MOCK === "1") console.log("Insumos Cargados",insumosMock.array)
+        else {
+            const insumos: AxiosResponse<IResponseInsumo[]> = await axios.get(SERVER+'/data/insumos', authReturner())
+            
+            const filtered = insumos.data.map(i => i.insumo)
+            if(LOGS === "1") console.log("INSUMOS ",filtered)
+            dispatch({
+                type: ac.GET_INSUMOS,
+                payload: filtered
+            })
+        }
     }
     //Trae los Centros de Costos para la creacion de pedidos
-    function ccosFn () {
+    async function ccosFn () {
         if(MOCK === "1") {
             dispatch({
                 type: ac.GET_CCOS,
                 payload: ccosMock.ccos
             })
         }
-        if(LOGS === "1") console.log("Ccos Cargados",ccosMock.ccos)
+        else {
+            const ccos: AxiosResponse<IServicio[]> = await axios.get(SERVER+'/data/cco', authReturner())
+            dispatch({
+                type: ac.GET_CCOS,
+                payload: ccos.data
+            })
+        }
     }
     //Trae todos los usuarios
-    function sysUsersFn () {
+    async function sysUsersFn () {
         if(MOCK === "1") {
             const users: IUser[] = usersMock.users
             dispatch({
@@ -174,57 +235,82 @@ export default function GlobalState (props: IPropsChildren) {
                 payload: users
             })
         }
+        else {
+            const users: AxiosResponse<IUser[]> = await axios.get(SERVER+'/user/all',authReturner())
+            console.log("USERS ",users)
+            dispatch({
+                type: ac.GET_ALL_USERS,
+                payload: users.data
+            })
+        }
     }
     //Aprueba pedido
-    function orderAproveFn () {
+    async function orderAproveFn (order_id: number) {
         if(LOGS === "1") console.log("Orden Aprobada")
+        await axios.patch(SERVER+'/pedido/aprove/'+order_id, {},authReturner())
+        window.location.reload()
         return 0;
     }
     //Rechaza pedido
-    function orderRejectFn () {
+    async function orderRejectFn (order_id: number) {
         if(LOGS === "1") console.log("Orden Rechazada")
+        await axios.patch(SERVER+'/pedido/reject/'+order_id, {},authReturner())
+        window.location.reload()
         return 0;
     }
     //Cancela pedido
-    function orderCancelFn () {
+    async function orderCancelFn (order_id: number) {
         if(LOGS === "1") console.log("Orden Cancelada")
+        await axios.patch(SERVER+'/pedido/cancel/'+order_id, {},authReturner())
+        window.location.reload()
         return 0;
     }
     //Entrega pedido
-    function orderDeliveredFn () {
+    async function orderDeliveredFn (order_id: number) {
         if(LOGS === "1") console.log("Orden Entregada")
+        await axios.patch(SERVER+'/pedido/delivered/'+order_id, {},authReturner())
+        window.location.reload()
         return 0;
     }
     //Edita pedido
-    function orderEditFn () {
+    async function orderEditFn () {
         if(LOGS === "1") console.log("Orden a Editar")
         return 0;
     }
     //Repetir pedido
-    function orderRepFn () {
+    async function orderRepFn () {
         if(LOGS === "1") console.log("Orden a Editar")
         return 0;
     }
     //AArchivar pedido
-    function orderArchFn () {
+    async function orderArchFn (order_id: number) {
         if(LOGS === "1") console.log("Orden a Archivar")
+        await axios.patch(SERVER+'/pedido/archive/'+order_id, {},authReturner())
+        window.location.reload()
         return 0;
     }
     //Eliminar/activar Usuario
-    function delUser (username: string, state: boolean) {
-        if(state) {
-            if(LOGS === "1") console.log("Usuario Activado: "+username)
-            
+    async function delUser (username: string, state: boolean) {
+        try {
+            if(state) {
+                if(LOGS === "1") console.log("Usuario Activado: "+username)
+                await axios.patch(SERVER+'/user/activar/'+username, {}, authReturner())
+            }
+            else{
+                if(LOGS === "1") console.log("Usuario elminado: "+username)
+                await axios.patch(SERVER+'/user/desactivar/'+username, {}, authReturner())
+            }
+            window.location.reload()
+        } catch (error) {
+            alert("Error a cambiar estado de usuario")
         }
-        else{
-            if(LOGS === "1") console.log("Usuario elminado: "+username)
-        }
-        
         return 0;
     }
     //Da de alta a un nuevo usuario
-    function addUser (user: IUser) {
+    async function addUser (user: IUser) {
         if(LOGS === "1") console.log("Nuevo usuario: ",user)
+        await axios.post(SERVER+'/user/register', user, authReturner())
+        window.location.reload()
         return 0
     }
 
@@ -247,6 +333,29 @@ export default function GlobalState (props: IPropsChildren) {
             }
         });
         
+    }
+
+    //Crea un nuevo pedido
+    async function addPedido (usuario_id: number, requester: string, service_id: number, client_id: number,
+        insumos: IInsumo[]
+    ) {
+        const ser: number = service_id
+        try {
+            const data: IPedidoRequest = {
+                usuario_id,
+                requester,
+                service_id: +ser,
+                client_id,
+                insumos
+            }
+            
+            if(LOGS) console.log("Order to create",data)
+            await axios.post(SERVER+'/pedido/add',data,authReturner())
+            alert("Pedido Creado!")
+            window.location.reload()
+        } catch (error) {
+            alert("Error al intentar crear pedido")
+        }
     }
 
     const innitialState: IGlobalContext = {
@@ -273,7 +382,8 @@ export default function GlobalState (props: IPropsChildren) {
         orderArchFn,
         delUser,
         addUser,
-        uniqPedido
+        uniqPedido,
+        addPedido
     }
 
 
@@ -294,24 +404,26 @@ interface IGlobalContext{
     pedidoDetail: IPedido,
     login: boolean,
     pedidos: IPedido[],
-    insumos: IInsumo[],
+    insumos: string[],
     sysUsers: IUser[],
     ccos: IServicio[],
     loginFn: (username: string) => void,
     logoutFn: () => void,
     sessionFn: () => void,
-    pedidosFn: (rol: number) => void,
+    pedidosFn: (rol: number, username: string) => void,
     insumosFn: () => void,
     ccosFn: () => void,
     sysUsersFn: () => void,
-    orderAproveFn: () => void,
-    orderRejectFn: () => void,
-    orderCancelFn: () => void,
+    orderAproveFn: (order_id: number) => void,
+    orderRejectFn: (order_id: number) => void,
+    orderCancelFn: (order_id: number) => void,
     orderEditFn: () => void,
-    orderDeliveredFn: () => void,
+    orderDeliveredFn: (order_id: number) => void,
     orderRepFn: () => void,
-    orderArchFn: () => void,
+    orderArchFn: (order_id: number) => void,
     delUser: (username: string, state: boolean) => void,
     addUser: (user: IUser) => void,
-    uniqPedido: (id: string, pedidos: IPedido[],empty: boolean) => void
+    uniqPedido: (id: string, pedidos: IPedido[],empty: boolean) => void,
+    addPedido: (user_id: number, requester: string, service_id: number, client_id: number,
+        insumos: IInsumo[]) => void
 }

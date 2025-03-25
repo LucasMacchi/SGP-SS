@@ -14,7 +14,8 @@ export default function UsersPagina () {
         first_name: '',
         last_name: '',
         activated: false,
-        rol : 0
+        rol : 0,
+        email: ''
     })
 
     const handleData = (data: string | number, prop: string) => {
@@ -42,7 +43,7 @@ export default function UsersPagina () {
         if(a) global?.delUser(usrnm, activated)
     }
 
-    const createUser = () => {
+    const createUser = async () => {
         global?.sysUsers.forEach(u => {
             if(u.username === newUser.username) {
                 alert("Usuario ya existe")
@@ -51,19 +52,21 @@ export default function UsersPagina () {
                     first_name: '',
                     last_name: '',
                     activated: false,
-                    rol : 0
+                    rol : 0,
+                    email: ''
                 })
                 return 0
             }
         });
-        if(newUser.username  && newUser.first_name && newUser.last_name && newUser.rol) {
+        if(newUser.username  && newUser.first_name && newUser.last_name && newUser.rol && newUser.email) {
             global?.addUser(newUser)
             setNewUser({
                 username: '',
                 first_name: '',
                 last_name: '',
                 activated: false,
-                rol : 0
+                rol : 0,
+                email: ''
             })
             alert('Nuevo Usuario dado de Alta')
         }
@@ -153,6 +156,11 @@ export default function UsersPagina () {
                 <h4 className="input-label-add-usr">Username:</h4>
                 <input type="text" name="usrnm" id="usrnm" className='data-div-texfield'
                 onChange={e => handleData(e.target.value, "username")} value={newUser.username}/>
+            </div>
+            <div className="data-div-add">
+                <h4 className="input-label-add-usr">Email:</h4>
+                <input type="text" name="email" id="email" className='data-div-texfield'
+                onChange={e => handleData(e.target.value, "email")} value={newUser.email}/>
             </div>
             <div className="data-div-add">
                 <h4 className="input-label-add-usr">Nombre:</h4>
