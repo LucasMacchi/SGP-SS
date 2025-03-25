@@ -146,7 +146,7 @@ export default function GlobalState (props: IPropsChildren) {
     }
 
     //Funcion para conseguir todos los pedidos
-    async function pedidosFn ( rol: number, username: string) {
+    async function pedidosFn ( rol: number) {
         if(LOGS === "1") console.log('ROL ',rol)
         if(MOCK === "1") {
             if(rol === rolesNum.encargado){
@@ -410,7 +410,7 @@ interface IGlobalContext{
     loginFn: (username: string) => void,
     logoutFn: () => void,
     sessionFn: () => void,
-    pedidosFn: (rol: number, username: string) => void,
+    pedidosFn: (rol: number) => void,
     insumosFn: () => void,
     ccosFn: () => void,
     sysUsersFn: () => void,

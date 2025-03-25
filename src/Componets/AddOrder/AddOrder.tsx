@@ -31,7 +31,7 @@ export default function AddOrder () {
         if(global) {
             if(global.insumos.length === 0) global?.insumosFn()
             if(global.ccos.length === 0) global?.ccosFn()
-            if(global.pedidos.length === 0 ) global.pedidosFn(global.user.rol, global.user.username)
+            if(global.pedidos.length === 0 ) global.pedidosFn(global.user.rol)
             setTimeout(() => {
                 setShowForm(true)
             }, waitTime);
