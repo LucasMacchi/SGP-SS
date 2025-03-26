@@ -3,7 +3,8 @@ import { JSX } from "react"
 export const rolesNum = {
     admin: 1,
     administrativo: 2,
-    encargado: 3
+    encargado: 3,
+    en_deposito: 4
 }
 
 export type TEstado = 'Pendiente' | 'Aprobado' | 'Cancelado' | 'Rechazado' | 'Entregado';
@@ -37,7 +38,7 @@ export interface IToken {
     usuario_id: number
 }
 export interface IPedido {
-    state: 'Pendiente' | 'Aprobado' | 'Cancelado' | 'Rechazado' | 'Entregado' | string,
+    state: 'Listo' | 'Pendiente' | 'Aprobado' | 'Cancelado' | 'Rechazado' | 'Entregado' | string,
     order_id: number,
     numero: string,
     date_aproved?: string | null,

@@ -4,6 +4,7 @@ import { IPedido, rolesNum } from '../../Utils/Interfaces'
 import "./Pagina.css"
 import dateParser from '../../Utils/dateParser'
 import { useNavigate } from 'react-router-dom'
+import lastMonth from '../../Utils/lastMonth'
 const use_logs = import.meta.env.VITE_USE_LOGS
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
@@ -17,14 +18,15 @@ export default function PaginaPedidos () {
     const [req, setReq] = useState('')
     const [dateStart, setDateStart] = useState('')
     const [dateEnd, setDateEnd] = useState('')
-
+    
     useEffect(() => {
         if(!global?.login) global?.sessionFn()
+            setDateStart(lastMonth())
     },[])
     useEffect(() => {
         setTimeout(() => {
             if(global){
-                if(global.pedidos.length === 0) global?.pedidosFn( global.user.rol, global.user.username)
+                if(global.pedidos.length === 0) global?.pedidosFn( global.user.rol)
                 if(global.ccos.length === 0 ) global.ccosFn()
             }
         }, waitTime);
@@ -33,10 +35,11 @@ export default function PaginaPedidos () {
     
     useEffect(() => {
         if(global?.pedidos) {
-            setFpedidos(global?.pedidos)
+            const date = new Date(lastMonth())
+            const arr = global.pedidos.filter(a => new Date(a.date_requested).getTime() >= date.getTime())
+            setFpedidos(arr)
         }
-    },[global?.pedidos])
-    
+    },[global?.pedidos])    
 
     const filterArray = () => {
         if(global?.pedidos){
@@ -86,10 +89,31 @@ export default function PaginaPedidos () {
         return d.day + '/'+d.month+'/'+d.year
     }
 
+    const colorChange = (state: string): string => {
+        switch(state) {
+            case 'Pendiente':
+                return 'pedido-component-yellow'
+            case 'Aprobado':
+                return 'pedido-component-green'
+            case 'Cancelado':
+                return 'pedido-component-red'
+            case 'Rechazado':
+                return 'pedido-component-red'
+            case 'Listo':
+                return 'pedido-component-green'
+            case 'Recibido':
+                return 'pedido-component-green'
+            case 'Entregado':
+                return 'pedido-component-neutral'
+            default:
+                return 'pedido-component'
+        }
+    }
     const displayPedidos = () => (
         fpedidos.map((p) => {
             return(
-                <div key={p.numero} className='pedido-component' 
+                <div key={p.numero} 
+                className={colorChange(p.state)} 
                 onClick={() => navigator('/pedidos/'+p.numero)}>
                     <h5>{"Nro: "+p.numero}</h5>
                     <h5>{displayDate(p.date_requested)}</h5>
@@ -98,12 +122,12 @@ export default function PaginaPedidos () {
             )
         })
     )
-
+/*
     const ccoSearch = (): Array<string> => {
         const ccoSet = new Set<string>(global?.ccos.map(p => p.service_id+'-'+p.service_des))
         const arr = Array.from(ccoSet)
         return arr
-    }
+    }*/
     const requesterSearch = (): Array<string> => {
         const reqSet = new Set<string>(global?.pedidos.map(p => p.requester))
         const arr = Array.from(reqSet)

@@ -20,7 +20,7 @@ function App() {
   }
 
   return (
-    <div>
+    <div className='app-div'>
       <img src="/logo_big.webp" alt="" className='logo-big-home'/>
       <h1 className='title-Homepage'>Sistema de Gestion de Pedidos</h1>
       <hr color='#3399ff'/>

@@ -34,7 +34,6 @@ export default function UsersPagina () {
         if(global?.sysUsers.length === 0) { 
             setTimeout(() => {
                 global?.sysUsersFn()
-                console.log("DO")
             }, waitTime);
         }
     },[])
@@ -80,6 +79,7 @@ export default function UsersPagina () {
         if(rol === rolesNum.admin) return 'Admin'
         else if(rol === rolesNum.administrativo) return 'Administrativo'
         else if(rol === rolesNum.encargado) return 'Encargado'
+        else if(rol === rolesNum.en_deposito) return 'Deposito'
         else return 'NaN'
     }
 
@@ -180,6 +180,7 @@ export default function UsersPagina () {
                     <option value={1}>Admin</option>
                     <option value={2}>Administrativo</option>
                     <option value={3}>Encargado</option>
+                    <option value={4}>Encargado de Deposito</option>
                 </select>
             </div>
                 <div className='div-btns'>

@@ -41,3 +41,18 @@
     height: 50px;
     width: 100px;
 }
+
+.btn-export {
+    color: white;
+    background-color: #3399ff;
+    border-color: #3399ff;
+    font-size: small;
+    height: 25px;
+}
+.btn-export-disable {
+    color: white;
+    background-color: #748da6;
+    border-color: #748da6;
+    font-size: small;
+    height: 25px;
+}

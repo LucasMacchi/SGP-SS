@@ -17,9 +17,6 @@ const MOCK = import.meta.env.VITE_USE_MOCK
 const LOGS = import.meta.env.VITE_USE_LOGS
 const SERVER = import.meta.env.VITE_SERVER
 
-console.log('MOCK STATUS: ', MOCK)
-console.log('MOCK LOGS: ', LOGS)
-
 const globalReducer = (state: IGlobalContext, action: IAction): IGlobalContext => {
     const {type, payload} = action
 
@@ -49,8 +46,8 @@ export default function GlobalState (props: IPropsChildren) {
 
     //Funcion para hacer login
     async function loginFn (username: string) {
-        let status1 = false
         if(MOCK === "1"){
+            let status1 = false
             usersMock.users.forEach(u => {
                 if(username === u.username){
                     status1 = true
@@ -180,7 +177,7 @@ export default function GlobalState (props: IPropsChildren) {
                     payload: pedidosFiltered
                 })
             }
-            else if(rol === rolesNum.admin || rol === rolesNum.administrativo){
+            else if(rol === rolesNum.admin || rol === rolesNum.administrativo || rol === rolesNum.en_deposito){
                 const pedidos: AxiosResponse<IPedido[]> = await axios.get(SERVER+'/pedido/all', authReturner())
                 console.log(pedidos)
                 dispatch({
@@ -245,32 +242,32 @@ export default function GlobalState (props: IPropsChildren) {
         }
     }
     //Aprueba pedido
-    async function orderAproveFn (order_id: number) {
+    async function orderAproveFn (order_id: number): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Aprobada")
         await axios.patch(SERVER+'/pedido/aprove/'+order_id, {},authReturner())
         window.location.reload()
-        return 0;
+        return true;
     }
     //Rechaza pedido
-    async function orderRejectFn (order_id: number) {
+    async function orderRejectFn (order_id: number): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Rechazada")
         await axios.patch(SERVER+'/pedido/reject/'+order_id, {},authReturner())
         window.location.reload()
-        return 0;
+        return true;
     }
     //Cancela pedido
-    async function orderCancelFn (order_id: number) {
+    async function orderCancelFn (order_id: number): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Cancelada")
         await axios.patch(SERVER+'/pedido/cancel/'+order_id, {},authReturner())
         window.location.reload()
-        return 0;
+        return true;
     }
     //Entrega pedido
-    async function orderDeliveredFn (order_id: number) {
+    async function orderDeliveredFn (order_id: number): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Entregada")
         await axios.patch(SERVER+'/pedido/delivered/'+order_id, {},authReturner())
         window.location.reload()
-        return 0;
+        return true;
     }
     //Edita pedido
     async function orderEditFn () {
@@ -278,16 +275,18 @@ export default function GlobalState (props: IPropsChildren) {
         return 0;
     }
     //Repetir pedido
-    async function orderRepFn () {
-        if(LOGS === "1") console.log("Orden a Editar")
-        return 0;
+    async function orderReadyFn (order_id: number): Promise<boolean> {
+        if(LOGS === "1") console.log("Orden Lista")
+        await axios.patch(SERVER+'/pedido/ready/'+order_id, {},authReturner())
+        window.location.reload()
+        return true;
     }
     //AArchivar pedido
-    async function orderArchFn (order_id: number) {
+    async function orderArchFn (order_id: number): Promise<boolean> {
         if(LOGS === "1") console.log("Orden a Archivar")
         await axios.patch(SERVER+'/pedido/archive/'+order_id, {},authReturner())
         window.location.reload()
-        return 0;
+        return true;
     }
     //Eliminar/activar Usuario
     async function delUser (username: string, state: boolean) {
@@ -378,7 +377,7 @@ export default function GlobalState (props: IPropsChildren) {
         orderCancelFn,
         orderDeliveredFn,
         orderEditFn,
-        orderRepFn,
+        orderReadyFn,
         orderArchFn,
         delUser,
         addUser,
@@ -419,11 +418,11 @@ interface IGlobalContext{
     orderCancelFn: (order_id: number) => void,
     orderEditFn: () => void,
     orderDeliveredFn: (order_id: number) => void,
-    orderRepFn: () => void,
     orderArchFn: (order_id: number) => void,
     delUser: (username: string, state: boolean) => void,
     addUser: (user: IUser) => void,
     uniqPedido: (id: string, pedidos: IPedido[],empty: boolean) => void,
     addPedido: (user_id: number, requester: string, service_id: number, client_id: number,
-        insumos: IInsumo[]) => void
+        insumos: IInsumo[]) => void,
+    orderReadyFn: (order_id: number) => void
 }

@@ -28,8 +28,45 @@
     background-color: #666666;
     color: white;
 }
-.pedido-component:hover {
-    background-color: #969696;
+.pedido-component-green {
+    max-width: 300px;
+    width: 300px;
+    display: flex;
+    justify-content: space-evenly;
+    background-color: #22d55b;
+    color: white;
+}
+.pedido-component-g {
+    max-width: 300px;
+    width: 300px;
+    display: flex;
+    justify-content: space-evenly;
+    background-color: #22d55b;
+    color: white;
+}
+.pedido-component-red {
+    max-width: 300px;
+    width: 300px;
+    display: flex;
+    justify-content: space-evenly;
+    background-color: #ff0000;
+    color: white;
+}
+.pedido-component-yellow {
+    max-width: 300px;
+    width: 300px;
+    display: flex;
+    justify-content: space-evenly;
+    background-color: #c4c42a;
+    color: white;
+}
+.pedido-component-neutral {
+    max-width: 300px;
+    width: 300px;
+    display: flex;
+    justify-content: space-evenly;
+    background-color: #3399ff;
+    color: white;
 }
 
 .pedido-component, div {

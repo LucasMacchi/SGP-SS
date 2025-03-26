@@ -6,6 +6,7 @@ import { IPedido, rolesNum } from '../../Utils/Interfaces'
 import dbDateParser from '../../Utils/dbDateParser'
 
 //const use_logs = import.meta.env.VITE_USE_LOGS
+const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
 export default function DetailsPage () {
     
@@ -14,6 +15,7 @@ export default function DetailsPage () {
     const id = params.orderId
     const global = useContext(GlobalContext)
     const [order, setOrder] = useState<IPedido | null>(null)
+    const [loading, setLoad] = useState(false)
 
     useEffect(() => {
         if(global && global.pedidos.length > 0 && id){
@@ -32,46 +34,144 @@ export default function DetailsPage () {
         }
     },[])
 
+    const rejectFn = (order_id: number) => {
+        setLoad(true)
+        global?.orderRejectFn(order_id)
+        setInterval(() => {
+            setLoad(false)
+        }, waitTime);
+    }
+    const aproveFn = (order_id: number) => {
+        setLoad(true)
+        global?.orderAproveFn(order_id)
+        setInterval(() => {
+            setLoad(false)
+        }, waitTime);
+    }
+    const cancelFn = (order_id: number) => {
+        setLoad(true)
+        global?.orderCancelFn(order_id)
+        setInterval(() => {
+            setLoad(false)
+        }, waitTime);
+    }
+    const deliverFn = (order_id: number) => {
+        setLoad(true)
+        global?.orderDeliveredFn(order_id)
+        setInterval(() => {
+            setLoad(false)
+        }, waitTime);
+    }
+    const readyFn = (order_id: number) => {
+        setLoad(true)
+        global?.orderReadyFn(order_id)
+        setInterval(() => {
+            setLoad(false)
+        }, waitTime);
+    }
+    const archiveFn = (order_id: number) => {
+        setLoad(true)
+        global?.orderArchFn(order_id)
+        setInterval(() => {
+            setLoad(false)
+        }, waitTime);
+    }
+
     const btnDisplay = () => {
-        if(global?.user.rol === rolesNum.encargado 
-            && order?.state === 'Pendiente'){
+        console.log('LOAD ',loading)
+        if(loading){
             return(
-                <div className='div-btns'>
-                    <button className='btn-negative' onClick={() => global.orderCancelFn(order.order_id)}>CANCELAR</button>
-                </div>
+                <h3 className='title-Homepage'>Cargando...</h3>
             )
         }
-        else if (global?.user.rol === rolesNum.encargado 
-            && order?.state === 'Aprobado') {
-            return(
-                <div className='div-btns'>
-                    <button className='btn-accept' onClick={() => global.orderDeliveredFn(order.order_id)}>RECIBIDO</button>
-                </div>
-            )
-        }
-        else if (global?.user.rol === rolesNum.encargado) {
-            return(
-                <div className='div-btns'>
-                    <button className='btn-neutral' onClick={() => navigator('/add/'+id)}>REPETIR</button>
-                </div>
-            )
-        } 
-        else if(global?.user.rol === rolesNum.administrativo 
-            || global?.user.rol === rolesNum.admin 
-            && order?.state === 'Pendiente') {
-            return(
-                <div className='div-btns'>
-                    <button className='btn-accept' onClick={() => global.orderAproveFn(order ? order.order_id : 0)}>APROBAR</button>
-                    <button className='btn-negative' onClick={() => global.orderRejectFn(order? order.order_id : 0)}>RECHAZAR</button>
-                </div>
-            )
+        else if(global?.user.rol === rolesNum.encargado) {
+            switch(order?.state){
+                case 'Pendiente':
+                    return(
+                        <div className='div-btns'>
+                            <button className='btn-negative' onClick={() => rejectFn(order.order_id)}>CANCELAR</button>
+                        </div>
+                    )
+                case 'Aprobado':
+                    return(
+                        <div className='div-btns'>
+                            <h3 className='title-Homepage'>Esperando a que el pedido este listo</h3>
+                        </div>
+                    )
+                case 'Listo':
+                    return (
+                        <div className='div-btns'>
+                            <button className='btn-accept' onClick={() => deliverFn(order.order_id)}>RECIBIDO</button>
+                        </div>
+                    )
+                default:
+                    return (
+                        <div className='div-btns'>
+                            <button className='btn-neutral' onClick={() => navigator('/add/'+id)}>REPETIR</button>
+                        </div>
+                    )
+
+            }
         }
         else if(global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin) {
-            return(
-                <div className='div-btns'>
-                    <button className='btn-neutral' onClick={() => global.orderArchFn(order? order.order_id : 0)}>ARCHIVAR</button>
-                </div>
-            ) 
+            switch(order?.state){
+                case 'Pendiente':
+                    return(
+                        <div className='div-btns'>
+                            <button className='btn-accept' onClick={() => aproveFn(order ? order.order_id : 0)}>APROBAR</button>
+                            <button className='btn-negative' onClick={() => rejectFn(order? order.order_id : 0)}>RECHAZAR</button>
+                        </div>
+                    )
+                case 'Aprobado':
+                    return(
+                        <div className='div-btns'>
+                            <h3 className='title-Homepage'>Pedido preparandose</h3>
+                        </div>
+                    )
+                case 'Listo':
+                    return (
+                        <div className='div-btns'>
+                            <h3 className='title-Homepage'>Pedido listo, esperando entrega</h3>
+                        </div>
+                    )
+                default:
+                    return(
+                        <div className='div-btns'>
+                            <button className='btn-neutral' onClick={() => archiveFn(order? order.order_id : 0)}>ARCHIVAR</button>
+                        </div>
+                    ) 
+
+            }
+        }
+        else if(global?.user.rol === rolesNum.en_deposito){
+            switch(order?.state){
+                case 'Pendiente':
+                    return(
+                        <div className='div-btns'>
+                            <h3 className='title-Homepage'>Esperando aprobacion del pedido</h3>
+                        </div>
+                    )
+                case 'Aprobado':
+                    return(
+                        <div className='div-btns'>
+                            <button className='btn-accept' onClick={() => readyFn(order ? order.order_id : 0)}>LISTO</button>
+                            <button className='btn-negative' onClick={() => cancelFn(order? order.order_id : 0)}>CANCELAR</button>
+                        </div>
+                    )
+                case 'Listo':
+                    return (
+                        <div className='div-btns'>
+                            <h3 className='title-Homepage'>Pedido listo, esperando entrega</h3>
+                        </div>
+                    )
+                default:
+                    return(
+                        <div className='div-btns'>
+                            <h3 className='title-Homepage'>Pedido entregado</h3>
+                        </div>
+                    ) 
+
+            }
         }
         else navigator('/')
     }
@@ -133,6 +233,13 @@ export default function DetailsPage () {
                 <h1 className='title-Homepage' >
                     {'Pedido Nro: '+id}
                 </h1>
+            </div>
+            <div>
+                <button disabled={global?.user.rol === 1 ? false : true}
+                className={global?.user.rol === 1 ? 'btn-export': 'btn-export-disable'}>
+                    Exportar txt
+                    </button>
+                <button className='btn-export'>Exportar pdf</button>
             </div>
             <hr color='#3399ff' className='hr-line'/>
             {dataDisplay()}
