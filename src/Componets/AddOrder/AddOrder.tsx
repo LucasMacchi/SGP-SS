@@ -19,6 +19,7 @@ export default function AddOrder () {
     const [insumos, setInsumos] = useState('')
     const [amount, setAmount] = useState(0)
     const [showForm, setShowForm] = useState(false)
+    const [loading, setLoad] = useState(false)
     const [newOrder, setOrder] = useState<IAddPedido>({
         requester: '',
         service_id: 0,
@@ -75,10 +76,13 @@ export default function AddOrder () {
     }
 
     const createOrder = async () => {
+        setLoad(true)
         const token = localStorage.getItem('jwToken')
         const dataUser: IToken = jwtDecode(token ?? "")
         global?.addPedido(dataUser.usuario_id, dataUser.user, newOrder.service_id, clientSearcher(global.ccos, newOrder.service_id), newOrder.insumos)
-        
+        setInterval(() => {
+            setLoad(false)
+        }, waitTime);
     }
 
     const deleteInsumoRow = (index: number, insumo: string) => {
@@ -144,10 +148,13 @@ export default function AddOrder () {
                             ))}
                         </tbody>
                     </table>
-                    <button className='btn-big-forms' disabled={btn}
-                    onClick={() => createOrder()}>
-                        Nuevo Pedido
-                    </button>
+                    {loading ? <h3 className='title-Homepage'>Cargando...</h3> : 
+                        <button className='btn-big-forms' disabled={btn}
+                        onClick={() => createOrder()}>
+                            Nuevo Pedido
+                        </button>
+                    }
+
                 </div>
             )
         }
