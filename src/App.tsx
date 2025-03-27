@@ -1,6 +1,9 @@
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from './Context/GlobalContext'
 import './App.css'
+
+console.log('MOCKS '+import.meta.env.VITE_USE_MOCK)
+
 function App() {
 
   const [username, setUsername] = useState('')
