@@ -355,6 +355,12 @@ export default function GlobalState (props: IPropsChildren) {
         }
     }
 
+    async function pingServer() {
+        const pingRes: AxiosResponse<string> = await axios.get(SERVER+'/data/ping')
+        if(pingRes.data) return pingRes.data + ' / '+SERVER     
+        else return 'Cannot ping the server '+SERVER 
+    }
+
     const innitialState: IGlobalContext = {
         user: {username: '', first_name: '', last_name: '', rol: 3, activated: false},
         pedidoDetail: {order_id: 0, requester: '', date_requested: '', insumos: [], state: '', service_id: 0, client_id: 0, archive: false, numero: '', user_id: 0},
@@ -380,7 +386,8 @@ export default function GlobalState (props: IPropsChildren) {
         delUser,
         addUser,
         uniqPedido,
-        addPedido
+        addPedido,
+        pingServer
     }
 
 
@@ -422,5 +429,6 @@ interface IGlobalContext{
     uniqPedido: (id: string, pedidos: IPedido[],empty: boolean) => void,
     addPedido: (user_id: number, requester: string, service_id: number, client_id: number,
         insumos: IInsumo[]) => void,
-    orderReadyFn: (order_id: number) => void
+    orderReadyFn: (order_id: number) => void,
+    pingServer: () => void
 }

@@ -3,6 +3,7 @@ import { GlobalContext } from './Context/GlobalContext'
 import './App.css'
 
 console.log('MOCKS '+import.meta.env.VITE_USE_MOCK)
+const LOGS = import.meta.env.VITE_USE_LOGS
 
 function App() {
 
@@ -11,10 +12,15 @@ function App() {
 
   useEffect( () => {
     global?.sessionFn()
+    if(LOGS) ping()
   },[])
 
   const handleUsername = (event: any) => {
     setUsername(event.target.value)
+  }
+
+  const ping = async () => {
+    console.log(await global?.pingServer())
   }
 
   const loginAction = () => {
