@@ -6,7 +6,7 @@ import { IPedido, rolesNum } from '../../Utils/Interfaces'
 import dbDateParser from '../../Utils/dbDateParser'
 
 //const use_logs = import.meta.env.VITE_USE_LOGS
-const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
+
 
 export default function DetailsPage () {
     
@@ -23,13 +23,11 @@ export default function DetailsPage () {
             console.log(global?.pedidos)
             global.pedidos.forEach(p => {
                 if(p.numero === id) {
-                    console.log(p)
                     setOrder(p)
                 }
             });
         }else{
-            console.log(id)
-            console.log(global?.pedidos)
+
             navigator('/')
         }
     },[])
@@ -37,44 +35,28 @@ export default function DetailsPage () {
     const rejectFn = (order_id: number) => {
         setLoad(true)
         global?.orderRejectFn(order_id)
-        setInterval(() => {
-            setLoad(false)
-        }, waitTime);
+
     }
     const aproveFn = (order_id: number) => {
         setLoad(true)
         global?.orderAproveFn(order_id)
-        setInterval(() => {
-            setLoad(false)
-        }, waitTime);
+
     }
     const cancelFn = (order_id: number) => {
         setLoad(true)
         global?.orderCancelFn(order_id)
-        setInterval(() => {
-            setLoad(false)
-        }, waitTime);
     }
     const deliverFn = (order_id: number) => {
         setLoad(true)
         global?.orderDeliveredFn(order_id)
-        setInterval(() => {
-            setLoad(false)
-        }, waitTime);
     }
     const readyFn = (order_id: number) => {
         setLoad(true)
         global?.orderReadyFn(order_id)
-        setInterval(() => {
-            setLoad(false)
-        }, waitTime);
     }
     const archiveFn = (order_id: number) => {
         setLoad(true)
         global?.orderArchFn(order_id)
-        setInterval(() => {
-            setLoad(false)
-        }, waitTime);
     }
 
     const btnDisplay = () => {
@@ -89,7 +71,7 @@ export default function DetailsPage () {
                 case 'Pendiente':
                     return(
                         <div className='div-btns'>
-                            <button className='btn-negative' onClick={() => rejectFn(order.order_id)}>CANCELAR</button>
+                            <button className='btn-negative' onClick={() => cancelFn(order.order_id)}>CANCELAR</button>
                         </div>
                     )
                 case 'Aprobado':
@@ -150,6 +132,18 @@ export default function DetailsPage () {
                         <div className='div-btns'>
                             <h3 className='title-Homepage'>Esperando aprobacion del pedido</h3>
                         </div>
+                    )
+                    case 'Cancelado':
+                        return(
+                            <div className='div-btns'>
+                                <h3 className='title-Homepage'>Pedido Cancelado</h3>
+                            </div>
+                        )
+                    case 'Rechazado':
+                        return(
+                            <div className='div-btns'>
+                                <h3 className='title-Homepage'>Pedido Rechazado</h3>
+                            </div>
                     )
                 case 'Aprobado':
                     return(
