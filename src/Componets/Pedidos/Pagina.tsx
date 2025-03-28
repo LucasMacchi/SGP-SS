@@ -154,9 +154,16 @@ export default function PaginaPedidos () {
                 </div>
             </div>
             <hr color='#3399ff' className='hr-line'/>
-            <button className='btn-big' onClick={() => navigator('/add')}>
-                Nuevo Pedido
-            </button>
+            <div>
+                <button className='btn-big' onClick={() => navigator('/add')}>
+                    Nuevo Pedido
+                </button>
+            </div>
+            <div>
+                <button className='btn-big' onClick={() => navigator('/preterminado')}>
+                    Pedido Preterminado
+                </button>
+            </div>
             <hr color='#3399ff' className='hr-line'/>
             <div className='div-filter'>
                 <div>

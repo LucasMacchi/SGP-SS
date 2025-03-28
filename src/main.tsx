@@ -9,6 +9,7 @@ import AdminPagina from './Componets/Admin/AdminPage.tsx'
 import AddOrder from './Componets/AddOrder/AddOrder.tsx'
 import DetailsPage from './Componets/Details/DetailsPage.tsx'
 import UsersPagina from './Componets/Users/Users.tsx'
+import DefaultOrder from './Componets/DefaultOrder/Default.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -17,6 +18,7 @@ createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path='/' element={<App />}></Route>
           <Route path='/pedidos' element={<PaginaPedidos />} />
+          <Route path='/preterminado' element={<DefaultOrder />} />
           <Route path='/pedidos/:orderId' element={<DetailsPage />}/>
           <Route path='/admin' element={<AdminPagina/>}/>
           <Route path='/admin/users' element={<UsersPagina/>}/>

@@ -3,7 +3,7 @@ import { createContext, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
 import { IAction, IInsumo, IPedido, IPedidoRequest, IPropsChildren, IResponseInsumo, IServicio, IToken, IUser, rolesNum } from "../Utils/Interfaces"
 import ac from "./Actions"
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode } from "jwt-decode"; 
 //Mocks
 import usersMock from "../Mocks/usersMock.json"
 import pedidosMock from "../Mocks/pedidosMocks.json"
@@ -83,11 +83,13 @@ export default function GlobalState (props: IPropsChildren) {
         try {
             localStorage.removeItem('jwToken')
             localStorage.removeItem('usrname')
+            navigation('/')
             window.location.reload()
         } catch (error) {
             console.log(error)
             localStorage.removeItem('jwToken')
             localStorage.removeItem('usrname')
+            navigation('/')
             window.location.reload()
         }
     }
@@ -243,6 +245,7 @@ export default function GlobalState (props: IPropsChildren) {
     async function orderAproveFn (order_id: number): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Aprobada")
         await axios.patch(SERVER+'/pedido/aprove/'+order_id, {},authReturner())
+        navigation('/')
         window.location.reload()
         return true;
     }
@@ -250,6 +253,7 @@ export default function GlobalState (props: IPropsChildren) {
     async function orderRejectFn (order_id: number): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Rechazada")
         await axios.patch(SERVER+'/pedido/reject/'+order_id, {},authReturner())
+        navigation('/')
         window.location.reload()
         return true;
     }
@@ -257,6 +261,7 @@ export default function GlobalState (props: IPropsChildren) {
     async function orderCancelFn (order_id: number): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Cancelada")
         await axios.patch(SERVER+'/pedido/cancel/'+order_id, {},authReturner())
+        navigation('/')
         window.location.reload()
         return true;
     }
@@ -264,6 +269,7 @@ export default function GlobalState (props: IPropsChildren) {
     async function orderDeliveredFn (order_id: number): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Entregada")
         await axios.patch(SERVER+'/pedido/delivered/'+order_id, {},authReturner())
+        navigation('/')
         window.location.reload()
         return true;
     }
@@ -276,6 +282,7 @@ export default function GlobalState (props: IPropsChildren) {
     async function orderReadyFn (order_id: number): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Lista")
         await axios.patch(SERVER+'/pedido/ready/'+order_id, {},authReturner())
+        navigation('/')
         window.location.reload()
         return true;
     }
@@ -283,6 +290,7 @@ export default function GlobalState (props: IPropsChildren) {
     async function orderArchFn (order_id: number): Promise<boolean> {
         if(LOGS === "1") console.log("Orden a Archivar")
         await axios.patch(SERVER+'/pedido/archive/'+order_id, {},authReturner())
+        navigation('/')
         window.location.reload()
         return true;
     }
@@ -297,6 +305,7 @@ export default function GlobalState (props: IPropsChildren) {
                 if(LOGS === "1") console.log("Usuario elminado: "+username)
                 await axios.patch(SERVER+'/user/desactivar/'+username, {}, authReturner())
             }
+            navigation('/')
             window.location.reload()
         } catch (error) {
             alert("Error a cambiar estado de usuario")
@@ -307,6 +316,7 @@ export default function GlobalState (props: IPropsChildren) {
     async function addUser (user: IUser) {
         if(LOGS === "1") console.log("Nuevo usuario: ",user)
         await axios.post(SERVER+'/user/register', user, authReturner())
+        navigation('/')
         window.location.reload()
         return 0
     }
@@ -349,6 +359,7 @@ export default function GlobalState (props: IPropsChildren) {
             if(LOGS) console.log("Order to create",data)
             await axios.post(SERVER+'/pedido/add',data,authReturner())
             alert("Pedido Creado!")
+            navigation('/')
             window.location.reload()
         } catch (error) {
             alert("Error al intentar crear pedido")
