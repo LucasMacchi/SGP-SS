@@ -243,7 +243,7 @@ export default function DetailsPage () {
                     {'Pedido Nro: '+id}
                 </h1>
             </div>
-            <div>
+            <div className='export-div'>
                 <button disabled={global?.user.rol === 1 ? false : true}
                 className={global?.user.rol === 1 ? 'btn-export': 'btn-export-disable'}>
                     Exportar txt

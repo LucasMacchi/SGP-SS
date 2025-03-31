@@ -2,6 +2,9 @@
     color: #666666;
     text-align: left;
 }
+.export-div {
+    display: none;
+}  
 .date-div, tr, th {
     border: 1px solid;
     padding: 4px;
