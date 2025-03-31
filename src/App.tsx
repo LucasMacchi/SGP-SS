@@ -35,7 +35,7 @@ function App() {
       <hr color='#3399ff'/>
       <h2 className='logintext'>Ingrese el Usuario</h2>
       <div className='div-login-input'>
-        <input type='text' id='username' size={20} className='textfield-login'
+        <input type='password' id='username' size={20} className='textfield-login'
         value={username} onChange={e => handleUsername(e)}/>
       </div>
       <button className='btn-small' onClick={loginAction}>Ingresar</button>
