@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
-import { IInsumo, IPedido, IServicio } from '../../Utils/Interfaces'
+import { /*IInsumo,*/ IServicio } from '../../Utils/Interfaces'
 
 export default function DefaultOrder () {
 
@@ -36,7 +36,7 @@ export default function DefaultOrder () {
 
         const addIns = () => {
             if(amount && insumos) {
-                const insu: IInsumo = {insumo_des: insumos, amount: amount ? amount : 1}
+                //const insu: IInsumo = {insumo_des: insumos, amount: amount ? amount : 1}
                 setAmount(0)
                 setInsumos('')
             }
