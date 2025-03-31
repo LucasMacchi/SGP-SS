@@ -4,8 +4,6 @@ import { GlobalContext } from '../../Context/GlobalContext'
 import { useNavigate } from 'react-router-dom'
 import { rolesNum } from '../../Utils/Interfaces'
 
-//const use_logs = import.meta.env.VITE_USE_LOGS
-
 export default function AdminPagina () {
 
     const global = useContext(GlobalContext)

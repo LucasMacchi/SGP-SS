@@ -6,9 +6,7 @@ import { IInsumo, IAddPedido, IToken } from '../../Utils/Interfaces'
 import clientSearcher from "../../Utils/clientSearcher"
 import { jwtDecode } from "jwt-decode"
 
-//const LOGS = import.meta.env.VITE_USE_LOGS
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
-
 
 export default function AddOrder () {
     const navigator = useNavigate()
@@ -79,10 +77,6 @@ export default function AddOrder () {
         }
         else alert('Error a agregar Insumo.')
     }
-    const delIns = () => {
-        newOrder.insumos.pop()
-        setOrder({...newOrder})
-    }
 
     const createOrder = async () => {
         setLoad(true)
@@ -102,9 +96,8 @@ export default function AddOrder () {
     }
 
     const changeAmount = (nm: number, index: number) => {
-        const newA = prompt('Ingrese el nuevo monto: ',nm.toString())
+        const newA = prompt('Ingrese la nueva cantidad: ',nm.toString()) ?? nm.toString()
         if(newA && parseInt(newA)) {
-            console.log('aaa')
             const newAmNum: number = parseInt(newA)
             newOrder.insumos[index].amount = newAmNum
             setOrder({...newOrder})
@@ -151,10 +144,7 @@ export default function AddOrder () {
                         <input type="text" id='otherins' className="data-div-select" 
                         onChange={(e) => setInsumos2(e.target.value)} value={insumos2}/>
                     </div>
-                    <div className="data-div-btn-insumo">
-                        <button className='data-del-btn-insumo' onClick={() => delIns()}>
-                            Eliminar
-                        </button>   
+                    <div className="data-div-btn-insumo">  
                         <button className='data-add-btn-insumo' onClick={() => addIns()}>
                             Agregar
                         </button>

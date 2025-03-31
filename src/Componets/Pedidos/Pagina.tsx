@@ -122,12 +122,6 @@ export default function PaginaPedidos () {
             )
         })
     )
-/*
-    const ccoSearch = (): Array<string> => {
-        const ccoSet = new Set<string>(global?.ccos.map(p => p.service_id+'-'+p.service_des))
-        const arr = Array.from(ccoSet)
-        return arr
-    }*/
     const requesterSearch = (): Array<string> => {
         const reqSet = new Set<string>(global?.pedidos.map(p => p.requester))
         const arr = Array.from(reqSet)
