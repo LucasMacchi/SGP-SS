@@ -16,7 +16,7 @@ export default function DetailsPage () {
     const global = useContext(GlobalContext)
     const [order, setOrder] = useState<IPedido | null>(null)
     const [loading, setLoad] = useState(false)
-    const [details, setDetails] = useState<number[]>([])
+    const [details, _setDetails] = useState<number[]>([])
 
     useEffect(() => {
         if(global && global.pedidos.length > 0 && id){
