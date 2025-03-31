@@ -134,6 +134,7 @@ export default function PaginaPedidos () {
         return arr
     }
 
+    /*
     const defaultBtn = () => (
         <div>
             <button className='btn-big' onClick={() => navigator('/preterminado')}>
@@ -141,6 +142,7 @@ export default function PaginaPedidos () {
             </button>
         </div>
     )
+        */
 
     return(
         <div >
