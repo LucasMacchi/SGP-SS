@@ -134,6 +134,16 @@ export default function PaginaPedidos () {
         return arr
     }
 
+    /*
+    const defaultBtn = () => (
+        <div>
+            <button className='btn-big' onClick={() => navigator('/preterminado')}>
+                Pedido Preterminado
+            </button>
+        </div>
+    )
+        */
+
     return(
         <div >
             <img src="/logo_big.webp" alt="" 
@@ -154,9 +164,13 @@ export default function PaginaPedidos () {
                 </div>
             </div>
             <hr color='#3399ff' className='hr-line'/>
-            <button className='btn-big' onClick={() => navigator('/add')}>
-                Nuevo Pedido
-            </button>
+            <div>
+                <button className='btn-big' onClick={() => navigator('/add')}>
+                    Nuevo Pedido
+                </button>
+            </div>
+            {/*defaultBtn()*/}
+
             <hr color='#3399ff' className='hr-line'/>
             <div className='div-filter'>
                 <div>

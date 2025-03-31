@@ -79,7 +79,7 @@ export interface IUser {
 export interface IServicio {
     service_id: number,
     client_id: number,
-    service_des: number
+    service_des: string
 }
 
 export interface IPedidoRequest {
