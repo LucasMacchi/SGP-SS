@@ -242,9 +242,13 @@ export default function GlobalState (props: IPropsChildren) {
         }
     }
     //Aprueba pedido
-    async function orderAproveFn (order_id: number): Promise<boolean> {
+    async function orderAproveFn (order_id: number, detailsDel?: number[]): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Aprobada")
-        await axios.patch(SERVER+'/pedido/aprove/'+order_id, {},authReturner())
+            const detailsToDelete = {
+                details: detailsDel
+            }
+            console.log(detailsDel)
+        await axios.patch(SERVER+'/pedido/aprove/'+order_id, detailsToDelete,authReturner())
         navigation('/')
         window.location.reload()
         return true;
@@ -281,7 +285,8 @@ export default function GlobalState (props: IPropsChildren) {
     //Repetir pedido
     async function orderReadyFn (order_id: number): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Lista")
-        await axios.patch(SERVER+'/pedido/ready/'+order_id, {},authReturner())
+
+        await axios.patch(SERVER+'/pedido/ready/'+order_id, {}, authReturner())
         navigation('/')
         window.location.reload()
         return true;
@@ -429,7 +434,7 @@ interface IGlobalContext{
     insumosFn: () => void,
     ccosFn: () => void,
     sysUsersFn: () => void,
-    orderAproveFn: (order_id: number) => void,
+    orderAproveFn: (order_id: number, detailsDel?: number[]) => void,
     orderRejectFn: (order_id: number) => void,
     orderCancelFn: (order_id: number) => void,
     orderEditFn: () => void,

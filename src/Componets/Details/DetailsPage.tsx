@@ -16,6 +16,7 @@ export default function DetailsPage () {
     const global = useContext(GlobalContext)
     const [order, setOrder] = useState<IPedido | null>(null)
     const [loading, setLoad] = useState(false)
+    const [details, setDetails] = useState<number[]>([])
 
     useEffect(() => {
         if(global && global.pedidos.length > 0 && id){
@@ -24,6 +25,7 @@ export default function DetailsPage () {
             global.pedidos.forEach(p => {
                 if(p.numero === id) {
                     setOrder(p)
+                    console.log(p.insumos)
                 }
             });
         }else{
@@ -32,6 +34,10 @@ export default function DetailsPage () {
         }
     },[])
 
+    useEffect(() => {
+        console.log(details)
+    },[details])
+
     const rejectFn = (order_id: number) => {
         setLoad(true)
         global?.orderRejectFn(order_id)
@@ -39,7 +45,7 @@ export default function DetailsPage () {
     }
     const aproveFn = (order_id: number) => {
         setLoad(true)
-        global?.orderAproveFn(order_id)
+        global?.orderAproveFn(order_id, details)
 
     }
     const cancelFn = (order_id: number) => {
@@ -59,8 +65,17 @@ export default function DetailsPage () {
         global?.orderArchFn(order_id)
     }
 
+    const deleteInsumoRow = (index: number, insumo: string, details_id: number | undefined) => {
+        if(order && order.insumos.length > 1 && order.state === 'Pendiente' && global?.user.rol === rolesNum.administrativo && details_id) {
+            if(confirm('¿Quiere eliminar el insumo '+insumo+ "?")){
+                order.insumos.splice(index, 1)
+                setOrder({...order})
+                details.push(details_id)
+            }
+        }
+    }
+
     const btnDisplay = () => {
-        console.log('LOAD ',loading)
         if(loading){
             return(
                 <h3 className='title-Homepage'>Cargando...</h3>
@@ -201,8 +216,8 @@ export default function DetailsPage () {
                                 <th>Insumo</th>
                                 <th>Cantidad</th>
                             </tr>
-                            {order.insumos.map((i) => (
-                                <tr key={i.cod_insumo}>
+                            {order.insumos.map((i, index) => (
+                                <tr key={i.cod_insumo} className='data-div-insumo-name-row' onClick={() => deleteInsumoRow(index, i.insumo_des, i.detail_id)}>
                                     <th>{i.insumo_des}</th>
                                     <th>{i.amount}</th>
                                 </tr>

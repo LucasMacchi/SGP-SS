@@ -95,12 +95,10 @@ export default function AddOrder () {
     }
 
     const deleteInsumoRow = (index: number, insumo: string) => {
-        
         if(confirm('¿Quiere eliminar el insumo '+insumo+ "?")){
             newOrder.insumos.splice(index, 1)
             setOrder({...newOrder})
         }
-
     }
 
     const changeAmount = (nm: number, index: number) => {
