@@ -5,9 +5,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { IPedido, rolesNum } from '../../Utils/Interfaces'
 import dbDateParser from '../../Utils/dbDateParser'
 
-//const use_logs = import.meta.env.VITE_USE_LOGS
-
-
 export default function DetailsPage () {
     
     const navigator = useNavigate()
@@ -20,12 +17,9 @@ export default function DetailsPage () {
 
     useEffect(() => {
         if(global && global.pedidos.length > 0 && id){
-            console.log(id)
-            console.log(global?.pedidos)
             global.pedidos.forEach(p => {
                 if(p.numero === id) {
                     setOrder(p)
-                    console.log(p.insumos)
                 }
             });
         }else{
@@ -33,10 +27,6 @@ export default function DetailsPage () {
             navigator('/')
         }
     },[])
-
-    useEffect(() => {
-        console.log(details)
-    },[details])
 
     const rejectFn = (order_id: number) => {
         setLoad(true)
@@ -192,6 +182,15 @@ export default function DetailsPage () {
         });
         return srv
     }
+
+    const classChange = (): string => {
+        if(global?.user.rol === 2 || global?.user.rol === 1){
+            if(order?.state === 'Pendiente' && order.insumos.length > 1) return 'data-div-insumo-name-row'
+            else return ''
+        }
+        else return ''
+    }
+
     const dataDisplay = () => {
         if(order) {
             return(
@@ -217,7 +216,7 @@ export default function DetailsPage () {
                                 <th>Cantidad</th>
                             </tr>
                             {order.insumos.map((i, index) => (
-                                <tr key={i.cod_insumo} className='data-div-insumo-name-row' onClick={() => deleteInsumoRow(index, i.insumo_des, i.detail_id)}>
+                                <tr key={i.cod_insumo} className={classChange()} onClick={() => deleteInsumoRow(index, i.insumo_des, i.detail_id)}>
                                     <th>{i.insumo_des}</th>
                                     <th>{i.amount}</th>
                                 </tr>

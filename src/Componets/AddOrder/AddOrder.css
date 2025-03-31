@@ -36,7 +36,7 @@
 }
 .data-div-btn-insumo {
     display: flex;
-    justify-content: end;
+    justify-content: center;
 }
 .data-div-insumo-name-row:hover {
     background-color: rgb(150, 148, 148);

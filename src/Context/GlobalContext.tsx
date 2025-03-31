@@ -100,7 +100,6 @@ export default function GlobalState (props: IPropsChildren) {
             if(MOCK === "1"){
                 usersMock.users.forEach(u => {
                     if(u.username === localStorage.getItem('usrname')){
-                        console.log("USER: ",u)
                         dispatch({
                             payload: {username: u.username, first_name: u.first_name, last_name: u.last_name, rol: u.rol},
                             type: ac.GET_USER
@@ -162,14 +161,15 @@ export default function GlobalState (props: IPropsChildren) {
                 })
                 if(LOGS === "1") console.log("Pedidos ",pedidosMock.pedidos)
             }
-            else console.log("No role")
+            else {
+                if(LOGS === "1") console.log("No role")
+            }
 
         }
         else {
             const token = localStorage.getItem('jwToken')
             const dataUser: IToken = jwtDecode(token ?? "")
             if(rol === rolesNum.encargado){
-                console.log("USERNER ",dataUser.user)
                 const pedidos: AxiosResponse<IPedido[]> = await axios.get(SERVER+'/pedido/all', authReturner())
                 const pedidosFiltered = pedidos.data.filter(p => p.requester === dataUser.user)
                 dispatch({
@@ -234,7 +234,6 @@ export default function GlobalState (props: IPropsChildren) {
         }
         else {
             const users: AxiosResponse<IUser[]> = await axios.get(SERVER+'/user/all',authReturner())
-            console.log("USERS ",users)
             dispatch({
                 type: ac.GET_ALL_USERS,
                 payload: users.data
@@ -247,7 +246,6 @@ export default function GlobalState (props: IPropsChildren) {
             const detailsToDelete = {
                 details: detailsDel
             }
-            console.log(detailsDel)
         await axios.patch(SERVER+'/pedido/aprove/'+order_id, detailsToDelete,authReturner())
         navigation('/')
         window.location.reload()
