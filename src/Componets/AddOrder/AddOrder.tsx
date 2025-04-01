@@ -135,7 +135,7 @@ export default function AddOrder () {
                             ))
                         }
                         </select>
-                        <input type="number" id='amount' defaultValue={0}
+                        <input type="number" id='amount' min={1} defaultValue={1}
                         value={amount} onChange={(e) => setAmount(parseInt(e.target.value))}
                         className="data-div-textfield-amount"/>
                     </div>
@@ -149,14 +149,15 @@ export default function AddOrder () {
                             Agregar
                         </button>
                     </div>
-                    <table>
+                    <h4 className='delete-text'>Para eliminar apreta en el nombre del insumo</h4>
+                    <table >
                         <tbody>
                             <tr>
                                 <th>Producto</th>
                                 <th>Cantidad</th>
                             </tr>
                             {newOrder.insumos.map((i, index) => (
-                                <tr className="data-row-insumo" key={index} >
+                                <tr  key={index} >
                                     <th className="data-div-insumo-name-row" onClick={() => deleteInsumoRow(index, i.insumo_des)}>{i.insumo_des}</th>
                                     <th className="data-div-insumo-amount-row" onClick={() => changeAmount(i.amount, index)}>{i.amount}</th>
                                 </tr>
@@ -166,7 +167,7 @@ export default function AddOrder () {
                     {loading ? <h3 className='title-Homepage'>Cargando...</h3> : 
                         <button className='btn-big-forms' disabled={btn}
                         onClick={() => createOrder()}>
-                            Nuevo Pedido
+                            Registrar
                         </button>
                     }
 

@@ -1,7 +1,7 @@
 //import { useReducer } from "react";
 import { createContext, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
-import { IAction, IInsumo, IPedido, IPedidoRequest, IPropsChildren, IResponseInsumo, IServicio, IToken, IUser, rolesNum } from "../Utils/Interfaces"
+import { IAction, IDetailChange, IInsumo, IPedido, IPedidoRequest, IPropsChildren, IResponseInsumo, IServicio, IToken, IUser, rolesNum } from "../Utils/Interfaces"
 import ac from "./Actions"
 import { jwtDecode } from "jwt-decode"; 
 //Mocks
@@ -200,7 +200,6 @@ export default function GlobalState (props: IPropsChildren) {
             const insumos: AxiosResponse<IResponseInsumo[]> = await axios.get(SERVER+'/data/insumos', authReturner())
             
             const filtered = insumos.data.map(i => i.insumo)
-            if(LOGS === "1") console.log("INSUMOS ",filtered)
             dispatch({
                 type: ac.GET_INSUMOS,
                 payload: filtered
@@ -241,10 +240,12 @@ export default function GlobalState (props: IPropsChildren) {
         }
     }
     //Aprueba pedido
-    async function orderAproveFn (order_id: number, detailsDel?: number[]): Promise<boolean> {
+    async function orderAproveFn (order_id: number, comentario: string, detailsDel?: number[], detailsChange?: IDetailChange[]): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Aprobada")
             const detailsToDelete = {
-                details: detailsDel
+                details: detailsDel,
+                comment: comentario,
+                change: detailsChange
             }
         await axios.patch(SERVER+'/pedido/aprove/'+order_id, detailsToDelete,authReturner())
         navigation('/')
@@ -252,9 +253,12 @@ export default function GlobalState (props: IPropsChildren) {
         return true;
     }
     //Rechaza pedido
-    async function orderRejectFn (order_id: number): Promise<boolean> {
+    async function orderRejectFn (order_id: number, comentario: string): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Rechazada")
-        await axios.patch(SERVER+'/pedido/reject/'+order_id, {},authReturner())
+        const data = {
+            comment: comentario
+        }
+        await axios.patch(SERVER+'/pedido/reject/'+order_id, data,authReturner())
         navigation('/')
         window.location.reload()
         return true;
@@ -432,8 +436,8 @@ interface IGlobalContext{
     insumosFn: () => void,
     ccosFn: () => void,
     sysUsersFn: () => void,
-    orderAproveFn: (order_id: number, detailsDel?: number[]) => void,
-    orderRejectFn: (order_id: number) => void,
+    orderAproveFn: (order_id: number, comentario: string, detailsDel?: number[], detailsChange?: IDetailChange[]) => void,
+    orderRejectFn: (order_id: number, comentario: string) => void,
     orderCancelFn: (order_id: number) => void,
     orderEditFn: () => void,
     orderDeliveredFn: (order_id: number) => void,

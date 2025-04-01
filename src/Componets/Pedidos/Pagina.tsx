@@ -37,7 +37,14 @@ export default function PaginaPedidos () {
         if(global?.pedidos) {
             const date = new Date(lastMonth())
             const arr = global.pedidos.filter(a => new Date(a.date_requested).getTime() >= date.getTime())
-            setFpedidos(arr)
+            if(global.user.rol === 4) {
+                const arr2 = arr.filter(p => p.state !== 'Cancelado' && p.state !== 'Rechazado')
+                setFpedidos(arr2)
+            }
+            else {
+                setFpedidos(arr)
+            }
+
         }
     },[global?.pedidos])    
 
@@ -100,9 +107,7 @@ export default function PaginaPedidos () {
             case 'Rechazado':
                 return 'pedido-component-red'
             case 'Listo':
-                return 'pedido-component-green'
-            case 'Recibido':
-                return 'pedido-component-green'
+                return 'pedido-component-green-black'
             case 'Entregado':
                 return 'pedido-component-neutral'
             default:

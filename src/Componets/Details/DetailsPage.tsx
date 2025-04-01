@@ -2,7 +2,7 @@ import './Details.css'
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
 import { useNavigate, useParams } from 'react-router-dom'
-import { IPedido, rolesNum } from '../../Utils/Interfaces'
+import { IDetailChange, IPedido, rolesNum } from '../../Utils/Interfaces'
 import dbDateParser from '../../Utils/dbDateParser'
 
 export default function DetailsPage () {
@@ -14,6 +14,8 @@ export default function DetailsPage () {
     const [order, setOrder] = useState<IPedido | null>(null)
     const [loading, setLoad] = useState(false)
     const [details, _setDetails] = useState<number[]>([])
+    const [detailsChange, _setChange] = useState<IDetailChange[]>([])
+    const [commnet, setComment] = useState<string>('')
 
     useEffect(() => {
         if(global && global.pedidos.length > 0 && id){
@@ -30,12 +32,12 @@ export default function DetailsPage () {
 
     const rejectFn = (order_id: number) => {
         setLoad(true)
-        global?.orderRejectFn(order_id)
+        global?.orderRejectFn(order_id, commnet)
 
     }
     const aproveFn = (order_id: number) => {
         setLoad(true)
-        global?.orderAproveFn(order_id, details)
+        global?.orderAproveFn(order_id, commnet , details, detailsChange)
 
     }
     const cancelFn = (order_id: number) => {
@@ -56,7 +58,7 @@ export default function DetailsPage () {
     }
 
     const deleteInsumoRow = (index: number, insumo: string, details_id: number | undefined) => {
-        if(order && order.insumos.length > 1 && order.state === 'Pendiente' && global?.user.rol === rolesNum.administrativo && details_id) {
+        if(order && order.insumos.length > 1 && order.state === 'Pendiente' && global?.user.rol !== rolesNum.encargado && details_id) {
             if(confirm('¿Quiere eliminar el insumo '+insumo+ "?")){
                 order.insumos.splice(index, 1)
                 setOrder({...order})
@@ -82,14 +84,20 @@ export default function DetailsPage () {
                 case 'Aprobado':
                     return(
                         <div className='div-btns'>
-                            <h3 className='title-Homepage'>Esperando a que el pedido este listo</h3>
+                            <h3 className='title-Homepage'>Esperando a que el pedido este listo.</h3>
                         </div>
                     )
                 case 'Listo':
                     return (
                         <div className='div-btns'>
-                            <button className='btn-accept' onClick={() => deliverFn(order.order_id)}>RECIBIDO</button>
+                            <h3 className='title-Homepage'>Pedido preparado.</h3>
                         </div>
+                    )
+                case 'Rechazado':
+                    return(
+                    <div className='div-btns'>
+                        <h3 className='title-Homepage'>Pedido rechazado.</h3>
+                    </div>
                     )
                 default:
                     return (
@@ -100,25 +108,24 @@ export default function DetailsPage () {
 
             }
         }
-        else if(global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin) {
+        else if(global?.user.rol === rolesNum.administrativo) {
             switch(order?.state){
                 case 'Pendiente':
                     return(
                         <div className='div-btns'>
-                            <button className='btn-accept' onClick={() => aproveFn(order ? order.order_id : 0)}>APROBAR</button>
                             <button className='btn-negative' onClick={() => rejectFn(order? order.order_id : 0)}>RECHAZAR</button>
                         </div>
                     )
                 case 'Aprobado':
                     return(
                         <div className='div-btns'>
-                            <h3 className='title-Homepage'>Pedido preparandose</h3>
+                            <button className='btn-negative' onClick={() => rejectFn(order? order.order_id : 0)}>RECHAZAR</button>
                         </div>
                     )
                 case 'Listo':
                     return (
                         <div className='div-btns'>
-                            <h3 className='title-Homepage'>Pedido listo, esperando entrega</h3>
+                            <button className='btn-negative' onClick={() => rejectFn(order? order.order_id : 0)}>RECHAZAR</button>
                         </div>
                     )
                 default:
@@ -130,12 +137,45 @@ export default function DetailsPage () {
 
             }
         }
+        else if(global?.user.rol === rolesNum.admin) {
+            switch(order?.state){
+                case 'Pendiente':
+                    return(
+                        <div className='div-btns'>
+                            <button className='btn-accept' onClick={() => aproveFn(order ? order.order_id : 0)}>APROBAR</button>
+                            <button className='btn-negative' onClick={() => rejectFn(order? order.order_id : 0)}>RECHAZAR</button>
+                        </div>
+                    )
+                case 'Aprobado':
+                    return(
+                        <div className='div-btns'>
+                            <button className='btn-accept' onClick={() => readyFn(order ? order.order_id : 0)}>LISTO</button>
+                            <button className='btn-negative' onClick={() => cancelFn(order? order.order_id : 0)}>CANCELAR</button>
+                        </div>
+                    )
+                case 'Listo':
+                    return (
+                        <div className='div-btns'>
+                            <button className='btn-accept' onClick={() => deliverFn(order.order_id)}>RECIBIDO</button>
+                        </div>
+                    )
+                default:
+                    return(
+                        <div className='div-btns'>
+                            <button className='btn-neutral' onClick={() => archiveFn(order? order.order_id : 0)}>ARCHIVAR</button>
+                            <button className='btn-neutral' onClick={() => navigator('/add/'+id)}>REPETIR</button>
+                        </div>
+                    ) 
+
+            }
+        }
         else if(global?.user.rol === rolesNum.en_deposito){
             switch(order?.state){
                 case 'Pendiente':
                     return(
                         <div className='div-btns'>
-                            <h3 className='title-Homepage'>Esperando aprobacion del pedido</h3>
+                            <button className='btn-accept' onClick={() => aproveFn(order ? order.order_id : 0)}>APROBAR</button>
+                            <button className='btn-negative' onClick={() => rejectFn(order? order.order_id : 0)}>RECHAZAR</button>
                         </div>
                     )
                     case 'Cancelado':
@@ -154,7 +194,7 @@ export default function DetailsPage () {
                     return(
                         <div className='div-btns'>
                             <button className='btn-accept' onClick={() => readyFn(order ? order.order_id : 0)}>LISTO</button>
-                            <button className='btn-negative' onClick={() => cancelFn(order? order.order_id : 0)}>CANCELAR</button>
+                            <button className='btn-negative' onClick={() => rejectFn(order? order.order_id : 0)}>RECHAZAR</button>
                         </div>
                     )
                 case 'Listo':
@@ -184,41 +224,71 @@ export default function DetailsPage () {
     }
 
     const classChange = (): string => {
-        if(global?.user.rol === 2 || global?.user.rol === 1){
+        if(global?.user.rol !== 3){
             if(order?.state === 'Pendiente' && order.insumos.length > 1) return 'data-div-insumo-name-row'
-            else return ''
+            else return 'table-users'
         }
-        else return ''
+        else return 'table-users'
+    }
+
+    const commentText = () => {
+        if((global?.user.rol === rolesNum.admin || global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.en_deposito) 
+            && order?.state === "Pendiente"){
+                return(
+                    <div>
+                        <h4 className='delete-text'>Comentarios</h4>
+                        <textarea value={commnet} className='texarea-details'
+                        onChange={(e) => setComment(e.target.value)}/>
+                    </div>
+
+                )
+        }
+    }
+
+    const changeAmount = (nm: number, index: number, detail_id: number | undefined) => {
+        const newA = prompt('Ingrese la nueva cantidad: ',nm.toString()) ?? nm.toString()
+        if(order && newA && parseInt(newA) && detail_id) {
+            const newAmNum: number = parseInt(newA)
+            order.insumos[index].amount = newAmNum
+            setOrder({...order})
+            const chang: IDetailChange = {
+                detail_id: detail_id,
+                amount: parseInt(newA)
+            }
+            detailsChange.push(chang)
+            return 0
+        }
+        else changeAmount(nm, index, detail_id)
     }
 
     const dataDisplay = () => {
         if(order) {
             return(
                 <div className='data-div'>
-                    <h3>Estado del Pedido: </h3>
-                    <h4>{order.state}</h4>
-                    <hr color='#666666' className='hr-details'/>
                     <h3>CCO: </h3>
                     <h4>{serviceDisplayer(order.service_id)}</h4>
                     <hr color='#666666' className='hr-details'/>
                     <h3>Solicitante: </h3>
                     <h4>{order.requester}</h4>
                     <hr color='#666666' className='hr-details'/>
+                    <h3>Estado del Pedido: </h3>
+                    <h4>{order.state}</h4>
+                    <hr color='#666666' className='hr-details'/>
                     <h3>Fecha:</h3>
                     <h4>{'Ordenado: '+dbDateParser(order.date_requested, false)}</h4>
-                    <h4>{order.date_aproved ? 'Aprobado: '+dbDateParser(order.date_aproved, false) : 'Aprobacion pendiente'}</h4>
-                    <h4>{order.date_delivered ? "Recibido: "+dbDateParser(order.date_delivered,false) : 'Entrega pendiente'}</h4>
+                    <h4>{order.date_aproved ? 'Aprobado: '+dbDateParser(order.date_aproved, false) : 'Aprobacion: pendiente'}</h4>
+                    <h4>{order.date_delivered ? "Recibido: "+dbDateParser(order.date_delivered,false) : 'Entrega: pendiente'}</h4>
                     <hr color='#666666' className='hr-details'/>
-                    <table>
+                    <table >
                         <tbody>
                             <tr>
                                 <th>Insumo</th>
                                 <th>Cantidad</th>
                             </tr>
                             {order.insumos.map((i, index) => (
-                                <tr key={i.cod_insumo} className={classChange()} onClick={() => deleteInsumoRow(index, i.insumo_des, i.detail_id)}>
-                                    <th>{i.insumo_des}</th>
-                                    <th>{i.amount}</th>
+                                <tr key={i.cod_insumo} className={classChange()}>
+                                    <th className='data-div-insumo-name-row' onClick={() => deleteInsumoRow(index, i.insumo_des, i.detail_id)}>{i.insumo_des}</th>
+                                    <th className='data-div-insumo-amount-row' onClick={() => changeAmount(i.amount, index, i.detail_id)}>{i.amount}</th>
                                 </tr>
                             ))}
                         </tbody>
@@ -232,7 +302,7 @@ export default function DetailsPage () {
     }
 
     return(
-        <div>
+        <div className='detail-all-div'>
             <img src="/logo_big.webp" alt="" className='logo-big-home'/>
             <div className='div-header-pedidos'>
                 <button className='btn-small-logout' onClick={() => navigator('/pedidos')}>
@@ -251,6 +321,7 @@ export default function DetailsPage () {
             </div>
             <hr color='#3399ff' className='hr-line'/>
             {dataDisplay()}
+            {commentText()}
             {btnDisplay()}
 
         </div>

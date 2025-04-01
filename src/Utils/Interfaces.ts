@@ -89,3 +89,9 @@ export interface IPedidoRequest {
     client_id: number,
     insumos: IInsumo[]
 }
+
+
+export interface IDetailChange {
+    detail_id: number,
+    amount: number
+}
