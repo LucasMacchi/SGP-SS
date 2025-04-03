@@ -36,6 +36,14 @@
     background-color: #22d55b;
     color: white;
 }
+.pedido-componen-problem {
+    max-width: 300px;
+    width: 300px;
+    display: flex;
+    justify-content: space-evenly;
+    background-color: #ff9c33;
+    color: white;
+}
 .pedido-component-green-black {
     max-width: 300px;
     width: 300px;

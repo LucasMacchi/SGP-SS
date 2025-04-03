@@ -38,7 +38,7 @@ export interface IToken {
     usuario_id: number
 }
 export interface IPedido {
-    state: 'Listo' | 'Pendiente' | 'Aprobado' | 'Cancelado' | 'Rechazado' | 'Entregado' | string,
+    state: 'Listo' | 'Pendiente' | 'Aprobado' | 'Cancelado' | 'Rechazado' | 'Entregado' | 'Problemas' | string,
     order_id: number,
     numero: string,
     date_aproved?: string | null,

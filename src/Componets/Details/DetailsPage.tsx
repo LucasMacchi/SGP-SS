@@ -32,29 +32,40 @@ export default function DetailsPage () {
 
     const rejectFn = (order_id: number) => {
         setLoad(true)
-        global?.orderRejectFn(order_id, commnet)
-
+        if(confirm('¿Quieres rechazar el pedido?')) global?.orderRejectFn(order_id, commnet)
+        else setLoad(false)
     }
     const aproveFn = (order_id: number) => {
         setLoad(true)
-        global?.orderAproveFn(order_id, commnet , details, detailsChange)
+        if(confirm('¿Quieres aprobar el pedido?')) global?.orderAproveFn(order_id, commnet , details, detailsChange)
+        else setLoad(false)
 
     }
     const cancelFn = (order_id: number) => {
         setLoad(true)
-        global?.orderCancelFn(order_id)
+        if(confirm('¿Quieres cancelar el pedido?')) global?.orderCancelFn(order_id)
+        else setLoad(false)
     }
     const deliverFn = (order_id: number) => {
         setLoad(true)
-        global?.orderDeliveredFn(order_id)
+        if(confirm('¿Quieres informar la entrega del pedido?')) global?.orderDeliveredFn(order_id)
+        else setLoad(false)
+    }
+    const problemFn = (order_id: number) => {
+        setLoad(true)
+        if(confirm('¿Quieres informar un problema?')) global?.problemFn(order_id, commnet)
+        else setLoad(false)
     }
     const readyFn = (order_id: number) => {
         setLoad(true)
-        global?.orderReadyFn(order_id)
+        if(confirm('¿Quieres informar que el pedido esta Listo?')) global?.orderReadyFn(order_id)
+        else setLoad(false)
     }
     const archiveFn = (order_id: number) => {
         setLoad(true)
-        global?.orderArchFn(order_id)
+        if(confirm('¿Quieres archivar el pedido?')) global?.orderArchFn(order_id)
+        else setLoad(false)
+        
     }
 
     const deleteInsumoRow = (index: number, insumo: string, details_id: number | undefined) => {
@@ -90,7 +101,8 @@ export default function DetailsPage () {
                 case 'Listo':
                     return (
                         <div className='div-btns'>
-                            <h3 className='title-Homepage'>Pedido preparado.</h3>
+                            <button className='btn-problem' onClick={() => problemFn(order.order_id)}>Problema</button>
+                            <button className='btn-neutral' onClick={() => deliverFn(order.order_id)}>Entregado</button>
                         </div>
                     )
                 case 'Rechazado':
@@ -242,6 +254,16 @@ export default function DetailsPage () {
                     </div>
 
                 )
+        }
+        else if(global?.user.rol === rolesNum.encargado && order?.state === 'Listo'){
+            return(
+                <div>
+                    <h4 className='delete-text'>Comentarios</h4>
+                    <textarea value={commnet} className='texarea-details'
+                    onChange={(e) => setComment(e.target.value)}/>
+                </div>
+
+            )
         }
     }
 

@@ -110,6 +110,8 @@ export default function PaginaPedidos () {
                 return 'pedido-component-green-black'
             case 'Entregado':
                 return 'pedido-component-neutral'
+            case 'Problemas':
+                return 'pedido-componen-problem'
             default:
                 return 'pedido-component'
         }

@@ -39,6 +39,14 @@
     height: 50px;
     width: 100px;
 }
+.btn-problem {
+    color: white;
+    background-color: #ff9c33;
+    border-color: #ff9c33;
+    font-size: medium;
+    height: 50px;
+    width: 100px;
+}
 .btn-accept {
     color: white;
     background-color: #2CFE6F;

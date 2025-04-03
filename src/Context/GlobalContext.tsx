@@ -271,6 +271,17 @@ export default function GlobalState (props: IPropsChildren) {
         window.location.reload()
         return true;
     }
+    //Problema pedido
+    async function problemFn (order_id: number, comentario: string): Promise<boolean> {
+        if(LOGS === "1") console.log("Orden informa problemas")
+        const data = {
+            comment: comentario
+        }
+        await axios.patch(SERVER+'/pedido/problem/'+order_id, data,authReturner())
+        navigation('/')
+        window.location.reload()
+        return true;
+    }
     //Entrega pedido
     async function orderDeliveredFn (order_id: number): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Entregada")
@@ -405,7 +416,8 @@ export default function GlobalState (props: IPropsChildren) {
         addUser,
         uniqPedido,
         addPedido,
-        pingServer
+        pingServer,
+        problemFn
     }
 
 
@@ -448,5 +460,6 @@ interface IGlobalContext{
     addPedido: (user_id: number, requester: string, service_id: number, client_id: number,
         insumos: IInsumo[]) => void,
     orderReadyFn: (order_id: number) => void,
-    pingServer: () => void
+    pingServer: () => void,
+    problemFn: (order_id: number, comentario: string) => void
 }
