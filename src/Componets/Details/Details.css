@@ -5,9 +5,7 @@
     color: #666666;
     text-align: left;
 }
-.export-div {
-    display: none;
-}  
+
 .date-div, tr, th {
     border: 1px solid;
     padding: 4px;
@@ -55,14 +53,26 @@
     height: 50px;
     width: 100px;
 }
-
-.btn-export {
+.btn-export-txt {
     color: white;
     background-color: #3399ff;
     border-color: #3399ff;
     font-size: small;
     height: 25px;
 }
+.btn-export-txt-none {
+    display: none;
+}
+.btn-export-pdf {
+    color: white;
+    background-color: #3399ff;
+    border-color: #3399ff;
+    font-size: small;
+    height: 25px;
+}
+.export-div {
+    display: block;
+}  
 .btn-export-disable {
     color: white;
     background-color: #748da6;

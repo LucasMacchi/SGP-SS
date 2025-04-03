@@ -2,8 +2,11 @@ import './Details.css'
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
 import { useNavigate, useParams } from 'react-router-dom'
-import { IDetailChange, IPedido, rolesNum } from '../../Utils/Interfaces'
+import { IDetailChange, IInsumo, IPedido, IpedidoDataPDF, rolesNum } from '../../Utils/Interfaces'
 import dbDateParser from '../../Utils/dbDateParser'
+import {pdf} from '@react-pdf/renderer';
+import PedidoDocument from '../pdfs/pedido'
+import { saveAs } from 'file-saver'
 
 export default function DetailsPage () {
     
@@ -65,7 +68,46 @@ export default function DetailsPage () {
         setLoad(true)
         if(confirm('¿Quieres archivar el pedido?')) global?.orderArchFn(order_id)
         else setLoad(false)
-        
+    }
+    const exportPdf = async () => {
+        if(order) {
+            const insumosFormat: IInsumo[] = order.insumos.map((i) => {
+                const format = i.insumo_des.split('-')
+                const cod = parseInt(format[0])
+                const cod1 = parseInt(format[1])
+                const cod2 = parseInt(format[2])
+                const cod3 = parseInt(format[3])
+                const data: IInsumo = {
+                    insumo_id: Number.isNaN(cod) ? 0 : cod,
+                    ins_cod1: Number.isNaN(cod1) ? 0 : cod1,
+                    ins_cod2: Number.isNaN(cod2) ? 0 : cod2,
+                    ins_cod3: Number.isNaN(cod3) ? 0 : cod3,
+                    insumo_des: format[4],
+                    amount: i.amount
+                }
+                return data
+            })
+            console.log(insumosFormat)
+            const serv = servData(order?.service_id)
+            const pedido: IpedidoDataPDF = {
+                solicitante_email: order.email,
+                solicitante_nombre: order.first_name,
+                solicitante_apellido: order.last_name,
+                solicitante_usuario: order.requester,
+                pedido_numero: order.numero,
+                pedido_req: order.date_requested,
+                pedido_deli: order.date_delivered,
+                pedido_apr: order.date_aproved,
+                pedido_client: serv.clientdes,
+                pedido_service: serv.serdes,
+                pedido_client_id: serv.clientid,
+                pedido_service_id: serv.serid,
+                pedido_state: order.state,
+                pedido_insumos: insumosFormat
+            }
+            const blob: Blob = await pdf(<PedidoDocument pedido={pedido}/>).toBlob()
+            saveAs(blob, 'SGP-'+order.numero+'.pdf')
+        }
     }
 
     const deleteInsumoRow = (index: number, insumo: string, details_id: number | undefined) => {
@@ -235,6 +277,24 @@ export default function DetailsPage () {
         return srv
     }
 
+    const servData = (id: number) => {
+        const data = {
+            serdes: '',
+            clientdes: '',
+            serid: 0,
+            clientid: 0
+        }
+        global?.ccos.forEach(s => {
+            if(id === s.service_id) {
+                data.clientdes = s.client_des
+                data.clientid = s.client_id
+                data.serdes = s.service_des,
+                data.serid = s.service_id
+            }
+        });
+        return data
+    }
+
     const classChange = (): string => {
         if(global?.user.rol !== 3){
             if(order?.state === 'Pendiente' && order.insumos.length > 1) return 'data-div-insumo-name-row'
@@ -308,7 +368,7 @@ export default function DetailsPage () {
                                 <th>Cantidad</th>
                             </tr>
                             {order.insumos.map((i, index) => (
-                                <tr key={i.cod_insumo} className={classChange()}>
+                                <tr key={i.insumo_id} className={classChange()}>
                                     <th className='data-div-insumo-name-row' onClick={() => deleteInsumoRow(index, i.insumo_des, i.detail_id)}>{i.insumo_des}</th>
                                     <th className='data-div-insumo-amount-row' onClick={() => changeAmount(i.amount, index, i.detail_id)}>{i.amount}</th>
                                 </tr>
@@ -336,10 +396,10 @@ export default function DetailsPage () {
             </div>
             <div className='export-div'>
                 <button disabled={global?.user.rol === 1 ? false : true}
-                className={global?.user.rol === 1 ? 'btn-export': 'btn-export-disable'}>
+                className={global?.user.rol === 1 ? 'btn-export-txt': 'btn-export-txt-none'}>
                     Exportar txt
                     </button>
-                <button className='btn-export'>Exportar pdf</button>
+                <button className='btn-export-pdf' onClick={() => exportPdf()}>Exportar pdf</button>
             </div>
             <hr color='#3399ff' className='hr-line'/>
             {dataDisplay()}

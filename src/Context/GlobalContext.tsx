@@ -6,7 +6,6 @@ import ac from "./Actions"
 import { jwtDecode } from "jwt-decode"; 
 //Mocks
 import usersMock from "../Mocks/usersMock.json"
-import pedidosMock from "../Mocks/pedidosMocks.json"
 import insumosMock from "../Mocks/insumosMock.json"
 import ccosMock from "../Mocks/ccoMock.json"
 import axios, { AxiosResponse } from "axios";
@@ -144,29 +143,6 @@ export default function GlobalState (props: IPropsChildren) {
     //Funcion para conseguir todos los pedidos
     async function pedidosFn ( rol: number) {
         if(LOGS === "1") console.log('ROL ',rol)
-        if(MOCK === "1") {
-            if(rol === rolesNum.encargado){
-                const username = localStorage.getItem('usrname')
-                const pedidos: IPedido[] = pedidosMock.pedidos.filter(p => p.requester === username)
-                dispatch({
-                    type: ac.GET_PEDIDOS,
-                    payload: pedidos
-                })
-                if(LOGS === "1") console.log("Pedidos rol 2",pedidos)
-            }
-            else if(rol === rolesNum.administrativo || rol === rolesNum.admin){
-                dispatch({
-                    type: ac.GET_PEDIDOS,
-                    payload: pedidosMock.pedidos
-                })
-                if(LOGS === "1") console.log("Pedidos ",pedidosMock.pedidos)
-            }
-            else {
-                if(LOGS === "1") console.log("No role")
-            }
-
-        }
-        else {
             const token = localStorage.getItem('jwToken')
             const dataUser: IToken = jwtDecode(token ?? "")
             if(rol === rolesNum.encargado){
@@ -186,7 +162,6 @@ export default function GlobalState (props: IPropsChildren) {
                 })
             }
             else alert('No valid rol')
-        }
     }
     //Trae todos los insumos para la creacion de nuevos pedidos
     async function insumosFn () {
@@ -392,7 +367,7 @@ export default function GlobalState (props: IPropsChildren) {
 
     const innitialState: IGlobalContext = {
         user: {username: '', first_name: '', last_name: '', rol: 3, activated: false},
-        pedidoDetail: {order_id: 0, requester: '', date_requested: '', insumos: [], state: '', service_id: 0, client_id: 0, archive: false, numero: '', user_id: 0},
+        pedidoDetail: {order_id: 0, requester: '', date_requested: '', insumos: [], state: '', service_id: 0, client_id: 0, archive: false, numero: '', user_id: 0, first_name: '', last_name: '', email: ''},
         sysUsers: [],
         login: false,
         pedidos: [],

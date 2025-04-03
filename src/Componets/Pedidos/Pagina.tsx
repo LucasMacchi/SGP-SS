@@ -14,6 +14,7 @@ export default function PaginaPedidos () {
     const global = useContext(GlobalContext)
     const [fpedidos, setFpedidos] = useState<IPedido[]>([])
     const [cco, setCco] = useState(0)
+    const [client, setClient] = useState(0)
     const [nro, setNro] = useState('')
     const [req, setReq] = useState('')
     const [dateStart, setDateStart] = useState('')
@@ -75,6 +76,8 @@ export default function PaginaPedidos () {
                     array = array.filter(a => new Date(a.date_requested).getTime() <= date.getTime())
                     if(use_logs === "1") console.log('date end ',date)  
                 }
+                if(client)
+                    array = array.filter(a => a.client_id === client)
             }
             if(use_logs === "1") console.log('ARRAY ==',array)
             setFpedidos(array)
@@ -83,6 +86,7 @@ export default function PaginaPedidos () {
             setCco(0)
             setNro('')
             setReq('')
+            setClient(0)
 
         }
     }
@@ -135,6 +139,7 @@ export default function PaginaPedidos () {
         return arr
     }
 
+
     /*
     const defaultBtn = () => (
         <div>
@@ -143,7 +148,24 @@ export default function PaginaPedidos () {
             </button>
         </div>
     )
-        */
+    */
+
+    const setClientsSelect = () => {
+        let aux: number = 0
+        const data = global?.ccos.map((s) => {
+            if(!aux) {
+                aux = s.client_id
+                return {cliente_id: s.client_id, cliente_des: s.client_des}
+            }
+            else{
+                if(s.client_id !== aux) {
+                    aux = s.client_id
+                    return {cliente_id: s.client_id, cliente_des: s.client_des}
+                }
+            }
+        })
+        return data?.filter(s => s)
+    }
 
     return(
         <div >
@@ -171,7 +193,6 @@ export default function PaginaPedidos () {
                 </button>
             </div>
             {/*defaultBtn()*/}
-
             <hr color='#3399ff' className='hr-line'/>
             <div className='div-filter'>
                 <div>
@@ -187,6 +208,18 @@ export default function PaginaPedidos () {
                         {
                             global?.ccos.map((cco) => (
                                 <option key={cco.service_id} value={cco.service_id}>{cco.service_id+'-'+cco.service_des}</option>
+                            ))
+                        }
+                    </select>
+                </div>
+                <div>
+                    <h5 className='filter-sub'>Cliente</h5>
+                    <select defaultValue={''} disabled={nro ? true : false}
+                    value={client} onChange={(e) => setClient(parseInt(e.target.value))} className='select-small-cco'>
+                        <option value={''}>---</option>
+                        {
+                            setClientsSelect()?.map((cco) => (
+                                <option key={cco?.cliente_id} value={cco?.cliente_id}>{cco?.cliente_id+'-'+cco?.cliente_des}</option>
                             ))
                         }
                     </select>

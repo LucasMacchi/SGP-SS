@@ -49,13 +49,19 @@ export interface IPedido {
     user_id: number,
     client_id: number,
     archive: boolean | number,
-    insumos: IInsumo[]
+    insumos: IInsumo[],
+    first_name: string,
+    last_name: string,
+    email: string
 }
 
 export interface IInsumo {
     detail_id?: number,
     amount: number,
-    cod_insumo?: number,
+    insumo_id?: number,
+    ins_cod1?: number,
+    ins_cod2?: number,
+    ins_cod3?: number,
     order_id?: number,
     insumo_des: string
 }
@@ -79,7 +85,8 @@ export interface IUser {
 export interface IServicio {
     service_id: number,
     client_id: number,
-    service_des: string
+    service_des: string,
+    client_des: string
 }
 
 export interface IPedidoRequest {
@@ -94,4 +101,23 @@ export interface IPedidoRequest {
 export interface IDetailChange {
     detail_id: number,
     amount: number
+}
+export interface IpedidoDataPDF {
+    solicitante_email: string,
+    solicitante_nombre: string,
+    solicitante_apellido: string,
+    solicitante_usuario: string,
+    pedido_numero: string,
+    pedido_req: string,
+    pedido_deli: string | undefined | null,
+    pedido_apr: string | undefined | null,
+    pedido_client: string,
+    pedido_service: string,
+    pedido_client_id: number,
+    pedido_service_id: number,
+    pedido_state: string,
+    pedido_insumos: IInsumo[]
+}
+export interface IPedidoPDF {
+    pedido: IpedidoDataPDF
 }
