@@ -121,3 +121,24 @@ export interface IpedidoDataPDF {
 export interface IPedidoPDF {
     pedido: IpedidoDataPDF
 }
+export interface IpedidoClientDataPDF {
+    pedido_start: string,
+    pedido_end: string,
+    pedido_client: string,
+    pedido_client_id: number,
+    pedido_insumos: IInsumo[]
+}
+export interface IPedidoClientPDF {
+    pedido: IpedidoClientDataPDF
+}
+export interface IClientIns {
+    insumo_des: string,
+    sum: number,
+    insumo_id?: number,
+    ins_cod1?: number,
+    ins_cod2?: number,
+    ins_cod3?: number,
+}
+export interface IClientResponse {
+    insumos: IClientIns[]
+}

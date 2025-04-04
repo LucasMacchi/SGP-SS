@@ -1,5 +1,5 @@
 import { Page, Image, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
-import { IPedidoPDF } from '../../Utils/Interfaces';
+import { IPedidoClientPDF } from '../../Utils/Interfaces';
 
 const stylePedido = StyleSheet.create({
     logo: {
@@ -83,7 +83,7 @@ const stylePedido = StyleSheet.create({
       }
 })
 
-const PedidoDocument: React.FC<IPedidoPDF> = ({pedido}) => (
+const ClientDocument: React.FC<IPedidoClientPDF> = ({pedido}) => (
     <Document>
         <Page size={'A4'} style={stylePedido.page}>
             <View style={stylePedido.viewdataHeader}>
@@ -97,18 +97,13 @@ const PedidoDocument: React.FC<IPedidoPDF> = ({pedido}) => (
             </View>
             <View style={stylePedido.viewdata}>
                 <View >
-                    <Text style={stylePedido.title}>Datos del Pedido - {pedido.pedido_numero}</Text>
+                    <Text style={stylePedido.title}>Datos del Informe</Text>
                     <Text style={stylePedido.body}>Cliente: {pedido.pedido_client_id+'-'+pedido.pedido_client}</Text>
-                    <Text style={stylePedido.body}>Servicio: {pedido.pedido_service_id+'-'+pedido.pedido_service}</Text>
-                    <Text style={stylePedido.body}>Solicitado en el dia: {pedido.pedido_req}</Text>
-                    <Text style={stylePedido.body}>Aprobado en el dia: {pedido.pedido_apr ?? 'Pendiente' }</Text>
-                    <Text style={stylePedido.body}>Entregado en el dia: {pedido.pedido_deli ?? 'Pendiente'}</Text>
-                    <Text style={stylePedido.body}>Estado Actual del Pedido: {pedido.pedido_state}</Text>
                 </View>
                 <View style={stylePedido.viewdataReq}>
-                    <Text style={stylePedido.title}>Datos del Solicitante</Text>
-                    <Text style={stylePedido.body}>Apellido y Nombre: {pedido.solicitante_apellido+' '+pedido.solicitante_nombre}</Text>
-                    <Text style={stylePedido.body}>Email: {pedido.solicitante_email}</Text>
+                    <Text style={stylePedido.title}>Fechas de pedidos</Text>
+                    <Text style={stylePedido.body}>Incio: {pedido.pedido_start}</Text>
+                    <Text style={stylePedido.body}>Final: {pedido.pedido_end}</Text>
                 </View>
             </View>
 
@@ -163,4 +158,4 @@ const PedidoDocument: React.FC<IPedidoPDF> = ({pedido}) => (
     </Document>
 )
 
-export default PedidoDocument
+export default ClientDocument

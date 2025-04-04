@@ -150,6 +150,14 @@ export default function PaginaPedidos () {
     )
     */
 
+    const informesBtn = () => (
+        <div>
+            <button className='btn-big' onClick={() => navigator('/informes')}>
+                Informes
+            </button>
+        </div>
+    )
+
     const setClientsSelect = () => {
         let aux: number = 0
         const data = global?.ccos.map((s) => {
@@ -187,6 +195,7 @@ export default function PaginaPedidos () {
                 </div>
             </div>
             <hr color='#3399ff' className='hr-line'/>
+            {informesBtn()}
             <div>
                 <button className='btn-big' onClick={() => navigator('/add')}>
                     Nuevo Pedido

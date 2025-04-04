@@ -87,7 +87,6 @@ export default function DetailsPage () {
                 }
                 return data
             })
-            console.log(insumosFormat)
             const serv = servData(order?.service_id)
             const pedido: IpedidoDataPDF = {
                 solicitante_email: order.email,
@@ -384,7 +383,7 @@ export default function DetailsPage () {
     }
 
     return(
-        <div className='detail-all-div'>
+        <div className='detaail-all-div'>
             <img src="/logo_big.webp" alt="" className='logo-big-home'/>
             <div className='div-header-pedidos'>
                 <button className='btn-small-logout' onClick={() => navigator('/pedidos')}>

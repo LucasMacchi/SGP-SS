@@ -1,7 +1,7 @@
 //import { useReducer } from "react";
 import { createContext, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
-import { IAction, IDetailChange, IInsumo, IPedido, IPedidoRequest, IPropsChildren, IResponseInsumo, IServicio, IToken, IUser, rolesNum } from "../Utils/Interfaces"
+import { IAction, IClientIns, IDetailChange, IInsumo, IPedido, IPedidoRequest, IPropsChildren, IResponseInsumo, IServicio, IToken, IUser, rolesNum } from "../Utils/Interfaces"
 import ac from "./Actions"
 import { jwtDecode } from "jwt-decode"; 
 //Mocks
@@ -365,6 +365,21 @@ export default function GlobalState (props: IPropsChildren) {
         else return 'Cannot ping the server '+SERVER 
     }
 
+    async function generateClientPDF (client_id: number, dateStart: string, dateEnd: string): Promise<IClientIns[] | undefined> {
+        try {
+            const data = {
+                client_id,
+                dateEnd,
+                dateStart
+            }
+            const clientInsumos: AxiosResponse<IClientIns[]> = await axios.post(SERVER+'/data/client',data,authReturner())
+            return clientInsumos.data
+        } catch (error) {
+            alert('Error generando pdf.')
+            return undefined
+        }
+    }
+
     const innitialState: IGlobalContext = {
         user: {username: '', first_name: '', last_name: '', rol: 3, activated: false},
         pedidoDetail: {order_id: 0, requester: '', date_requested: '', insumos: [], state: '', service_id: 0, client_id: 0, archive: false, numero: '', user_id: 0, first_name: '', last_name: '', email: ''},
@@ -392,7 +407,8 @@ export default function GlobalState (props: IPropsChildren) {
         uniqPedido,
         addPedido,
         pingServer,
-        problemFn
+        problemFn,
+        generateClientPDF
     }
 
 
@@ -436,5 +452,6 @@ interface IGlobalContext{
         insumos: IInsumo[]) => void,
     orderReadyFn: (order_id: number) => void,
     pingServer: () => void,
-    problemFn: (order_id: number, comentario: string) => void
+    problemFn: (order_id: number, comentario: string) => void,
+    generateClientPDF: (client_id: number, dateStart: string, dateEnd: string) => Promise<IClientIns[] | undefined>,
 }
