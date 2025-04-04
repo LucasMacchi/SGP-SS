@@ -30,7 +30,7 @@
 .data-div-textfield-amount {
     font-size: small;
     border-color: #3399ff;
-    width: 30px;
+    width: 35px;
     align-self: center;
     margin-left: 10px;
 }
@@ -69,5 +69,9 @@
     background-color: #3399ff;
     border-color: #3399ff;
     font-size: xx-large;
+}
+.delete-text {
+    font-weight: normal;
+    color: #3399ff;
 }
 

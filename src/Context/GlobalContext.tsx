@@ -1,12 +1,11 @@
 //import { useReducer } from "react";
 import { createContext, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
-import { IAction, IInsumo, IPedido, IPedidoRequest, IPropsChildren, IResponseInsumo, IServicio, IToken, IUser, rolesNum } from "../Utils/Interfaces"
+import { IAction, IClientIns, IDetailChange, IInsumo, IPedido, IPedidoRequest, IPropsChildren, IResponseInsumo, IServicio, IToken, IUser, rolesNum } from "../Utils/Interfaces"
 import ac from "./Actions"
 import { jwtDecode } from "jwt-decode"; 
 //Mocks
 import usersMock from "../Mocks/usersMock.json"
-import pedidosMock from "../Mocks/pedidosMocks.json"
 import insumosMock from "../Mocks/insumosMock.json"
 import ccosMock from "../Mocks/ccoMock.json"
 import axios, { AxiosResponse } from "axios";
@@ -144,29 +143,6 @@ export default function GlobalState (props: IPropsChildren) {
     //Funcion para conseguir todos los pedidos
     async function pedidosFn ( rol: number) {
         if(LOGS === "1") console.log('ROL ',rol)
-        if(MOCK === "1") {
-            if(rol === rolesNum.encargado){
-                const username = localStorage.getItem('usrname')
-                const pedidos: IPedido[] = pedidosMock.pedidos.filter(p => p.requester === username)
-                dispatch({
-                    type: ac.GET_PEDIDOS,
-                    payload: pedidos
-                })
-                if(LOGS === "1") console.log("Pedidos rol 2",pedidos)
-            }
-            else if(rol === rolesNum.administrativo || rol === rolesNum.admin){
-                dispatch({
-                    type: ac.GET_PEDIDOS,
-                    payload: pedidosMock.pedidos
-                })
-                if(LOGS === "1") console.log("Pedidos ",pedidosMock.pedidos)
-            }
-            else {
-                if(LOGS === "1") console.log("No role")
-            }
-
-        }
-        else {
             const token = localStorage.getItem('jwToken')
             const dataUser: IToken = jwtDecode(token ?? "")
             if(rol === rolesNum.encargado){
@@ -186,7 +162,6 @@ export default function GlobalState (props: IPropsChildren) {
                 })
             }
             else alert('No valid rol')
-        }
     }
     //Trae todos los insumos para la creacion de nuevos pedidos
     async function insumosFn () {
@@ -200,7 +175,6 @@ export default function GlobalState (props: IPropsChildren) {
             const insumos: AxiosResponse<IResponseInsumo[]> = await axios.get(SERVER+'/data/insumos', authReturner())
             
             const filtered = insumos.data.map(i => i.insumo)
-            if(LOGS === "1") console.log("INSUMOS ",filtered)
             dispatch({
                 type: ac.GET_INSUMOS,
                 payload: filtered
@@ -241,10 +215,12 @@ export default function GlobalState (props: IPropsChildren) {
         }
     }
     //Aprueba pedido
-    async function orderAproveFn (order_id: number, detailsDel?: number[]): Promise<boolean> {
+    async function orderAproveFn (order_id: number, comentario: string, detailsDel?: number[], detailsChange?: IDetailChange[]): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Aprobada")
             const detailsToDelete = {
-                details: detailsDel
+                details: detailsDel,
+                comment: comentario,
+                change: detailsChange
             }
         await axios.patch(SERVER+'/pedido/aprove/'+order_id, detailsToDelete,authReturner())
         navigation('/')
@@ -252,9 +228,12 @@ export default function GlobalState (props: IPropsChildren) {
         return true;
     }
     //Rechaza pedido
-    async function orderRejectFn (order_id: number): Promise<boolean> {
+    async function orderRejectFn (order_id: number, comentario: string): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Rechazada")
-        await axios.patch(SERVER+'/pedido/reject/'+order_id, {},authReturner())
+        const data = {
+            comment: comentario
+        }
+        await axios.patch(SERVER+'/pedido/reject/'+order_id, data,authReturner())
         navigation('/')
         window.location.reload()
         return true;
@@ -263,6 +242,17 @@ export default function GlobalState (props: IPropsChildren) {
     async function orderCancelFn (order_id: number): Promise<boolean> {
         if(LOGS === "1") console.log("Orden Cancelada")
         await axios.patch(SERVER+'/pedido/cancel/'+order_id, {},authReturner())
+        navigation('/')
+        window.location.reload()
+        return true;
+    }
+    //Problema pedido
+    async function problemFn (order_id: number, comentario: string): Promise<boolean> {
+        if(LOGS === "1") console.log("Orden informa problemas")
+        const data = {
+            comment: comentario
+        }
+        await axios.patch(SERVER+'/pedido/problem/'+order_id, data,authReturner())
         navigation('/')
         window.location.reload()
         return true;
@@ -375,9 +365,24 @@ export default function GlobalState (props: IPropsChildren) {
         else return 'Cannot ping the server '+SERVER 
     }
 
+    async function generateClientPDF (client_id: number, dateStart: string, dateEnd: string): Promise<IClientIns[] | undefined> {
+        try {
+            const data = {
+                client_id,
+                dateEnd,
+                dateStart
+            }
+            const clientInsumos: AxiosResponse<IClientIns[]> = await axios.post(SERVER+'/data/client',data,authReturner())
+            return clientInsumos.data
+        } catch (error) {
+            alert('Error generando pdf.')
+            return undefined
+        }
+    }
+
     const innitialState: IGlobalContext = {
         user: {username: '', first_name: '', last_name: '', rol: 3, activated: false},
-        pedidoDetail: {order_id: 0, requester: '', date_requested: '', insumos: [], state: '', service_id: 0, client_id: 0, archive: false, numero: '', user_id: 0},
+        pedidoDetail: {order_id: 0, requester: '', date_requested: '', insumos: [], state: '', service_id: 0, client_id: 0, archive: false, numero: '', user_id: 0, first_name: '', last_name: '', email: ''},
         sysUsers: [],
         login: false,
         pedidos: [],
@@ -401,7 +406,9 @@ export default function GlobalState (props: IPropsChildren) {
         addUser,
         uniqPedido,
         addPedido,
-        pingServer
+        pingServer,
+        problemFn,
+        generateClientPDF
     }
 
 
@@ -432,8 +439,8 @@ interface IGlobalContext{
     insumosFn: () => void,
     ccosFn: () => void,
     sysUsersFn: () => void,
-    orderAproveFn: (order_id: number, detailsDel?: number[]) => void,
-    orderRejectFn: (order_id: number) => void,
+    orderAproveFn: (order_id: number, comentario: string, detailsDel?: number[], detailsChange?: IDetailChange[]) => void,
+    orderRejectFn: (order_id: number, comentario: string) => void,
     orderCancelFn: (order_id: number) => void,
     orderEditFn: () => void,
     orderDeliveredFn: (order_id: number) => void,
@@ -444,5 +451,7 @@ interface IGlobalContext{
     addPedido: (user_id: number, requester: string, service_id: number, client_id: number,
         insumos: IInsumo[]) => void,
     orderReadyFn: (order_id: number) => void,
-    pingServer: () => void
+    pingServer: () => void,
+    problemFn: (order_id: number, comentario: string) => void,
+    generateClientPDF: (client_id: number, dateStart: string, dateEnd: string) => Promise<IClientIns[] | undefined>,
 }

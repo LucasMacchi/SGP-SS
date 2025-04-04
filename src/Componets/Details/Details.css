@@ -1,10 +1,11 @@
+.detail-all-div {
+    max-width: 300px;
+}
 .data-div {
     color: #666666;
     text-align: left;
 }
-.export-div {
-    display: none;
-}  
+
 .date-div, tr, th {
     border: 1px solid;
     padding: 4px;
@@ -16,7 +17,7 @@
     width: 320px;
 }
 .div-btns {
-    margin: 10px;
+    margin: 8px;
     display: flex;
     justify-content: space-evenly;
 }
@@ -36,6 +37,14 @@
     height: 50px;
     width: 100px;
 }
+.btn-problem {
+    color: white;
+    background-color: #ff9c33;
+    border-color: #ff9c33;
+    font-size: medium;
+    height: 50px;
+    width: 100px;
+}
 .btn-accept {
     color: white;
     background-color: #2CFE6F;
@@ -44,18 +53,36 @@
     height: 50px;
     width: 100px;
 }
-
-.btn-export {
+.btn-export-txt {
     color: white;
     background-color: #3399ff;
     border-color: #3399ff;
     font-size: small;
     height: 25px;
 }
+.btn-export-txt-none {
+    display: none;
+}
+.btn-export-pdf {
+    color: white;
+    background-color: #3399ff;
+    border-color: #3399ff;
+    font-size: small;
+    height: 25px;
+}
+.export-div {
+    display: block;
+}  
 .btn-export-disable {
     color: white;
     background-color: #748da6;
     border-color: #748da6;
     font-size: small;
     height: 25px;
+}
+.texarea-details {
+    width: 300px;
+    max-width: 300px;
+    height: 120px;
+    resize: none;
 }

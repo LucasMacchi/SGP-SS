@@ -4,7 +4,7 @@ export default function (dbdate: string, rDate: boolean) : string | Date {
     const dateParsed = new Date(date[0])
     const year = dateParsed.getFullYear()
     const month = dateParsed.getMonth() + 1
-    const day = dateParsed.getDate() + 1
+    const day = dateParsed.getDate()
     return rDate ? dateParsed : day + '/' + month + '/' + year
 
 }
