@@ -1,6 +1,6 @@
 
 ![alt text](https://raw.githubusercontent.com/LucasMacchi/SGP-SS/refs/heads/main/public/logo_big.webp)
-# SISTEMA DE GESTION DE PEDIDOS V0.2.0
+# SISTEMA DE GESTION DE PEDIDOS V0.3.0
 
 El objetivo del proyecto es crear un sistema de pedidos para los CCO (Centros de Costos Operativos). En el mismo, los encargados podrán realizar pedidos de Insumos a la ADMINISTRACIÓN, los mismo podrán aprobarlo o no, como tambien hacer cambios en los insumos pedidos. 
 Los encargados podrán realizar un pedido personalizado o repetir un pedido.
