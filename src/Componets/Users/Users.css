@@ -11,5 +11,6 @@
     width: 90px;
 }
 .table-users, th {
-    font-size: xx-small !important; 
+    font-size: small !important; 
+    max-width: 200px;
 }
