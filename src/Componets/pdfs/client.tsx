@@ -1,4 +1,4 @@
-import { Page, Image, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
 import { IPedidoClientPDF } from '../../Utils/Interfaces';
 
 const stylePedido = StyleSheet.create({
@@ -88,7 +88,7 @@ const ClientDocument: React.FC<IPedidoClientPDF> = ({pedido}) => (
         <Page size={'A4'} style={stylePedido.page}>
             <View style={stylePedido.viewdataHeader}>
                 <View >
-                    <Image style={stylePedido.logo} src={'/src/assets/logo_big.png'}/>
+                    <Text style={stylePedido.title}>Soluciones & Servicios</Text>
                 </View>
                 <View >
                     <Text style={stylePedido.subtitle}>Junin 766 Piso 2 Oficina 4</Text>
