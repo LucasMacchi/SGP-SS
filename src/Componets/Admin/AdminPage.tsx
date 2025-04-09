@@ -29,6 +29,9 @@ export default function AdminPagina () {
                 <button className='btn-big' onClick={() => navigator('/admin/users')}>
                     Usuarios
                 </button>
+                <button className='btn-big' onClick={() => navigator('/admin/correo')}>
+                    Correo
+                </button>
         </div>
     )
 }

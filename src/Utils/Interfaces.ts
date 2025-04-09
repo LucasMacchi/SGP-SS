@@ -142,3 +142,8 @@ export interface IClientIns {
 export interface IClientResponse {
     insumos: IClientIns[]
 }
+export interface IEmailSender {
+    to_send:string,
+    msg:string,
+    sender:string
+}
