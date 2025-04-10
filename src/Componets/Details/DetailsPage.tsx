@@ -7,6 +7,7 @@ import dbDateParser from '../../Utils/dbDateParser'
 import {pdf} from '@react-pdf/renderer';
 import PedidoDocument from '../pdfs/pedido'
 import { saveAs } from 'file-saver'
+import Header from '../Header/Header'
 
 export default function DetailsPage () {
     
@@ -351,6 +352,7 @@ export default function DetailsPage () {
                     <hr color='#666666' className='hr-details'/>
                     <h3>Solicitante: </h3>
                     <h4>{order.requester}</h4>
+                    <h4>{order.email}</h4>
                     <hr color='#666666' className='hr-details'/>
                     <h3>Estado del Pedido: </h3>
                     <h4>{order.state}</h4>
@@ -384,15 +386,12 @@ export default function DetailsPage () {
 
     return(
         <div className='detaail-all-div'>
-            <img src="/logo_big.webp" alt="" className='logo-big-home'/>
             <div className='div-header-pedidos'>
-                <button className='btn-small-logout' onClick={() => navigator('/pedidos')}>
-                    Volver
-                </button>
-                <h1 className='title-Homepage' >
+                <Header />
+            </div>
+            <h1 className='title-Homepage' >
                     {'Pedido Nro: '+id}
                 </h1>
-            </div>
             <div className='export-div'>
                 <button disabled={global?.user.rol === 1 ? false : true}
                 className={global?.user.rol === 1 ? 'btn-export-txt': 'btn-export-txt-none'}>

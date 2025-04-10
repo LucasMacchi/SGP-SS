@@ -3,6 +3,7 @@ import { GlobalContext } from '../../Context/GlobalContext'
 import { useNavigate } from 'react-router-dom'
 import "./Users.css"
 import { IUser, rolesNum } from '../../Utils/Interfaces'
+import Header from '../Header/Header'
 
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
@@ -85,17 +86,12 @@ export default function UsersPagina () {
 
     return(
         <div>
-            <img src="/logo_big.webp" alt="" 
-            className='logo-big-home'/>
-            <hr color='#3399ff' className='hr-line'/>
             <div className='div-header-pedidos'>
-                <button className='btn-small-logout' onClick={() => navigator('/admin')}>
-                    Volver
-                </button>
-                <h1 className='title-Homepage' >
-                    {'Usuarios'}
-                </h1>
+                <Header />
             </div>
+            <h1 className='title-Homepage' >
+                    {'Usuarios'}
+            </h1>
             <hr color='#3399ff' className='hr-line'/>
 
             <h3 className='title-Homepage'>Usuarios Activos</h3>

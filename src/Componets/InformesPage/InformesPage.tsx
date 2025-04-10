@@ -1,15 +1,14 @@
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
-import { useNavigate } from 'react-router-dom'
 import './informes.css'
 import lastMonth from '../../Utils/lastMonth'
 import { IInsumo, IpedidoClientDataPDF } from '../../Utils/Interfaces'
 import {pdf} from '@react-pdf/renderer';
 import { saveAs } from 'file-saver'
 import ClientDocument from '../pdfs/client'
+import Header from '../Header/Header'
 
 export default function InformesPage () {
-    const navigator = useNavigate()
     const global = useContext(GlobalContext)
     const [startDate, setStartDate] = useState(lastMonth())
     const [endDate, setEndDate] = useState('')
@@ -85,15 +84,12 @@ export default function InformesPage () {
     return(
         <div>
             <div>
-                <img src="/logo_big.webp" alt="" className='logo-big-home'/>
                 <div className='div-informes-header'>
-                    <button className='btn-small-logout' onClick={() => navigator('/pedidos')}>
-                        Volver
-                    </button>
-                    <h1 className='title-Homepage' >
-                        Informes
-                    </h1>
+                    <Header />
                 </div>
+                <h1 className='title-Homepage' >
+                        Informes
+                </h1>
                 <hr color='#3399ff' className='hr-line'/>
                 <div>
                     <h2 className='title-Homepage' >

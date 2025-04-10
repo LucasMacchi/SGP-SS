@@ -19,6 +19,7 @@
     width: 170px;
     align-self: center;
     margin-left: 10px;
+    z-index: 1;
 }
 .data-div-select-big {
     font-size: small;
