@@ -1,11 +1,14 @@
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
-import { IPedido, rolesNum } from '../../Utils/Interfaces'
+import { IInsumo, IPedido, IpedidoDataPDF, rolesNum } from '../../Utils/Interfaces'
 import "./Pagina.css"
 import dateParser from '../../Utils/dateParser'
 import { useNavigate } from 'react-router-dom'
 import lastMonth from '../../Utils/lastMonth'
+import PedidosDocument from '../pdfs/multiPedidos'
 import Header from '../Header/Header'
+import { pdf } from '@react-pdf/renderer'
+import saveAs from 'file-saver'
 const use_logs = import.meta.env.VITE_USE_LOGS
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
@@ -150,6 +153,65 @@ export default function PaginaPedidos () {
         const arr = Array.from(stSet)
         return arr
     }
+    const servData = (id: number) => {
+        const data = {
+            serdes: '',
+            clientdes: '',
+            serid: 0,
+            clientid: 0
+        }
+        global?.ccos.forEach(s => {
+            if(id === s.service_id) {
+                data.clientdes = s.client_des
+                data.clientid = s.client_id
+                data.serdes = s.service_des,
+                data.serid = s.service_id
+            }
+        });
+        return data
+    }
+    const imprimirPedidos = async () => {
+        if(confirm('¿Quieres imprimir los pedidos?')) {
+            const newArray = fpedidos.map((order) => {
+                const serv = servData(order?.service_id)
+                const insumosFormat: IInsumo[] = order.insumos.map((i) => {
+                    const format = i.insumo_des.split('-')
+                    const cod = parseInt(format[0])
+                    const cod1 = parseInt(format[1])
+                    const cod2 = parseInt(format[2])
+                    const cod3 = parseInt(format[3])
+                    const data: IInsumo = {
+                        insumo_id: Number.isNaN(cod) ? 0 : cod,
+                        ins_cod1: Number.isNaN(cod1) ? 0 : cod1,
+                        ins_cod2: Number.isNaN(cod2) ? 0 : cod2,
+                        ins_cod3: Number.isNaN(cod3) ? 0 : cod3,
+                        insumo_des: format[4],
+                        amount: i.amount
+                    }
+                    return data
+                })
+                const pedido: IpedidoDataPDF = {
+                    solicitante_email: order.email,
+                    solicitante_nombre: order.first_name,
+                    solicitante_apellido: order.last_name,
+                    solicitante_usuario: order.requester,
+                    pedido_numero: order.numero,
+                    pedido_req: order.date_requested,
+                    pedido_deli: order.date_delivered,
+                    pedido_apr: order.date_aproved,
+                    pedido_client: serv.clientdes,
+                    pedido_service: serv.serdes,
+                    pedido_client_id: serv.clientid,
+                    pedido_service_id: serv.serid,
+                    pedido_state: order.state,
+                    pedido_insumos: insumosFormat
+                }
+                return pedido
+            })
+            const blob: Blob = await pdf(<PedidosDocument pedidos={newArray}/>).toBlob()
+            saveAs(blob, 'SGP-Pedidos.pdf')
+        }
+    }
 
     const setClientsSelect = () => {
         let aux: number = 0
@@ -238,6 +300,9 @@ export default function PaginaPedidos () {
                     type='date' id='date_end' className='date-input'
                     value={dateEnd} onChange={e => setDateEnd(e.target.value)}/>
                 </div>
+                <button className='btn-small-logout' onClick={() => imprimirPedidos()}>
+                    Imprimir
+                </button>
                 <button className='btn-small-logout' onClick={() => filterArray()}>
                     Filtrar
                 </button>

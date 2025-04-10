@@ -16,10 +16,14 @@ export default function DetailsPage () {
     const id = params.orderId
     const global = useContext(GlobalContext)
     const [order, setOrder] = useState<IPedido | null>(null)
+    const [insumos, setInsumos] = useState('')
     const [loading, setLoad] = useState(false)
     const [details, _setDetails] = useState<number[]>([])
     const [detailsChange, _setChange] = useState<IDetailChange[]>([])
     const [commnet, setComment] = useState<string>('')
+    const [amount, setAmount] = useState(0)
+    const [insumoArray, setInArray] = useState<IInsumo[]>([])
+
 
     useEffect(() => {
         if(global && global.pedidos.length > 0 && id){
@@ -28,11 +32,35 @@ export default function DetailsPage () {
                     setOrder(p)
                 }
             });
+            if(global.insumos.length === 0) global?.insumosFn()
         }else{
 
             navigator('/')
         }
     },[])
+
+    useEffect(() => {
+        console.log(insumoArray)
+    },[insumoArray])
+
+    /*
+    const addIns = () => {
+        if(insumos) {
+            const insu: IInsumo = {insumo_des: insumos, amount: amount ? amount : 1}
+            insumoArray.push(insu)
+            setAmount(0)
+            setInsumos('')
+        } else alert('Agrege un insumo valido')
+    }
+
+    const deleteNewInsumoRow = (index: number, insumo: string) => {
+        console.log(insumoArray)
+        if(confirm('¿Quiere eliminar el insumo '+insumo+ "?")){
+            insumoArray.splice(index, 1)
+            setInArray(insumoArray)
+        }
+    }
+    */
 
     const rejectFn = (order_id: number) => {
         setLoad(true)
@@ -302,7 +330,50 @@ export default function DetailsPage () {
         }
         else return 'table-users'
     }
+    /*
+    const insumoAdder = () => {
+        return(
+        <div>
+            <div className='data-div-add'>
+            <h4>Agregar Insumos: </h4>
+            <select defaultValue={''} value={insumos} className="data-div-select"
+            onChange={e => setInsumos(e.target.value)}>
+            <option value={''}>---</option>
+            {
+                global?.insumos.map((i, index) => (
+                    <option key={index} value={i}>{i}</option>
+                ))
+            }
+            </select>
+            <input type="number" id='amount' min={1} defaultValue={1}
+            value={amount} onChange={(e) => setAmount(parseInt(e.target.value))}
+            className="data-div-textfield-amount"/>
+            </div>
+            <div className="data-div-btn-insumo">  
+                <button className='data-add-btn-insumo' onClick={() => addIns()}>
+                    Agregar
+                </button>
+            </div>
+            <h4 className='delete-text'>Para eliminar apreta en el nombre del insumo</h4>
+                    <table >
+                        <tbody>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                            </tr>
+                            {insumoArray.map((i, index) => (
+                                <tr  key={index} >
+                                    <th className="data-div-insumo-name-row" onClick={() => deleteNewInsumoRow(index, i.insumo_des)}>{i.insumo_des}</th>
+                                    <th className="data-div-insumo-amount-row" onClick={() => changeAmountAdded(i.amount, index)}>{i.amount}</th>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+        </div>
 
+        )
+    }
+*/
     const commentText = () => {
         if((global?.user.rol === rolesNum.admin || global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.en_deposito) 
             && order?.state === "Pendiente"){
@@ -325,6 +396,16 @@ export default function DetailsPage () {
 
             )
         }
+    }
+
+    const changeAmountAdded = (nm: number, index: number) => {
+        const newA = prompt('Ingrese la nueva cantidad: ',nm.toString()) ?? nm.toString()
+        if(newA && parseInt(newA)) {
+            const newAmNum: number = parseInt(newA)
+            insumoArray[index].amount = newAmNum
+            setInArray(insumoArray)
+        }
+        else changeAmountAdded(nm, index)
     }
 
     const changeAmount = (nm: number, index: number, detail_id: number | undefined) => {
@@ -376,6 +457,7 @@ export default function DetailsPage () {
                             ))}
                         </tbody>
                     </table>
+                    {/*insumoAdder()*/}
                 </div>
             )
         }

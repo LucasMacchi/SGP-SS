@@ -118,6 +118,9 @@ export interface IpedidoDataPDF {
     pedido_state: string,
     pedido_insumos: IInsumo[]
 }
+export interface IPedidosPDF {
+    pedidos: IpedidoDataPDF[]
+}
 export interface IPedidoPDF {
     pedido: IpedidoDataPDF
 }
