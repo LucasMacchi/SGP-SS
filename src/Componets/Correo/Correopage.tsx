@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { IEmailSender, IToken } from '../../Utils/Interfaces'
 import { jwtDecode } from 'jwt-decode'
 import Header from '../Header/Header'
-
+import './Correo.css'
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 const use_logs = import.meta.env.VITE_USE_LOGS
 
@@ -107,7 +107,7 @@ export default function Correopage () {
             </h1>
             <hr color='#3399ff' className='hr-line'/>
             {selectDisplayer()}
-            <textarea value={message} className='texarea-details' onChange={(e) => setMsg(e.target.value)}/>
+            <textarea value={message} className='texarea-details-big' onChange={(e) => setMsg(e.target.value)}/>
             <div className='div-btns'>
                 {load ? <h3 className='title-Homepage'>Cargando...</h3> : <button className='btn-neutral' onClick={() => message && email ? sendEmail() : alert('Es necesario escribir un mensaje y seleccionar un correo.')}>MANDAR</button>}
             </div>

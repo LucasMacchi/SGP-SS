@@ -35,7 +35,8 @@ export interface IToken {
     last_name: string,
     exp: number,
     iat: number,
-    usuario_id: number
+    usuario_id: number,
+    email: string
 }
 export interface IPedido {
     state: 'Listo' | 'Pendiente' | 'Aprobado' | 'Cancelado' | 'Rechazado' | 'Entregado' | 'Problemas' | string,
@@ -145,8 +146,23 @@ export interface IClientIns {
 export interface IClientResponse {
     insumos: IClientIns[]
 }
+export interface ICategoriesRes {
+    categorias: string[]
+}
 export interface IEmailSender {
     to_send:string,
     msg:string,
     sender:string
+}
+export interface IReport {
+    order_id?: number,
+    descripcion: string,
+    category: string
+    pedido_numero: string,
+    report_id?: number,
+    fecha?: string,
+    user_id: number,
+    nombre_completo: string,
+    email: string,
+    fullname?: string
 }

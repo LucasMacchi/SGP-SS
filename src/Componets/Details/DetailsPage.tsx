@@ -16,13 +16,12 @@ export default function DetailsPage () {
     const id = params.orderId
     const global = useContext(GlobalContext)
     const [order, setOrder] = useState<IPedido | null>(null)
-    const [insumos, setInsumos] = useState('')
+    //const [insumos, setInsumos] = useState('')
     const [loading, setLoad] = useState(false)
     const [details, _setDetails] = useState<number[]>([])
     const [detailsChange, _setChange] = useState<IDetailChange[]>([])
     const [commnet, setComment] = useState<string>('')
-    const [amount, setAmount] = useState(0)
-    const [insumoArray, setInArray] = useState<IInsumo[]>([])
+    //const [amount, setAmount] = useState(0)
 
 
     useEffect(() => {
@@ -38,10 +37,6 @@ export default function DetailsPage () {
             navigator('/')
         }
     },[])
-
-    useEffect(() => {
-        console.log(insumoArray)
-    },[insumoArray])
 
     /*
     const addIns = () => {
@@ -80,12 +75,12 @@ export default function DetailsPage () {
     }
     const deliverFn = (order_id: number) => {
         setLoad(true)
-        if(confirm('¿Quieres informar la entrega del pedido?')) global?.orderDeliveredFn(order_id)
+        if(confirm('¿Quieres informar la entrega del pedido? Al hacerlo, declara que el pedido se entrego correctamente.')) global?.orderDeliveredFn(order_id, commnet)
         else setLoad(false)
     }
     const problemFn = (order_id: number) => {
         setLoad(true)
-        if(confirm('¿Quieres informar un problema?')) global?.problemFn(order_id, commnet)
+        if(confirm('¿Quieres informar un problema? Al hacerlo, declara que el pedido no se entrego correctamente.')) global?.problemFn(order_id, commnet)
         else setLoad(false)
     }
     const readyFn = (order_id: number) => {
@@ -171,8 +166,8 @@ export default function DetailsPage () {
                 case 'Listo':
                     return (
                         <div className='div-btns'>
-                            <button className='btn-problem' onClick={() => problemFn(order.order_id)}>Problema</button>
-                            <button className='btn-neutral' onClick={() => deliverFn(order.order_id)}>Entregado</button>
+                            <button className='btn-problem' onClick={() => problemFn(order.order_id)}>PROBLEMA</button>
+                            <button className='btn-neutral' onClick={() => deliverFn(order.order_id)}>ENTREGADO</button>
                         </div>
                     )
                 case 'Rechazado':
@@ -397,7 +392,7 @@ export default function DetailsPage () {
             )
         }
     }
-
+/*
     const changeAmountAdded = (nm: number, index: number) => {
         const newA = prompt('Ingrese la nueva cantidad: ',nm.toString()) ?? nm.toString()
         if(newA && parseInt(newA)) {
@@ -405,23 +400,25 @@ export default function DetailsPage () {
             insumoArray[index].amount = newAmNum
             setInArray(insumoArray)
         }
+
         else changeAmountAdded(nm, index)
     }
-
+*/
     const changeAmount = (nm: number, index: number, detail_id: number | undefined) => {
-        const newA = prompt('Ingrese la nueva cantidad: ',nm.toString()) ?? nm.toString()
-        if(order && newA && parseInt(newA) && detail_id) {
-            const newAmNum: number = parseInt(newA)
-            order.insumos[index].amount = newAmNum
-            setOrder({...order})
-            const chang: IDetailChange = {
-                detail_id: detail_id,
-                amount: parseInt(newA)
-            }
-            detailsChange.push(chang)
-            return 0
+        if(order && detail_id && order.state === 'Pendiente' && global?.user.rol !== 3) {
+            const newA = prompt('Ingrese la nueva cantidad: ',nm.toString()) ?? nm.toString()
+            if(newA && parseInt(newA)) {
+                const newAmNum: number = parseInt(newA)
+                order.insumos[index].amount = newAmNum
+                setOrder({...order})
+                const chang: IDetailChange = {
+                    detail_id: detail_id,
+                    amount: parseInt(newA)
+                }
+                detailsChange.push(chang)
+                return 0
+            } else changeAmount(nm, index, detail_id)
         }
-        else changeAmount(nm, index, detail_id)
     }
 
     const dataDisplay = () => {
@@ -472,14 +469,15 @@ export default function DetailsPage () {
                 <Header />
             </div>
             <h1 className='title-Homepage' >
-                    {'Pedido Nro: '+id}
-                </h1>
+                {'Pedido Nro: '+id}
+            </h1>
             <div className='export-div'>
                 <button disabled={global?.user.rol === 1 ? false : true}
                 className={global?.user.rol === 1 ? 'btn-export-txt': 'btn-export-txt-none'}>
                     Exportar txt
-                    </button>
+                </button>
                 <button className='btn-export-pdf' onClick={() => exportPdf()}>Exportar pdf</button>
+                <button className='btn-export-pdf' onClick={() => navigator('/reportar/'+order?.numero)}>Reportar</button>
             </div>
             <hr color='#3399ff' className='hr-line'/>
             {dataDisplay()}

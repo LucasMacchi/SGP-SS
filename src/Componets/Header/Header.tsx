@@ -44,7 +44,10 @@ export default function Header () {
                             </li>
                         <li className='dropdown-li' onClick={() => navigateTo('/correo')}>
                             Correo
-                            </li>
+                        </li>
+                        <li className='dropdown-li' onClick={() => navigateTo('/reportes')}>
+                            Reportes
+                        </li>
                         {global?.user.rol === 1 && 
                         <li className='dropdown-li' onClick={() => navigateTo('/admin/users')}>
                             Admin - Usuarios

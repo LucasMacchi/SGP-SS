@@ -94,9 +94,6 @@ export default function AddOrder () {
         const token = localStorage.getItem('jwToken')
         const dataUser: IToken = jwtDecode(token ?? "")
         global?.addPedido(dataUser.usuario_id, dataUser.user, newOrder.service_id, clientSearcher(global.ccos, newOrder.service_id), newOrder.insumos)
-        setInterval(() => {
-            setLoad(false)
-        }, waitTime);
     }
 
     const deleteInsumoRow = (index: number, insumo: string) => {
@@ -163,8 +160,8 @@ export default function AddOrder () {
                     <table >
                         <tbody>
                             <tr>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
+                                <th className="data-div-table-sections">Producto</th>
+                                <th className="data-div-table-sections">Cantidad</th>
                             </tr>
                             {newOrder.insumos.map((i, index) => (
                                 <tr  key={index} >

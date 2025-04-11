@@ -39,6 +39,27 @@
     display: flex;
     justify-content: center;
 }
+.data-div-insumo-name-row{
+    border: 1px solid;
+    padding: 4px;
+    text-align: left;
+    width: 100%;
+    font-size: small;
+}
+.data-div-insumo-amount-row{
+    border: 1px solid;
+    padding: 4px;
+    text-align: left;
+    width: 100%;
+    font-size: small;
+}
+.data-div-table-sections {
+    border: 1px solid;
+    padding: 4px;
+    text-align: left;
+    width: 100%;
+    font-size: small;
+}
 .data-div-insumo-name-row:hover {
     background-color: rgb(150, 148, 148);
 }
