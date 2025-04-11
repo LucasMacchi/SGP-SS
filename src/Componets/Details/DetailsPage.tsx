@@ -233,7 +233,7 @@ export default function DetailsPage () {
                 case 'Listo':
                     return (
                         <div className='div-btns'>
-                            <button className='btn-accept' onClick={() => deliverFn(order.order_id)}>RECIBIDO</button>
+                            <button className='btn-neutral' onClick={() => deliverFn(order.order_id)}>ENTREGADO</button>
                         </div>
                     )
                 default:

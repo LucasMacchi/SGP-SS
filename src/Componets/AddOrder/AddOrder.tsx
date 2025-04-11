@@ -73,7 +73,8 @@ export default function AddOrder () {
 
     const addIns = () => {
         if(amount && insumos2) {
-            const insu: IInsumo = {insumo_des: insumos2, amount: amount ? amount : 1}
+            const formatedIn = '----'+insumos2
+            const insu: IInsumo = {insumo_des: formatedIn, amount: amount ? amount : 1}
             newOrder.insumos.push(insu)
             setOrder({...newOrder})
             setAmount(0)
