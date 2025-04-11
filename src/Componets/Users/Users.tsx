@@ -99,10 +99,10 @@ export default function UsersPagina () {
             <table className='table-users'>
                 <tbody>
                     <tr>
-                        <th>Username</th>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                        <th>Rol</th>
+                        <th className='tr-user'>Username</th>
+                        <th className='tr-user'>Nombre</th>
+                        <th className='tr-user'>Apellido</th>
+                        <th className='tr-user'>Rol</th>
                     </tr>
                     { global?.sysUsers.length === 0 ? 
                     <h3 className='title-Homepage'>Cargando...</h3> :
@@ -110,10 +110,10 @@ export default function UsersPagina () {
                             if(u.activated) return(
                                 <tr key={u.username+i} className='tr-user'
                                 onClick={() => delUser(confirm("Seguro que quieres eliminar a "+u.username), u.username, false)}>
-                                    <th>{u.username}</th>
-                                    <th>{u.first_name}</th>
-                                    <th>{u.last_name}</th>
-                                    <th>{rolDisplayer(u.rol)}</th>
+                                    <th className='tr-user'>{u.username}</th>
+                                    <th className='tr-user'>{u.first_name}</th>
+                                    <th className='tr-user'>{u.last_name}</th>
+                                    <th className='tr-user'>{rolDisplayer(u.rol)}</th>
                                 </tr>
                             )
                         })
@@ -125,10 +125,10 @@ export default function UsersPagina () {
             <table className='table-users'>
                 <tbody>
                     <tr>
-                        <th>Username</th>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                        <th>Rol</th>
+                        <th className='tr-user'>Username</th>
+                        <th className='tr-user'>Nombre</th>
+                        <th className='tr-user'>Apellido</th>
+                        <th className='tr-user'>Rol</th>
                     </tr>
                     { global?.sysUsers.length === 0 ? 
                     <h3 className='title-Homepage'>Cargando...</h3> :
@@ -136,10 +136,10 @@ export default function UsersPagina () {
                             if(!u.activated) return(
                                 <tr key={u.username+i} className='tr-user'
                                 onClick={() => delUser(confirm("Seguro que quieres reactivar a "+u.username), u.username, true)}>
-                                    <th>{u.username}</th>
-                                    <th>{u.first_name}</th>
-                                    <th>{u.last_name}</th>
-                                    <th>{rolDisplayer(u.rol)}</th>
+                                    <th className='tr-user'>{u.username}</th>
+                                    <th className='tr-user'>{u.first_name}</th>
+                                    <th className='tr-user'>{u.last_name}</th>
+                                    <th className='tr-user'>{rolDisplayer(u.rol)}</th>
                                 </tr>
                             )
                         })

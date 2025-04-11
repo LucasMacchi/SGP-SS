@@ -10,7 +10,14 @@
 .input-label-add-usr {
     width: 90px;
 }
-.table-users, th {
+.table-users {
     font-size: small !important; 
     max-width: 200px;
+}
+.tr-user{
+    border: 1px solid;
+    padding: 4px;
+    text-align: left;
+    width: 100%;
+    font-size: small;
 }

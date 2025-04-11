@@ -40,13 +40,13 @@ export default function Header () {
                             Nuevo Pedido
                             </li>
                         <li className='dropdown-li' onClick={() => navigateTo('/informes')}>
-                            Informes
+                            Generar Informes
                             </li>
                         <li className='dropdown-li' onClick={() => navigateTo('/correo')}>
                             Correo
                         </li>
                         <li className='dropdown-li' onClick={() => navigateTo('/reportes')}>
-                            Reportes
+                            Buscar Reportes
                         </li>
                         {global?.user.rol === 1 && 
                         <li className='dropdown-li' onClick={() => navigateTo('/admin/users')}>
