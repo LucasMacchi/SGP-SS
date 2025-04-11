@@ -19,6 +19,7 @@
     width: 170px;
     align-self: center;
     margin-left: 10px;
+    z-index: 1;
 }
 .data-div-select-big {
     font-size: small;
@@ -37,6 +38,27 @@
 .data-div-btn-insumo {
     display: flex;
     justify-content: center;
+}
+.data-div-insumo-name-row{
+    border: 1px solid;
+    padding: 4px;
+    text-align: left;
+    width: 100%;
+    font-size: small;
+}
+.data-div-insumo-amount-row{
+    border: 1px solid;
+    padding: 4px;
+    text-align: left;
+    width: 100%;
+    font-size: small;
+}
+.data-div-table-sections {
+    border: 1px solid;
+    padding: 4px;
+    text-align: left;
+    width: 100%;
+    font-size: small;
 }
 .data-div-insumo-name-row:hover {
     background-color: rgb(150, 148, 148);

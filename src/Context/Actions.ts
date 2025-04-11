@@ -9,6 +9,8 @@ export default {
     GET_UNIQUE_PEDIDO: "get_un_pd",
     POST_PEDIDO: 'post_pedido',
     ADD_USER: 'add_user',
-    DEL_USER: 'del_user'
+    DEL_USER: 'del_user',
+    GET_CATEGORIES: 'get_categories',
+    GET_REPORTS: 'get_reports'
     
 }

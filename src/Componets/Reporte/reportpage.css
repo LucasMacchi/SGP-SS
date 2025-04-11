@@ -1,0 +1,36 @@
+.table-report{
+    font-size: small !important; 
+    max-width: 350px;
+
+}
+.data-div-category {
+    border: 1px solid;
+    padding: 4px;
+    text-align: left;
+    font-size: small;
+}
+.data-div-des{
+    border: 1px solid;
+    padding: 4px;
+    text-align: left;
+    font-size: small;
+}
+.data-div-date {
+    border: 1px solid;
+    padding: 4px;
+    text-align: left;
+    font-size: small;
+}
+.table-report:hover {
+    background-color: rgb(150, 148, 148);
+}
+.description-report{
+    text-align: left;
+    white-space: pre-wrap;
+    max-width: 340px;
+    text-wrap: wrap;
+    word-wrap: break-word;
+}
+.select-category {
+    width: auto;
+}

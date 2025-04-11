@@ -1,7 +1,7 @@
 //import { useReducer } from "react";
 import { createContext, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
-import { IAction, IClientIns, IDetailChange, IInsumo, IPedido, IPedidoRequest, IPropsChildren, IResponseInsumo, IServicio, IToken, IUser, rolesNum } from "../Utils/Interfaces"
+import { IAction, ICategoriesRes, IClientIns, IDetailChange, IEmailSender, IInsumo, IPedido, IPedidoRequest, IPropsChildren, IReport, IResponseInsumo, IServicio, IToken, IUser, rolesNum } from "../Utils/Interfaces"
 import ac from "./Actions"
 import { jwtDecode } from "jwt-decode"; 
 //Mocks
@@ -33,7 +33,11 @@ const globalReducer = (state: IGlobalContext, action: IAction): IGlobalContext =
         case ac.GET_PEDIDOS:
             return {...state, pedidos: payload}
         case ac.LOGSTATUS_CHN:
-            return {...state, login: payload} 
+            return {...state, login: payload}
+        case ac.GET_CATEGORIES:
+            return {...state, categories: payload}
+        case ac.GET_REPORTS:
+            return {...state, reports: payload}
         default:
             return state
     }
@@ -258,9 +262,12 @@ export default function GlobalState (props: IPropsChildren) {
         return true;
     }
     //Entrega pedido
-    async function orderDeliveredFn (order_id: number): Promise<boolean> {
-        if(LOGS === "1") console.log("Orden Entregada")
-        await axios.patch(SERVER+'/pedido/delivered/'+order_id, {},authReturner())
+    async function orderDeliveredFn (order_id: number, comentario: string): Promise<boolean> {
+        if(LOGS === "1") console.log("Orden Entregada, coment: ",comentario)
+            const data = {
+                comment: comentario
+            }
+        await axios.patch(SERVER+'/pedido/delivered/'+order_id, data,authReturner())
         navigation('/')
         window.location.reload()
         return true;
@@ -380,6 +387,42 @@ export default function GlobalState (props: IPropsChildren) {
         }
     }
 
+    async function sendEmail(data:IEmailSender) {
+        await axios.post(SERVER+'/user/email',data,authReturner())
+    }
+
+    //Trae todos las categorias 
+    async function categoriesGet () {
+        const res: ICategoriesRes = await (await axios.get(SERVER+'/data/categories', authReturner())).data
+        dispatch({
+            type: ac.GET_CATEGORIES,
+            payload: res.categorias
+        })
+    }
+
+    //Crea un nuevo reporte
+    async function createReport(data: IReport) {
+        try {
+            await axios.post(SERVER+'/pedido/report',data,authReturner())
+            alert("Reporte Creado!")
+            navigation('/')
+            window.location.reload()
+            return 0
+        } catch (error) {
+            alert("Error al crear el reporte.")
+        }
+
+    }
+    //Trae todos reportes
+    async function getReports(numero:string) {
+        const res: AxiosResponse<IReport[]> = await (await axios.get(SERVER+'/data/reports/'+numero, authReturner())).data
+        console.log(res)
+        dispatch({
+            type: ac.GET_REPORTS,
+            payload: res
+        })
+    }
+
     const innitialState: IGlobalContext = {
         user: {username: '', first_name: '', last_name: '', rol: 3, activated: false},
         pedidoDetail: {order_id: 0, requester: '', date_requested: '', insumos: [], state: '', service_id: 0, client_id: 0, archive: false, numero: '', user_id: 0, first_name: '', last_name: '', email: ''},
@@ -388,6 +431,8 @@ export default function GlobalState (props: IPropsChildren) {
         pedidos: [],
         ccos: [],
         insumos: [],
+        categories: [],
+        reports: [],
         loginFn,
         logoutFn,
         sessionFn,
@@ -408,7 +453,11 @@ export default function GlobalState (props: IPropsChildren) {
         addPedido,
         pingServer,
         problemFn,
-        generateClientPDF
+        generateClientPDF,
+        sendEmail,
+        categoriesGet,
+        createReport,
+        getReports
     }
 
 
@@ -426,12 +475,14 @@ export default function GlobalState (props: IPropsChildren) {
 
 interface IGlobalContext{
     user: IUser,
+    categories: string[],
     pedidoDetail: IPedido,
     login: boolean,
     pedidos: IPedido[],
     insumos: string[],
     sysUsers: IUser[],
     ccos: IServicio[],
+    reports: IReport[],
     loginFn: (username: string) => void,
     logoutFn: () => void,
     sessionFn: () => void,
@@ -443,7 +494,7 @@ interface IGlobalContext{
     orderRejectFn: (order_id: number, comentario: string) => void,
     orderCancelFn: (order_id: number) => void,
     orderEditFn: () => void,
-    orderDeliveredFn: (order_id: number) => void,
+    orderDeliveredFn: (order_id: number,comentario: string) => void,
     orderArchFn: (order_id: number) => void,
     delUser: (username: string, state: boolean) => void,
     addUser: (user: IUser) => void,
@@ -454,4 +505,8 @@ interface IGlobalContext{
     pingServer: () => void,
     problemFn: (order_id: number, comentario: string) => void,
     generateClientPDF: (client_id: number, dateStart: string, dateEnd: string) => Promise<IClientIns[] | undefined>,
+    sendEmail: (data:IEmailSender) => void,
+    categoriesGet: () => void,
+    createReport: (data: IReport) => void,
+    getReports: (numero:string) => void
 }

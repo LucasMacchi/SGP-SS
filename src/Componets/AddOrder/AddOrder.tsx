@@ -1,15 +1,15 @@
 import "./AddOrder.css"
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { IInsumo, IAddPedido, IToken } from '../../Utils/Interfaces'
 import clientSearcher from "../../Utils/clientSearcher"
 import { jwtDecode } from "jwt-decode"
+import Header from "../Header/Header"
 
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
 export default function AddOrder () {
-    const navigator = useNavigate()
     const global = useContext(GlobalContext)
     const params = useParams()
     const id = params.orderId
@@ -39,11 +39,22 @@ export default function AddOrder () {
                 global.uniqPedido(id, global.pedidos, false)
             }
         }
+
     },[])
 
     useEffect(() => {
         if(global?.pedidoDetail) setOrder(global?.pedidoDetail)
     },[global?.pedidoDetail])
+
+    useEffect(() => {
+        setOrder({
+            requester: '',
+            service_id: 0,
+            client_id: 0,
+            insumos: [],
+            user_id: 0
+        })
+    },[loading])
 
     const handleData = (data: string, prop: string) => {
         setOrder({
@@ -83,9 +94,6 @@ export default function AddOrder () {
         const token = localStorage.getItem('jwToken')
         const dataUser: IToken = jwtDecode(token ?? "")
         global?.addPedido(dataUser.usuario_id, dataUser.user, newOrder.service_id, clientSearcher(global.ccos, newOrder.service_id), newOrder.insumos)
-        setInterval(() => {
-            setLoad(false)
-        }, waitTime);
     }
 
     const deleteInsumoRow = (index: number, insumo: string) => {
@@ -110,7 +118,6 @@ export default function AddOrder () {
         if(showForm) {
             return(
                 <div className="add-form-page">
-                    <hr color='#666666' className='hr-line'/>
                     <div className='data-div-add'>
                         <h4>Centro de Costo: </h4>
                         <select disabled={id ? true : false} defaultValue={''} value={newOrder.service_id} className="data-div-select"
@@ -153,8 +160,8 @@ export default function AddOrder () {
                     <table >
                         <tbody>
                             <tr>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
+                                <th className="data-div-table-sections">Producto</th>
+                                <th className="data-div-table-sections">Cantidad</th>
                             </tr>
                             {newOrder.insumos.map((i, index) => (
                                 <tr  key={index} >
@@ -179,25 +186,12 @@ export default function AddOrder () {
 
     return(
         <div>
-            <img src="/logo_big.webp" alt="" 
-            className='logo-big-home'/>
             <div className='div-header-pedidos'>
-                <button className='btn-small-logout' onClick={() => {
-                    setOrder({
-                        requester: '',
-                        service_id: 0,
-                        client_id: 0,
-                        insumos: newOrder.insumos.splice(0, newOrder.insumos.length),
-                        user_id: 0
-                    })
-                    navigator('/pedidos')
-                    }}>
-                    Volver
-                </button>
-                <h1 className='title-Homepage' >
-                    {'Nuevo Pedido'}
-                </h1>
+                <Header/>
             </div>
+            <h1 className='title-Homepage' >
+                    {'Nuevo Pedido'}
+            </h1>
             <hr color='#666666' className='hr-line'/>
             {displayForms()}
         </div>
