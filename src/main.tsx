@@ -13,6 +13,7 @@ import InformesPage from './Componets/InformesPage/InformesPage.tsx'
 import Correopage from './Componets/Correo/Correopage.tsx'
 import Report from './Componets/Reporte/Report.tsx'
 import ReportPage from './Componets/Reporte/ReportPage.tsx'
+import Provisorio from './Componets/Provisorios/Provisorios.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -22,6 +23,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path='/' element={<App />}></Route>
           <Route path='/reportes' element={<ReportPage />}></Route>
           <Route path='/reportar/:orderId' element={<Report />}></Route>
+          <Route path='/provisorio/:orderId' element={<Provisorio />}/>
           <Route path='/pedidos' element={<PaginaPedidos />} />
           <Route path='/informes' element={<InformesPage />} />
           <Route path='/pedidos/:orderId' element={<DetailsPage />}/>

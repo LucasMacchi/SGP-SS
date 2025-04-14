@@ -1,7 +1,7 @@
 //import { useReducer } from "react";
 import { createContext, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
-import { IAction, ICategoriesRes, IClientIns, IDetailChange, IEmailSender, IInsumo, IPedido, IPedidoRequest, IPropsChildren, IReport, IResponseInsumo, IServicio, IToken, IUser, rolesNum } from "../Utils/Interfaces"
+import { IAction, ICategoriesRes, IChangeData, IClientIns, IDetailChange, IEmailSender, IInsumo, IPedido, IPedidoRequest, IPropsChildren, IReport, IResponseInsumo, IServicio, IToken, IUser, rolesNum } from "../Utils/Interfaces"
 import ac from "./Actions"
 import { jwtDecode } from "jwt-decode"; 
 //Mocks
@@ -344,7 +344,7 @@ export default function GlobalState (props: IPropsChildren) {
 
     //Crea un nuevo pedido
     async function addPedido (usuario_id: number, requester: string, service_id: number, client_id: number,
-        insumos: IInsumo[]
+        insumos: IInsumo[], prov: boolean, prov_des: string | null
     ) {
         const ser: number = service_id
         try {
@@ -353,7 +353,9 @@ export default function GlobalState (props: IPropsChildren) {
                 requester,
                 service_id: +ser,
                 client_id,
-                insumos
+                insumos,
+                prov: prov,
+                prov_des: prov_des
             }
             
             if(LOGS) console.log("Order to create",data)
@@ -401,12 +403,14 @@ export default function GlobalState (props: IPropsChildren) {
     }
 
     //Crea un nuevo reporte
-    async function createReport(data: IReport) {
+    async function createReport(data: IReport, reload: boolean) {
         try {
             await axios.post(SERVER+'/pedido/report',data,authReturner())
             alert("Reporte Creado!")
-            navigation('/')
-            window.location.reload()
+            if(reload) {
+                navigation('/')
+                window.location.reload()
+            }
             return 0
         } catch (error) {
             alert("Error al crear el reporte.")
@@ -421,6 +425,14 @@ export default function GlobalState (props: IPropsChildren) {
             type: ac.GET_REPORTS,
             payload: res
         })
+    }
+
+    //Modifica los provisorios
+    async function modProvisorios(data:IChangeData, id: number) {
+        await axios.patch(SERVER+'/pedido/provisional/'+id,data,authReturner())
+        alert("Pedido modificado")
+        navigation('/')
+        window.location.reload()
     }
 
     const innitialState: IGlobalContext = {
@@ -457,7 +469,8 @@ export default function GlobalState (props: IPropsChildren) {
         sendEmail,
         categoriesGet,
         createReport,
-        getReports
+        getReports,
+        modProvisorios
     }
 
 
@@ -500,13 +513,14 @@ interface IGlobalContext{
     addUser: (user: IUser) => void,
     uniqPedido: (id: string, pedidos: IPedido[],empty: boolean) => void,
     addPedido: (user_id: number, requester: string, service_id: number, client_id: number,
-        insumos: IInsumo[]) => void,
+        insumos: IInsumo[], prov: boolean, prov_des: string | null) => void,
     orderReadyFn: (order_id: number) => void,
     pingServer: () => void,
     problemFn: (order_id: number, comentario: string) => void,
     generateClientPDF: (client_id: number, dateStart: string, dateEnd: string) => Promise<IClientIns[] | undefined>,
     sendEmail: (data:IEmailSender) => void,
     categoriesGet: () => void,
-    createReport: (data: IReport) => void,
-    getReports: (numero:string) => void
+    createReport: (data: IReport, reload: boolean) => void,
+    getReports: (numero:string) => void,
+    modProvisorios : (data:IChangeData, id: number) => void
 }

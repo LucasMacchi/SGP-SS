@@ -19,12 +19,14 @@ export default function AddOrder () {
     const [amount, setAmount] = useState(0)
     const [showForm, setShowForm] = useState(false)
     const [loading, setLoad] = useState(false)
+    const [custom, setCustom] = useState(false)
+    const [service, setService] = useState('')
     const [newOrder, setOrder] = useState<IAddPedido>({
         requester: '',
         service_id: 0,
         client_id: 0,
         insumos: [],
-        user_id: 0
+        user_id: 0,
     })
 
     useEffect(() => {
@@ -52,7 +54,7 @@ export default function AddOrder () {
             service_id: 0,
             client_id: 0,
             insumos: [],
-            user_id: 0
+            user_id: 0,
         })
     },[loading])
 
@@ -65,11 +67,11 @@ export default function AddOrder () {
     }
 
     useEffect(() => {
-        if(newOrder.service_id && newOrder.insumos.length > 0){
+        if((newOrder.service_id && newOrder.insumos.length > 0) || (newOrder.insumos.length > 0 && service && custom)){
             setBtn(false)
         }
         else setBtn(true)
-    },[newOrder])
+    },[newOrder, service])
 
     const addIns = () => {
         if(amount && insumos2) {
@@ -94,7 +96,21 @@ export default function AddOrder () {
         setLoad(true)
         const token = localStorage.getItem('jwToken')
         const dataUser: IToken = jwtDecode(token ?? "")
-        global?.addPedido(dataUser.usuario_id, dataUser.user, newOrder.service_id, clientSearcher(global.ccos, newOrder.service_id), newOrder.insumos)
+        if(service && custom) {
+            newOrder.client_id = -1
+            newOrder.service_id = -1
+            newOrder.prov = true
+            newOrder.prov_des = service
+            console.log(newOrder)
+            await global?.addPedido(dataUser.usuario_id, dataUser.user, newOrder.service_id, clientSearcher(global.ccos, newOrder.service_id), newOrder.insumos, newOrder.prov, newOrder.prov_des)
+
+        }
+        else if (custom) {
+            alert("Ingrese un servicio personalizado valido.")
+        }
+        else {
+            await global?.addPedido(dataUser.usuario_id, dataUser.user, newOrder.service_id, clientSearcher(global.ccos, newOrder.service_id), newOrder.insumos, false, '')
+        }
     }
 
     const deleteInsumoRow = (index: number, insumo: string) => {
@@ -115,22 +131,44 @@ export default function AddOrder () {
         else changeAmount(nm, index)
     }
 
+    const displayCustomService = () => {
+        if(custom) {
+            return(
+                <div className='data-div-add'>
+                    <div className='data-div-add' >
+                        <h6>Servicio personalizado </h6>
+                        <input type="text" id='otherins' className="data-div-select" 
+                        onChange={(e) => setService(e.target.value)} value={service}/>
+                    </div>
+                </div>
+            )
+        } else {
+            return (
+            <div className='data-div-add'>
+                <h4>Centro de Costo: </h4>
+                <select disabled={id ? true : false} defaultValue={''} value={newOrder.service_id} className="data-div-select"
+                onChange={e => handleData(e.target.value, 'service_id')}>
+                <option value={''}>---</option>
+                {
+                    global?.ccos.map((c) => (
+                        <option key={c.service_id} value={c.service_id}>{c.service_des}</option>
+                    ))
+                }
+                </select>
+            </div>
+            )
+        }
+    }
+
     const displayForms = () => {
         if(showForm) {
             return(
                 <div className="add-form-page">
-                    <div className='data-div-add'>
-                        <h4>Centro de Costo: </h4>
-                        <select disabled={id ? true : false} defaultValue={''} value={newOrder.service_id} className="data-div-select"
-                        onChange={e => handleData(e.target.value, 'service_id')}>
-                        <option value={''}>---</option>
-                        {
-                            global?.ccos.map((c) => (
-                                <option key={c.service_id} value={c.service_id}>{c.service_des}</option>
-                            ))
-                        }
-                        </select>
+                    <div className='data-div-add-special'>
+                        <h4>Servicio Especial: </h4>
+                        <input type="checkbox" checked={custom} onChange={(e) => setCustom(e.target.checked)}/>
                     </div>
+                    {displayCustomService()}
                     <div className='data-div-add'>
                         <h4>Insumos: </h4>
                         <select defaultValue={''} value={insumos} className="data-div-select"

@@ -23,7 +23,8 @@ function App() {
     console.log(await global?.pingServer())
   }
 
-  const loginAction = () => {
+  const loginAction = (e: React.MouseEvent) => {
+    e.preventDefault()
     global?.loginFn(username)
     setUsername('')
   }
@@ -34,11 +35,14 @@ function App() {
       <h1 className='title-Homepage'>Sistema de Gestion de Pedidos</h1>
       <hr color='#3399ff'/>
       <h2 className='logintext'>Ingrese el Usuario</h2>
+      <form >
       <div className='div-login-input'>
         <input type='password' id='username' size={20} className='textfield-login'
         value={username} onChange={e => handleUsername(e)}/>
       </div>
-      <button className='btn-small' onClick={loginAction}>Ingresar</button>
+      <button className='btn-small' onClick={(e) => loginAction(e)}>Ingresar</button>
+      </form>
+
     </div>
   )
   

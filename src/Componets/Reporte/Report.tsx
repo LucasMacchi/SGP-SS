@@ -43,7 +43,7 @@ export default function Report () {
                     user_id: dataUser.usuario_id,
                     email: dataUser.email
                 }
-                await global.createReport(data)
+                await global.createReport(data, true)
                 
             }
         }

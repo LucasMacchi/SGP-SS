@@ -25,8 +25,9 @@ export interface IAddPedido {
     service_id: number,
     client_id: number,
     user_id: number,
-    insumos: IInsumo[]
-
+    insumos: IInsumo[],
+    prov?: boolean,
+    prov_des?: string
 }
 export interface IToken {
     user: string,
@@ -53,7 +54,9 @@ export interface IPedido {
     insumos: IInsumo[],
     first_name: string,
     last_name: string,
-    email: string
+    email: string,
+    prov?: boolean,
+    prov_des?: string
 }
 
 export interface IInsumo {
@@ -95,10 +98,10 @@ export interface IPedidoRequest {
     requester: string,
     service_id: number,
     client_id: number,
-    insumos: IInsumo[]
+    insumos: IInsumo[],
+    prov?: boolean,
+    prov_des?: string | null
 }
-
-
 export interface IDetailChange {
     detail_id: number,
     amount: number
@@ -165,4 +168,8 @@ export interface IReport {
     nombre_completo: string,
     email: string,
     fullname?: string
+}
+export interface IChangeData {
+    client_id: number,
+    service_id: number
 }
