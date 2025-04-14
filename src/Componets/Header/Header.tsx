@@ -51,7 +51,7 @@ export default function Header () {
                         {global?.user.rol === 1 && 
                         <li className='dropdown-li' onClick={() => navigateTo('/admin/users')}>
                             Admin - Usuarios
-                            </li>
+                        </li>
                         }
                     </ul>
                 )}

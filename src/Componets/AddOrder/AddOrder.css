@@ -1,9 +1,18 @@
 .data-div-add {
     color: #666666;
     text-align: left;
-    height: 50px;
 }
 .data-div-add, h4, h6 {
+    margin: 5px;
+}
+.data-div-add-special {
+    color: #666666;
+    text-align: left;
+    height: 50px;
+    display: flex;
+    align-items: center;
+}
+.data-div-add-special, h4 {
     margin: 5px;
 }
 .data-div-add-date {

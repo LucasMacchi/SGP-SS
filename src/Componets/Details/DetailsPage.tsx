@@ -463,6 +463,12 @@ export default function DetailsPage () {
         }
     }
 
+    const provBtn = () => {
+        if(order?.prov && global?.user.rol === 1){
+            return(<button className='btn-export-pdf' onClick={() => navigator('/provisorio/'+order?.numero)}>Provisorio</button>)
+        }
+    }
+
     return(
         <div className='detaail-all-div'>
             <div className='div-header-pedidos'>
@@ -478,6 +484,7 @@ export default function DetailsPage () {
                 </button>
                 <button className='btn-export-pdf' onClick={() => exportPdf()}>Exportar pdf</button>
                 <button className='btn-export-pdf' onClick={() => navigator('/reportar/'+order?.numero)}>Reportar</button>
+                {provBtn()}
             </div>
             <hr color='#3399ff' className='hr-line'/>
             {dataDisplay()}
