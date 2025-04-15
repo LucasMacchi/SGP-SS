@@ -500,7 +500,7 @@ interface IGlobalContext{
     loginFn: (username: string) => void,
     logoutFn: () => void,
     sessionFn: () => void,
-    pedidosFn: (rol: number,filter: IFilter) => void,
+    pedidosFn: (rol: number, filter: IFilter) => void,
     insumosFn: () => void,
     ccosFn: () => void,
     sysUsersFn: () => void,
