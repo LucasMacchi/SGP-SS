@@ -1,7 +1,7 @@
 //import { useReducer } from "react";
 import { createContext, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
-import { IAction, ICategoriesRes, IChangeData, IClientIns, IDetailChange, IEmailSender, IInsumo, IPedido, IPedidoRequest, IPropsChildren, IReport, IResponseInsumo, IServicio, IToken, IUser, rolesNum } from "../Utils/Interfaces"
+import { IAction, ICategoriesRes, IChangeData, IClientIns, IDetailChange, IEmailSender, IFilter, IInsumo, IPedido, IPedidoRequest, IPropsChildren, IReport, IResponseInsumo, IServicio, IToken, IUser, rolesNum } from "../Utils/Interfaces"
 import ac from "./Actions"
 import { jwtDecode } from "jwt-decode"; 
 //Mocks
@@ -145,12 +145,13 @@ export default function GlobalState (props: IPropsChildren) {
     }
 
     //Funcion para conseguir todos los pedidos
-    async function pedidosFn ( rol: number) {
+    async function pedidosFn ( rol: number, filter: IFilter) {
         if(LOGS === "1") console.log('ROL ',rol)
             const token = localStorage.getItem('jwToken')
             const dataUser: IToken = jwtDecode(token ?? "")
             if(rol === rolesNum.encargado){
-                const pedidos: AxiosResponse<IPedido[]> = await axios.get(SERVER+'/pedido/all', authReturner())
+                filter.requester = dataUser.user
+                const pedidos: AxiosResponse<IPedido[]> = await axios.post(SERVER+'/pedido/all', filter,authReturner())
                 const pedidosFiltered = pedidos.data.filter(p => p.requester === dataUser.user)
                 dispatch({
                     type: ac.GET_PEDIDOS,
@@ -158,7 +159,7 @@ export default function GlobalState (props: IPropsChildren) {
                 })
             }
             else if(rol === rolesNum.admin || rol === rolesNum.administrativo || rol === rolesNum.en_deposito){
-                const pedidos: AxiosResponse<IPedido[]> = await axios.get(SERVER+'/pedido/all', authReturner())
+                const pedidos: AxiosResponse<IPedido[]> = await axios.post(SERVER+'/pedido/all',filter ,authReturner())
                 console.log(pedidos)
                 dispatch({
                     type: ac.GET_PEDIDOS,
@@ -499,7 +500,7 @@ interface IGlobalContext{
     loginFn: (username: string) => void,
     logoutFn: () => void,
     sessionFn: () => void,
-    pedidosFn: (rol: number) => void,
+    pedidosFn: (rol: number, filter: IFilter) => void,
     insumosFn: () => void,
     ccosFn: () => void,
     sysUsersFn: () => void,

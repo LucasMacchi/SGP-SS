@@ -1,0 +1,11 @@
+{
+    "states": [
+        "Pendiente",
+        "Aprobado",
+        "Rechazado",
+        "Cancelado",
+        "Listo",
+        "Entregado",
+        "Problemas"
+    ]
+}

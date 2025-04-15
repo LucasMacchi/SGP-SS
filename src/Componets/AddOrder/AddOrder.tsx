@@ -2,7 +2,7 @@ import "./AddOrder.css"
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
 import { useParams } from 'react-router-dom'
-import { IInsumo, IAddPedido, IToken } from '../../Utils/Interfaces'
+import { IInsumo, IAddPedido, IToken, IServicio } from '../../Utils/Interfaces'
 import clientSearcher from "../../Utils/clientSearcher"
 import { jwtDecode } from "jwt-decode"
 import Header from "../Header/Header"
@@ -14,6 +14,10 @@ export default function AddOrder () {
     const params = useParams()
     const id = params.orderId
     const [btn, setBtn] = useState(true)
+    const [searchIns, setSearchIns] = useState('')
+    const [searchServ, setSearchServ] = useState('')
+    const [filterIns, setFilterIns] = useState<string[]>([])
+    const [filterServ, setFilterServ] = useState<IServicio[]>([])
     const [insumos, setInsumos] = useState('')
     const [insumos2, setInsumos2] = useState('')
     const [amount, setAmount] = useState(0)
@@ -33,7 +37,6 @@ export default function AddOrder () {
         if(global) {
             if(global.insumos.length === 0) global?.insumosFn()
             if(global.ccos.length === 0) global?.ccosFn()
-            if(global.pedidos.length === 0 ) global.pedidosFn(global.user.rol)
             setTimeout(() => {
                 setShowForm(true)
             }, waitTime);
@@ -72,6 +75,19 @@ export default function AddOrder () {
         }
         else setBtn(true)
     },[newOrder, service])
+
+    useEffect(() => {
+        if(searchServ.length > 2){
+            const filtered = global?.ccos.filter(c => c.service_des.toUpperCase().includes(searchServ.toUpperCase()))
+            if(filtered) setFilterServ(filtered)
+        }
+    },[searchServ])
+    useEffect(() => {
+        if(searchIns.length > 2){
+            const filtered = global?.insumos.filter(c => c.toUpperCase().includes(searchIns.toUpperCase()))
+            if(filtered) setFilterIns(filtered)
+        }
+    },[searchIns])
 
     const addIns = () => {
         if(amount && insumos2) {
@@ -122,8 +138,8 @@ export default function AddOrder () {
 
     const changeAmount = (nm: number, index: number) => {
         const newA = prompt('Ingrese la nueva cantidad: ',nm.toString()) ?? nm.toString()
-        if(newA && parseInt(newA)) {
-            const newAmNum: number = parseInt(newA)
+        if(newA && parseFloat(newA)) {
+            const newAmNum: number = parseFloat(newA)
             newOrder.insumos[index].amount = newAmNum
             setOrder({...newOrder})
             return 0
@@ -146,13 +162,23 @@ export default function AddOrder () {
             return (
             <div className='data-div-add'>
                 <h4>Centro de Costo: </h4>
+                <div className='data-div-add' >
+                    <h6>Busqueda</h6>
+                    <input type="text" id='otherins' className="data-div-select" 
+                    onChange={(e) => setSearchServ(e.target.value)} value={searchServ}/>
+                </div>
                 <select disabled={id ? true : false} defaultValue={''} value={newOrder.service_id} className="data-div-select"
                 onChange={e => handleData(e.target.value, 'service_id')}>
                 <option value={''}>---</option>
                 {
-                    global?.ccos.map((c) => (
-                        <option key={c.service_id} value={c.service_id}>{c.service_des}</option>
-                    ))
+                    searchServ.length > 2 ?
+                    filterServ.map((c) => {
+                        return(<option key={c.service_id} value={c.service_id}>{c.service_des}</option>)
+                    })
+                    :
+                    global?.ccos.map((c) => {
+                        return(<option key={c.service_id} value={c.service_id}>{c.service_des}</option>)
+                    })
                 }
                 </select>
             </div>
@@ -171,18 +197,28 @@ export default function AddOrder () {
                     {displayCustomService()}
                     <div className='data-div-add'>
                         <h4>Insumos: </h4>
+                        <div className='data-div-add' >
+                            <h6>Busqueda</h6>
+                            <input type="text" id='otherins' className="data-div-select" 
+                            onChange={(e) => setSearchIns(e.target.value)} value={searchIns}/>
+                        </div>
                         <select defaultValue={''} value={insumos} className="data-div-select"
                         disabled={insumos2 ? true : false}
                         onChange={e => setInsumos(e.target.value)}>
                         <option value={''}>---</option>
                         {
+                            searchIns.length > 2 ? 
+                            filterIns.map((i, index) => (
+                                <option key={index} value={i}>{i}</option>
+                            ))
+                            :
                             global?.insumos.map((i, index) => (
                                 <option key={index} value={i}>{i}</option>
                             ))
                         }
                         </select>
-                        <input type="number" id='amount' min={1} defaultValue={1}
-                        value={amount} onChange={(e) => setAmount(parseInt(e.target.value))}
+                        <input type="number" step='any' id='amount' min={0}
+                        value={amount} onChange={(e) => setAmount(parseFloat(e.target.value))}
                         className="data-div-textfield-amount"/>
                     </div>
                     <div className='data-div-add' >

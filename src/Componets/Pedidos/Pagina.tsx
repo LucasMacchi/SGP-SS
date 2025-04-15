@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
-import { IInsumo, IPedido, IpedidoDataPDF, rolesNum } from '../../Utils/Interfaces'
+import { IFilter, IInsumo, IpedidoDataPDF, rolesNum } from '../../Utils/Interfaces'
 import "./Pagina.css"
 import dateParser from '../../Utils/dateParser'
 import { useNavigate } from 'react-router-dom'
@@ -9,14 +9,14 @@ import PedidosDocument from '../pdfs/multiPedidos'
 import Header from '../Header/Header'
 import { pdf } from '@react-pdf/renderer'
 import saveAs from 'file-saver'
-const use_logs = import.meta.env.VITE_USE_LOGS
+import filterJSON from '../../Utils/dataFilter.json'
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
 export default function PaginaPedidos () {
 
     const navigator = useNavigate()
     const global = useContext(GlobalContext)
-    const [fpedidos, setFpedidos] = useState<IPedido[]>([])
+    const [limit, setLimit] = useState(50)
     const [cco, setCco] = useState(0)
     const [client, setClient] = useState(0)
     const [nro, setNro] = useState('')
@@ -32,73 +32,35 @@ export default function PaginaPedidos () {
     useEffect(() => {
         setTimeout(() => {
             if(global){
-                if(global.pedidos.length === 0) global?.pedidosFn( global.user.rol)
+                const filtro: IFilter = {
+                    limit,
+                    client,
+                    service: cco,
+                    requester: req,
+                    numero: nro,
+                    state: state,
+                    dateStart,
+                    dateEnd
+                }
+                if(global.pedidos.length === 0) global?.pedidosFn( global.user.rol, filtro)
                 if(global.ccos.length === 0 ) global.ccosFn()
             }
         }, waitTime);
     },[global?.user])
+ 
 
-    
-    useEffect(() => {
-        if(global?.pedidos) {
-            const date = new Date(lastMonth())
-            const arr = global.pedidos.filter(a => new Date(a.date_requested).getTime() >= date.getTime())
-            if(global.user.rol === 4) {
-                const arr2 = arr.filter(p => p.state !== 'Cancelado' && p.state !== 'Rechazado')
-                setFpedidos(arr2)
-            }
-            else {
-                setFpedidos(arr)
-            }
-
+    const filterArray = async () => {
+        const filterData: IFilter = {
+            limit: limit,
+            client,
+            service: cco,
+            requester: req,
+            numero: nro,
+            state: state,
+            dateStart,
+            dateEnd
         }
-    },[global?.pedidos])    
-
-    const filterArray = () => {
-        if(global?.pedidos){
-            let array = global?.pedidos
-            if(nro){
-                array = array?.filter(a => a.numero === nro)
-                if(use_logs === "1") console.log("nro "+nro,array)
-            }
-            else {
-                if(cco){
-                    array = array.filter(a => a.service_id === cco)
-                    if(use_logs === "1") console.log('cco '+cco,array)
-                }
-                if(req) {
-                    array = array.filter(a => a.requester === req)
-                    if(use_logs === "1") console.log('req '+req,array)
-                }
-                if(dateStart) {
-                    const date = new Date(dateStart)
-                    array = array.filter(a => new Date(a.date_requested).getTime() >= date.getTime())
-                    if(use_logs === "1") console.log('date start ',date.getTime())
-
-                }
-                if(dateEnd) {
-                    const date = new Date(dateEnd)
-                    array = array.filter(a => new Date(a.date_requested).getTime() <= date.getTime())
-                    if(use_logs === "1") console.log('date end ',date)  
-                }
-                if(client){
-                    array = array.filter(a => a.client_id === client)
-                }
-                if(state) {
-                    array = array.filter(a => a.state === state)
-                }
-                    
-            }
-            if(use_logs === "1") console.log('ARRAY ==',array)
-            setFpedidos(array)
-            setDateEnd('')
-            setDateStart('')
-            setCco(0)
-            setNro('')
-            setReq('')
-            setClient(0)
-
-        }
+        await global?.pedidosFn( global.user.rol, filterData)
     }
 
     const displayLoading = () => {
@@ -131,7 +93,7 @@ export default function PaginaPedidos () {
         }
     }
     const displayPedidos = () => (
-        fpedidos.map((p) => {
+        global?.pedidos.map((p) => {
             return(
                 <div key={p.numero} 
                 className={colorChange(p.state)} 
@@ -149,9 +111,7 @@ export default function PaginaPedidos () {
         return arr
     }
     const stateSearch = () => {
-        const stSet = new Set<string>(global?.pedidos.map(p => p.state))
-        const arr = Array.from(stSet)
-        return arr
+        return filterJSON.states
     }
     const servData = (id: number) => {
         const data = {
@@ -171,8 +131,8 @@ export default function PaginaPedidos () {
         return data
     }
     const imprimirPedidos = async () => {
-        if(confirm('¿Quieres imprimir los pedidos?')) {
-            const newArray = fpedidos.map((order) => {
+        if(confirm('¿Quieres imprimir los pedidos?') && global) {
+            const newArray = global.pedidos.map((order) => {
                 const serv = servData(order?.service_id)
                 const insumosFormat: IInsumo[] = order.insumos.map((i) => {
                     const format = i.insumo_des.split('-')
@@ -280,8 +240,7 @@ export default function PaginaPedidos () {
                 </div>
                 <div>
                     <h5 className='filter-sub'>Estado</h5>
-                    <select defaultValue={''} disabled={parseInt(nro) ||  global?.user.rol === rolesNum.encargado ? true : false}
-                    value={state} onChange={(e) => setState(e.target.value)} className='select-small'>
+                    <select defaultValue={''} value={state} onChange={(e) => setState(e.target.value)} className='select-small'>
                         <option value={''}>---</option>
                         {
                             stateSearch().map((s) => (
@@ -289,6 +248,11 @@ export default function PaginaPedidos () {
                             ))
                         }
                     </select>
+                </div>
+                <div>
+                    <h5 className='filter-sub'>Cantidad de Pedidos</h5>
+                    <input type='number' id='limit' className='textfield-search' min={10}
+                    value={limit} onChange={e => setLimit(parseInt(e.target.value))}/>
                 </div>
                 <div>
                     <h5 className='filter-sub'>Fecha de inicio y Final</h5>
