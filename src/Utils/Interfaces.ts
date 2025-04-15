@@ -173,3 +173,13 @@ export interface IChangeData {
     client_id: number,
     service_id: number
 }
+export interface IFilter {
+    limit: number,
+    client: number,
+    service: number,
+    requester: string,
+    numero: string
+    state: string
+    dateStart: string
+    dateEnd: string
+}
