@@ -24,6 +24,7 @@ export default function AddOrder () {
     const [showForm, setShowForm] = useState(false)
     const [loading, setLoad] = useState(false)
     const [custom, setCustom] = useState(false)
+    const [customIn, setCustomIn] = useState(false)
     const [service, setService] = useState('')
     const [newOrder, setOrder] = useState<IAddPedido>({
         requester: '',
@@ -36,7 +37,9 @@ export default function AddOrder () {
     useEffect(() => {
         if(global) {
             if(global.insumos.length === 0) global?.insumosFn()
-            if(global.ccos.length === 0) global?.ccosFn()
+            if(global.ccos.length === 0) {
+                global?.ccosFn()
+            }
             setTimeout(() => {
                 setShowForm(true)
             }, waitTime);
@@ -46,6 +49,14 @@ export default function AddOrder () {
         }
 
     },[])
+
+    useEffect(() => {
+        setService('')
+    },[custom])
+
+    useEffect(() => {
+        setInsumos2('')
+    },[customIn])
 
     useEffect(() => {
         if(global?.pedidoDetail) setOrder(global?.pedidoDetail)
@@ -106,6 +117,27 @@ export default function AddOrder () {
             setInsumos('')
         }
         else alert('Error a agregar Insumo.')
+    }
+
+    const saveOrder = () => {
+        if(confirm('¿Quieres guardar el pedido? Podria reescribir otro guardado.')) {
+            localStorage.setItem("savedOrder", JSON.stringify(newOrder));
+            alert('Pedido guardado.')
+        }
+        
+    }
+
+    const loadOrder = () => {
+        const data = localStorage.getItem("savedOrder");
+        if(data && confirm('¿Quieres cargar el pedido? Esto remplazara el pedido actual y eliminara el guardado.')) {
+            setOrder(JSON.parse(data))
+            localStorage.removeItem('savedOrder');
+            alert('Pedido cargado.')
+
+        }
+        else{
+            alert('No existe un pedido guardado.')
+        }
     }
 
     const createOrder = async () => {
@@ -186,6 +218,54 @@ export default function AddOrder () {
         }
     }
 
+    const displayCustomInsumo = () => {
+        if(customIn) {
+            return(
+                <div className='data-div-add'>
+                <h4>Insumos: </h4>
+                <div className='data-div-add' >
+                    <h6>Insumo personalizado </h6>
+                    <input type="text" id='otherins' className="data-div-select" 
+                    onChange={(e) => setInsumos2(e.target.value)} value={insumos2}/>
+                    <input type="number" step='any' id='amount' min={0}
+                    value={amount} onChange={(e) => setAmount(parseFloat(e.target.value))}
+                    className="data-div-textfield-amount"/>
+                </div>
+            </div>
+            )
+        }
+        else{
+            return(
+                <div className='data-div-add'>
+                <h4>Insumos: </h4>
+                <div className='data-div-add' >
+                    <h6>Busqueda</h6>
+                    <input type="text" id='otherins' className="data-div-select" 
+                    onChange={(e) => setSearchIns(e.target.value)} value={searchIns}/>
+                </div>
+                <select defaultValue={''} value={insumos} className="data-div-select"
+                disabled={insumos2 ? true : false}
+                onChange={e => setInsumos(e.target.value)}>
+                <option value={''}>---</option>
+                {
+                    searchIns.length > 2 ? 
+                    filterIns.map((i, index) => (
+                        <option key={index} value={i}>{i}</option>
+                    ))
+                    :
+                    global?.insumos.map((i, index) => (
+                        <option key={index} value={i}>{i}</option>
+                    ))
+                }
+                </select>
+                <input type="number" step='any' id='amount' min={0}
+                value={amount} onChange={(e) => setAmount(parseFloat(e.target.value))}
+                className="data-div-textfield-amount"/>
+            </div>
+            )
+        }
+    }
+
     const displayForms = () => {
         if(showForm) {
             return(
@@ -194,44 +274,19 @@ export default function AddOrder () {
                         <h4>Servicio Especial: </h4>
                         <input type="checkbox" checked={custom} onChange={(e) => setCustom(e.target.checked)}/>
                     </div>
+                    <div className='data-div-add-special'>
+                        <h4>Insumo Personalizado: </h4>
+                        <input type="checkbox" checked={customIn} onChange={(e) => setCustomIn(e.target.checked)}/>
+                    </div>
                     {displayCustomService()}
-                    <div className='data-div-add'>
-                        <h4>Insumos: </h4>
-                        <div className='data-div-add' >
-                            <h6>Busqueda</h6>
-                            <input type="text" id='otherins' className="data-div-select" 
-                            onChange={(e) => setSearchIns(e.target.value)} value={searchIns}/>
-                        </div>
-                        <select defaultValue={''} value={insumos} className="data-div-select"
-                        disabled={insumos2 ? true : false}
-                        onChange={e => setInsumos(e.target.value)}>
-                        <option value={''}>---</option>
-                        {
-                            searchIns.length > 2 ? 
-                            filterIns.map((i, index) => (
-                                <option key={index} value={i}>{i}</option>
-                            ))
-                            :
-                            global?.insumos.map((i, index) => (
-                                <option key={index} value={i}>{i}</option>
-                            ))
-                        }
-                        </select>
-                        <input type="number" step='any' id='amount' min={0}
-                        value={amount} onChange={(e) => setAmount(parseFloat(e.target.value))}
-                        className="data-div-textfield-amount"/>
-                    </div>
-                    <div className='data-div-add' >
-                        <h6>Insumo personalizado </h6>
-                        <input type="text" id='otherins' className="data-div-select" 
-                        onChange={(e) => setInsumos2(e.target.value)} value={insumos2}/>
-                    </div>
+                    {displayCustomInsumo()}
                     <div className="data-div-btn-insumo">  
                         <button className='data-add-btn-insumo' onClick={() => addIns()}>
                             Agregar
                         </button>
                     </div>
-                    <h4 className='delete-text'>Para eliminar apreta en el nombre del insumo</h4>
+                    <h5 className='delete-text'>Para eliminar apreta en el nombre del insumo</h5>
+                    <h5 className='delete-text'>Para cambiar la cantidad, aprete en el numero</h5>
                     <table >
                         <tbody>
                             <tr>
@@ -267,6 +322,9 @@ export default function AddOrder () {
             <h1 className='title-Homepage' >
                     {'Nuevo Pedido'}
             </h1>
+            <hr color='#666666' className='hr-line'/>
+            <button className='btn-export-pdf' onClick={() => saveOrder()}>Guardar Pedido</button>
+            <button className='btn-export-pdf' onClick={() => loadOrder()}>Cargar Pedido</button>
             <hr color='#666666' className='hr-line'/>
             {displayForms()}
         </div>
