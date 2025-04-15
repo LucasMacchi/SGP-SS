@@ -138,8 +138,8 @@ export default function AddOrder () {
 
     const changeAmount = (nm: number, index: number) => {
         const newA = prompt('Ingrese la nueva cantidad: ',nm.toString()) ?? nm.toString()
-        if(newA && parseInt(newA)) {
-            const newAmNum: number = parseInt(newA)
+        if(newA && parseFloat(newA)) {
+            const newAmNum: number = parseFloat(newA)
             newOrder.insumos[index].amount = newAmNum
             setOrder({...newOrder})
             return 0
