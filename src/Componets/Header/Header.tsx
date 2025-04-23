@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { GlobalContext } from '../../Context/GlobalContext'
 import './Header.css'
 import { useContext, useState } from 'react'
+
 export default function Header () {
 
     const [drop, setDrop] = useState(false)
