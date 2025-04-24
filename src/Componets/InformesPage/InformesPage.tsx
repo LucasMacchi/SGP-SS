@@ -90,6 +90,8 @@ export default function InformesPage () {
                 <h1 className='title-Homepage' >
                         Informes
                 </h1>
+                <h5 className='filter-sub'>Los informes generados son sobre los pedidos </h5>
+                <h5 className='filter-sub'>que ya estan Listos o Entregados.</h5>
                 <hr color='#3399ff' className='hr-line'/>
                 <div>
                     <h2 className='title-Homepage' >

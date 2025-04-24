@@ -8,7 +8,7 @@
 .data-div-add-special {
     color: #666666;
     text-align: left;
-    height: 50px;
+    height: 30px;
     display: flex;
     align-items: center;
 }
@@ -104,5 +104,6 @@
 .delete-text {
     font-weight: normal;
     color: #3399ff;
+    margin: 3px;
 }
 

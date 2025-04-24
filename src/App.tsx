@@ -2,7 +2,6 @@ import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from './Context/GlobalContext'
 import './App.css'
 
-console.log('MOCKS '+import.meta.env.VITE_USE_MOCK)
 const LOGS = import.meta.env.VITE_USE_LOGS
 
 function App() {
