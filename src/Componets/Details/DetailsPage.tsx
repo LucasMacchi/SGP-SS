@@ -149,12 +149,6 @@ export default function DetailsPage () {
                             <button className='btn-neutral' onClick={() => deliverFn(order.order_id)}>ENTREGADO</button>
                         </div>
                     )
-                case 'Rechazado':
-                    return(
-                    <div className='div-btns'>
-                        <h3 className='title-Homepage'>Pedido rechazado.</h3>
-                    </div>
-                    )
                 default:
                     return (
                         <div className='div-btns'>
