@@ -27,7 +27,7 @@ export default function Provisorio () {
                 service_id: service,
                 client_id: client_id
             }
-            await global.modProvisorios(data, global.pedidoDetail.order_id)
+            global.modProvisorios(data, global.pedidoDetail.order_id)
         }
 
     }

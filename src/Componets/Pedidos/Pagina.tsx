@@ -10,6 +10,7 @@ import Header from '../Header/Header'
 import { pdf } from '@react-pdf/renderer'
 import saveAs from 'file-saver'
 import filterJSON from '../../Utils/dataFilter.json'
+import clientesReturner from '../../Utils/clientesReturner'
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
 export default function PaginaPedidos () {
@@ -60,7 +61,7 @@ export default function PaginaPedidos () {
             dateStart,
             dateEnd
         }
-        await global?.pedidosFn( global.user.rol, filterData)
+        global?.pedidosFn( global.user.rol, filterData)
     }
 
     const displayLoading = () => {
@@ -173,23 +174,6 @@ export default function PaginaPedidos () {
         }
     }
 
-    const setClientsSelect = () => {
-        let aux: number = 0
-        const data = global?.ccos.map((s) => {
-            if(!aux) {
-                aux = s.client_id
-                return {cliente_id: s.client_id, cliente_des: s.client_des}
-            }
-            else{
-                if(s.client_id !== aux) {
-                    aux = s.client_id
-                    return {cliente_id: s.client_id, cliente_des: s.client_des}
-                }
-            }
-        })
-        return data?.filter(s => s)
-    }
-
     return(
         <div >
             <div className='div-pedidos'>
@@ -219,8 +203,8 @@ export default function PaginaPedidos () {
                     <select defaultValue={''} disabled={parseInt(nro) ? true : false}
                     value={client} onChange={(e) => setClient(parseInt(e.target.value))} className='select-small-cco'>
                         <option value={''}>---</option>
-                        {
-                            setClientsSelect()?.map((cco) => (
+                        {global?.ccos &&
+                            clientesReturner(global.ccos)?.map((cco) => (
                                 <option key={cco?.cliente_id} value={cco?.cliente_id}>{cco?.cliente_id+'-'+cco?.cliente_des}</option>
                             ))
                         }
