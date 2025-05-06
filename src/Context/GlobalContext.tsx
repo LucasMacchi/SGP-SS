@@ -4,15 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { IAction, ICategoriesRes, IChangeData, IClientIns, IDetailChange, IEmailSender, IFilter, IInsumo, IPedido, IPedidoRequest, IPropsChildren, IReport, IResponseInsumo, IServicio, IToken, IUser, rolesNum } from "../Utils/Interfaces"
 import ac from "./Actions"
 import { jwtDecode } from "jwt-decode"; 
-//Mocks
-import usersMock from "../Mocks/usersMock.json"
-import insumosMock from "../Mocks/insumosMock.json"
-import ccosMock from "../Mocks/ccoMock.json"
 import axios, { AxiosResponse } from "axios";
 import authReturner from "../Utils/authReturner";
 
 export const GlobalContext = createContext<IGlobalContext | null>(null)
-const MOCK = import.meta.env.VITE_USE_MOCK
 const LOGS = import.meta.env.VITE_USE_LOGS
 const SERVER = import.meta.env.VITE_SERVER
 
@@ -49,28 +44,12 @@ export default function GlobalState (props: IPropsChildren) {
 
     //Funcion para hacer login
     async function loginFn (username: string) {
-        if(MOCK === "1"){
-            usersMock.users.forEach(u => {
-                if(username === u.username){
-                    dispatch({
-                        payload: true,
-                        type: ac.LOGSTATUS_CHN
-                    })
-                    if(LOGS === "1") console.log("User " +username+ " logged in")
-                    localStorage.setItem('jwToken', '1')
-                    localStorage.setItem("usrname", u.username)
-                    window.location.reload()
-                }
-            });
-        }
-        else {
-            try {
-                const token: AxiosResponse = await axios.post(SERVER+'/user/login', {username: username})
-                localStorage.setItem('jwToken', token.data)
-                window.location.reload()
-            } catch (error) {
-                alert("Error a iniciar sesion: usuario incorrecto")
-            }
+        try {
+            const token: AxiosResponse = await axios.post(SERVER+'/user/login', {username: username})
+            localStorage.setItem('jwToken', token.data)
+            window.location.reload()
+        } catch (error) {
+            alert("Error a iniciar sesion: usuario incorrecto")
         }
     }
     //Funcion para hacer logout
@@ -100,39 +79,21 @@ export default function GlobalState (props: IPropsChildren) {
     function sessionFn () {
         const token = localStorage.getItem('jwToken')
         if(token){
-            if(MOCK === "1"){
-                usersMock.users.forEach(u => {
-                    if(u.username === localStorage.getItem('usrname')){
-                        dispatch({
-                            payload: {username: u.username, first_name: u.first_name, last_name: u.last_name, rol: u.rol},
-                            type: ac.GET_USER
-                        })
-                        dispatch({
-                            payload: true,
-                            type: ac.LOGSTATUS_CHN
-                        })
-                        
-                    }
-                });
+            dispatch({
+                payload: true,
+                type: ac.LOGSTATUS_CHN
+            })
+            const dataUser: IToken = jwtDecode(token)
+            const currentDateTime = Math.floor(Date.now() / 1000)
+            if(dataUser.exp < currentDateTime) {
+                logoutFn()
+                return 0
             }
             else{
-
                 dispatch({
-                    payload: true,
-                    type: ac.LOGSTATUS_CHN
+                    payload: {username: dataUser.user, first_name: dataUser.first_name, last_name: dataUser.last_name, rol: dataUser.rol},
+                    type: ac.GET_USER
                 })
-                const dataUser: IToken = jwtDecode(token)
-                const currentDateTime = Math.floor(Date.now() / 1000)
-                if(dataUser.exp < currentDateTime) {
-                    logoutFn()
-                    return 0
-                }  
-                else{
-                    dispatch({
-                        payload: {username: dataUser.user, first_name: dataUser.first_name, last_name: dataUser.last_name, rol: dataUser.rol},
-                        type: ac.GET_USER
-                    })
-                }
             }
 
             if(LOGS === "1") console.log("User logged in by session ")
@@ -170,54 +131,29 @@ export default function GlobalState (props: IPropsChildren) {
     }
     //Trae todos los insumos para la creacion de nuevos pedidos
     async function insumosFn () {
-        if(MOCK === "1") {
-            dispatch({
-                type: ac.GET_INSUMOS,
-                payload: insumosMock.array
-            })
-        }
-        else {
-            const insumos: AxiosResponse<IResponseInsumo[]> = await axios.get(SERVER+'/data/insumos', authReturner())
-            
-            const filtered = insumos.data.map(i => i.insumo)
-            dispatch({
-                type: ac.GET_INSUMOS,
-                payload: filtered
-            })
-        }
+        const insumos: AxiosResponse<IResponseInsumo[]> = await axios.get(SERVER+'/data/insumos', authReturner())
+
+        const filtered = insumos.data.map(i => i.insumo)
+        dispatch({
+            type: ac.GET_INSUMOS,
+            payload: filtered
+        })
     }
     //Trae los Centros de Costos para la creacion de pedidos
     async function ccosFn () {
-        if(MOCK === "1") {
-            dispatch({
-                type: ac.GET_CCOS,
-                payload: ccosMock.ccos
-            })
-        }
-        else {
-            const ccos: AxiosResponse<IServicio[]> = await axios.get(SERVER+'/data/cco', authReturner())
-            dispatch({
-                type: ac.GET_CCOS,
-                payload: ccos.data
-            })
-        }
+        const ccos: AxiosResponse<IServicio[]> = await axios.get(SERVER+'/data/cco', authReturner())
+        dispatch({
+            type: ac.GET_CCOS,
+            payload: ccos.data
+        })
     }
     //Trae todos los usuarios
     async function sysUsersFn () {
-        if(MOCK === "1") {
-            const users: IUser[] = usersMock.users
-            dispatch({
-                type: ac.GET_ALL_USERS,
-                payload: users
-            })
-        }
-        else {
-            const users: AxiosResponse<IUser[]> = await axios.get(SERVER+'/user/all',authReturner())
-            dispatch({
-                type: ac.GET_ALL_USERS,
-                payload: users.data
-            })
-        }
+        const users: AxiosResponse<IUser[]> = await axios.get(SERVER+'/user/all',authReturner())
+        dispatch({
+            type: ac.GET_ALL_USERS,
+            payload: users.data
+        })
     }
     //Aprueba pedido
     async function orderAproveFn (order_id: number, comentario: string, detailsDel?: number[], detailsChange?: IDetailChange[]): Promise<boolean> {
