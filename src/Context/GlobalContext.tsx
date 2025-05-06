@@ -436,6 +436,18 @@ export default function GlobalState (props: IPropsChildren) {
         window.location.reload()
     }
 
+    //Agrega un insumo al pedido
+    async function addInsumo (insumo: string, orderId: number, amount: number) {
+        try{
+            await axios.post(SERVER+`/pedido/insumo/${orderId}/${insumo}/${amount}`,{} ,authReturner())
+            alert("Insumo agregado a la orden correctamente.")
+            navigation('/')
+            window.location.reload()
+        }catch(error){
+            alert("Error a agregar insumo al pedido.")
+        }
+    }
+
     const innitialState: IGlobalContext = {
         user: {username: '', first_name: '', last_name: '', rol: 3, activated: false},
         pedidoDetail: {order_id: 0, requester: '', date_requested: '', insumos: [], state: '', service_id: 0, client_id: 0, archive: false, numero: '', user_id: 0, first_name: '', last_name: '', email: ''},
@@ -471,7 +483,8 @@ export default function GlobalState (props: IPropsChildren) {
         categoriesGet,
         createReport,
         getReports,
-        modProvisorios
+        modProvisorios,
+        addInsumo
     }
 
 
@@ -523,5 +536,6 @@ interface IGlobalContext{
     categoriesGet: () => void,
     createReport: (data: IReport, reload: boolean) => void,
     getReports: (numero:string) => void,
-    modProvisorios : (data:IChangeData, id: number) => void
+    modProvisorios : (data:IChangeData, id: number) => void,
+    addInsumo: (insumo: string, orderId: number, amount: number) => void
 }

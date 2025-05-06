@@ -18,7 +18,7 @@ export default function ReportPage () {
 
     const searchReports = async () => {
         if(global){
-            await global.getReports(nro)
+            global.getReports(nro)
         }
         
     }

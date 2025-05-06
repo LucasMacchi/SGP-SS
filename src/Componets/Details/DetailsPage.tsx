@@ -17,6 +17,9 @@ export default function DetailsPage () {
     const global = useContext(GlobalContext)
     const [order, setOrder] = useState<IPedido | null>(null)
     const [loading, setLoad] = useState(false)
+    const [addIns, setAddIns] = useState(false)
+    const [newIns, setNewAdd] = useState('')
+    const [newAmount, setNewAmount] = useState(0)
     const [details, _setDetails] = useState<number[]>([])
     const [detailsChange, _setChange] = useState<IDetailChange[]>([])
     const [commnet, setComment] = useState<string>('')
@@ -338,6 +341,18 @@ export default function DetailsPage () {
         }
     }
 
+    const addNewInsumo = async () => {
+        if(order && global && newIns && newAmount) {
+            global.addInsumo( newIns, order.order_id,newAmount)
+        }
+        else alert('Ingrese un insumo y monto correcto.')
+    }
+
+    const checkToAdd = (): boolean => {
+        if(order?.state === "Pendiente" && global?.user.rol === rolesNum.en_deposito) return true
+        else return false
+    }
+
     const dataDisplay = () => {
         if(order) {
             return(
@@ -357,6 +372,30 @@ export default function DetailsPage () {
                     <h4>{order.date_aproved ? 'Aprobado: '+dbDateParser(order.date_aproved, false) : 'Aprobacion: pendiente'}</h4>
                     <h4>{order.date_delivered ? "Recibido: "+dbDateParser(order.date_delivered,false) : 'Entrega: pendiente'}</h4>
                     <hr color='#666666' className='hr-details'/>
+                    {checkToAdd() &&
+                        <div className='data-div-add-special'>
+                            <h4>Agregar insumo: </h4>
+                            <input type="checkbox" checked={addIns} onChange={(e) => setAddIns(e.target.checked)}/>
+                        </div>
+                    }
+
+                    {addIns &&
+                        <div>
+                        <select defaultValue={''} value={newIns} className="data-div-select"
+                        onChange={e => setNewAdd(e.target.value)}>
+                        <option value={''}>---</option>
+                        {
+                            global?.insumos.map((i, index) => (
+                                <option key={index} value={i}>{i}</option>
+                            ))
+                        }
+                        </select>
+                        <input type="number" step='any' id='amount' min={0}
+                        value={newAmount} onChange={(e) => setNewAmount(parseFloat(e.target.value))}
+                        className="data-div-textfield-amount"/>
+                        <button className='btn-export-pdf' onClick={() => addNewInsumo()}>Agregar</button>
+                        </div>
+                    }
                     <table >
                         <tbody>
                             <tr>

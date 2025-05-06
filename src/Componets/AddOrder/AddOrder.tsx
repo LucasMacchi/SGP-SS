@@ -6,6 +6,7 @@ import { IInsumo, IAddPedido, IToken, IServicio } from '../../Utils/Interfaces'
 import clientSearcher from "../../Utils/clientSearcher"
 import { jwtDecode } from "jwt-decode"
 import Header from "../Header/Header"
+import clientesReturner from "../../Utils/clientesReturner"
 
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
@@ -16,6 +17,7 @@ export default function AddOrder () {
     const [btn, setBtn] = useState(true)
     const [searchIns, setSearchIns] = useState('')
     const [searchServ, setSearchServ] = useState('')
+    const [filterClient, setFilterClient] = useState(0)
     const [filterIns, setFilterIns] = useState<string[]>([])
     const [filterServ, setFilterServ] = useState<IServicio[]>([])
     const [insumos, setInsumos] = useState('')
@@ -88,11 +90,19 @@ export default function AddOrder () {
     },[newOrder, service])
 
     useEffect(() => {
-        if(searchServ.length > 2){
-            const filtered = global?.ccos.filter(c => c.service_des.toUpperCase().includes(searchServ.toUpperCase()))
-            if(filtered) setFilterServ(filtered)
+        let arr = global?.ccos
+        if(arr) {
+            if(searchServ.length > 2){
+                arr = arr.filter(c => c.service_des.toUpperCase().includes(searchServ.toUpperCase()))
+
+            }
+            if(filterClient > 0) {
+                arr = arr.filter(c => c.client_id === filterClient)
+            }
+            setFilterServ(arr)
         }
-    },[searchServ])
+    },[searchServ, filterClient, global?.ccos])
+
     useEffect(() => {
         if(searchIns.length > 2){
             const filtered = global?.insumos.filter(c => c.toUpperCase().includes(searchIns.toUpperCase()))
@@ -150,14 +160,14 @@ export default function AddOrder () {
             newOrder.prov = true
             newOrder.prov_des = service
             console.log(newOrder)
-            await global?.addPedido(dataUser.usuario_id, dataUser.user, newOrder.service_id, clientSearcher(global.ccos, newOrder.service_id), newOrder.insumos, newOrder.prov, newOrder.prov_des)
+            global?.addPedido(dataUser.usuario_id, dataUser.user, newOrder.service_id, clientSearcher(global.ccos, newOrder.service_id), newOrder.insumos, newOrder.prov, newOrder.prov_des)
 
         }
         else if (custom) {
             alert("Ingrese un servicio personalizado valido.")
         }
         else {
-            await global?.addPedido(dataUser.usuario_id, dataUser.user, newOrder.service_id, clientSearcher(global.ccos, newOrder.service_id), newOrder.insumos, false, '')
+            global?.addPedido(dataUser.usuario_id, dataUser.user, newOrder.service_id, clientSearcher(global.ccos, newOrder.service_id), newOrder.insumos, false, '')
         }
     }
 
@@ -199,20 +209,31 @@ export default function AddOrder () {
                     <input type="text" id='otherins' className="data-div-select" 
                     onChange={(e) => setSearchServ(e.target.value)} value={searchServ}/>
                 </div>
+                <div>
+                <h6>Cliente</h6>
+                <select disabled={id ? true : false} defaultValue={''} value={filterClient} className="data-div-select"
+                onChange={e => setFilterClient(parseInt(e.target.value))}>
+                <option value={0}>---</option>
+                {global?.ccos &&
+                    clientesReturner(global?.ccos).map((c) => {
+                        return(<option key={c?.cliente_id} value={c?.cliente_id}>{c?.cliente_id+'-'+c?.cliente_des}</option>)
+                    })
+                }
+                </select>
+                </div>
+                <div>
+                <h6>Servicio</h6>
                 <select disabled={id ? true : false} defaultValue={''} value={newOrder.service_id} className="data-div-select"
                 onChange={e => handleData(e.target.value, 'service_id')}>
                 <option value={''}>---</option>
                 {
-                    searchServ.length > 2 ?
                     filterServ.map((c) => {
-                        return(<option key={c.service_id} value={c.service_id}>{c.service_des}</option>)
-                    })
-                    :
-                    global?.ccos.map((c) => {
                         return(<option key={c.service_id} value={c.service_id}>{c.service_des}</option>)
                     })
                 }
                 </select>
+                </div>
+
             </div>
             )
         }
@@ -243,12 +264,14 @@ export default function AddOrder () {
                     <input type="text" id='otherins' className="data-div-select" 
                     onChange={(e) => setSearchIns(e.target.value)} value={searchIns}/>
                 </div>
+                <div>
+                <h6>Insumo</h6>
                 <select defaultValue={''} value={insumos} className="data-div-select"
                 disabled={insumos2 ? true : false}
                 onChange={e => setInsumos(e.target.value)}>
                 <option value={''}>---</option>
                 {
-                    searchIns.length > 2 ? 
+                    searchIns.length > 2 ?
                     filterIns.map((i, index) => (
                         <option key={index} value={i}>{i}</option>
                     ))
@@ -261,6 +284,9 @@ export default function AddOrder () {
                 <input type="number" step='any' id='amount' min={0}
                 value={amount} onChange={(e) => setAmount(parseFloat(e.target.value))}
                 className="data-div-textfield-amount"/>
+                </div>
+
+
             </div>
             )
         }
