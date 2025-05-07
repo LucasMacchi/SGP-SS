@@ -64,16 +64,6 @@ export default function AddOrder () {
         if(global?.pedidoDetail) setOrder(global?.pedidoDetail)
     },[global?.pedidoDetail])
 
-    useEffect(() => {
-        setOrder({
-            requester: '',
-            service_id: 0,
-            client_id: 0,
-            insumos: [],
-            user_id: 0,
-        })
-    },[loading])
-
     const handleData = (data: string, prop: string) => {
         setOrder({
             ...newOrder,

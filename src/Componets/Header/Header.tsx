@@ -13,8 +13,6 @@ export default function Header () {
     const navigateTo = (link: string) => {
         setDrop(false)
         navigator(link)
-        if(link === '/pedidos') window.location.reload()
-
     }
 
     const logOutHeader = () => {
