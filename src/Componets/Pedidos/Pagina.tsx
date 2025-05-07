@@ -53,7 +53,7 @@ export default function PaginaPedidos () {
     const filterArray = async () => {
         const filterData: IFilter = {
             limit: limit,
-            client,
+            client: client ? client : 0,
             service: cco,
             requester: req,
             numero: nro,
@@ -96,7 +96,7 @@ export default function PaginaPedidos () {
     const displayPedidos = () => (
         global?.pedidos.map((p) => {
             return(
-                <div key={p.numero} 
+                <div key={p.numero+p.date_requested}
                 className={colorChange(p.state)} 
                 onClick={() => navigator('/pedidos/'+p.numero)}>
                     <h5>{"Nro: "+p.numero}</h5>
@@ -205,7 +205,7 @@ export default function PaginaPedidos () {
                         <option value={''}>---</option>
                         {global?.ccos &&
                             clientesReturner(global.ccos)?.map((cco) => (
-                                <option key={cco?.cliente_id} value={cco?.cliente_id}>{cco?.cliente_id+'-'+cco?.cliente_des}</option>
+                                <option key={cco.client_id} value={cco.client_id}>{cco.client_id+'-'+cco.client_des}</option>
                             ))
                         }
                     </select>

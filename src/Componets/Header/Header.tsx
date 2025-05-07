@@ -39,10 +39,13 @@ export default function Header () {
                         </li>
                         <li className='dropdown-li' onClick={() => navigateTo('/add')}>
                             Nuevo Pedido
-                            </li>
+                        </li>
                         <li className='dropdown-li' onClick={() => navigateTo('/informes')}>
                             Generar Informes
-                            </li>
+                        </li>
+                        <li className='dropdown-li' onClick={() => navigateTo('/services')}>
+                        Servicios
+                        </li>
                         <li className='dropdown-li' onClick={() => navigateTo('/correo')}>
                             Correo
                         </li>

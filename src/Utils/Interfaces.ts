@@ -90,7 +90,8 @@ export interface IServicio {
     service_id: number,
     client_id: number,
     service_des: string,
-    client_des: string
+    client_des: string,
+    localidad: string
 }
 
 export interface IPedidoRequest {

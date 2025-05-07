@@ -1,0 +1,12 @@
+.service-div {
+    max-width: 300px
+}
+.service-table {
+    max-width: 500px;
+}
+.service-table-row {
+    border: 1px solid;
+    padding: 1px;
+    text-align: left;
+    font-size: small;
+}

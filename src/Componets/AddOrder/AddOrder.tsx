@@ -7,6 +7,7 @@ import clientSearcher from "../../Utils/clientSearcher"
 import { jwtDecode } from "jwt-decode"
 import Header from "../Header/Header"
 import clientesReturner from "../../Utils/clientesReturner"
+import departamentoReturner from "../../Utils/departamentoReturner"
 
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
@@ -18,6 +19,7 @@ export default function AddOrder () {
     const [searchIns, setSearchIns] = useState('')
     const [searchServ, setSearchServ] = useState('')
     const [filterClient, setFilterClient] = useState(0)
+    const [filterDepartment, setDepartment] = useState('')
     const [filterIns, setFilterIns] = useState<string[]>([])
     const [filterServ, setFilterServ] = useState<IServicio[]>([])
     const [insumos, setInsumos] = useState('')
@@ -89,9 +91,12 @@ export default function AddOrder () {
             if(filterClient > 0) {
                 arr = arr.filter(c => c.client_id === filterClient)
             }
+            if(filterDepartment) {
+                arr = arr.filter(c => c.localidad === filterDepartment)
+            }
             setFilterServ(arr)
         }
-    },[searchServ, filterClient, global?.ccos])
+    },[searchServ, filterClient, filterDepartment, global?.ccos])
 
     useEffect(() => {
         if(searchIns.length > 2){
@@ -151,7 +156,6 @@ export default function AddOrder () {
             newOrder.prov_des = service
             console.log(newOrder)
             global?.addPedido(dataUser.usuario_id, dataUser.user, newOrder.service_id, clientSearcher(global.ccos, newOrder.service_id), newOrder.insumos, newOrder.prov, newOrder.prov_des)
-
         }
         else if (custom) {
             alert("Ingrese un servicio personalizado valido.")
@@ -206,7 +210,19 @@ export default function AddOrder () {
                 <option value={0}>---</option>
                 {global?.ccos &&
                     clientesReturner(global?.ccos).map((c) => {
-                        return(<option key={c?.cliente_id} value={c?.cliente_id}>{c?.cliente_id+'-'+c?.cliente_des}</option>)
+                        return(<option key={c.client_id} value={c.client_id}>{c.client_id+'-'+c.client_des}</option>)
+                    })
+                }
+                </select>
+                </div>
+                <div>
+                <h6>Departamento</h6>
+                <select disabled={id ? true : false} defaultValue={''} value={filterDepartment} className="data-div-select"
+                onChange={e => setDepartment(e.target.value)}>
+                <option value={''}>---</option>
+                {global?.ccos &&
+                    departamentoReturner(global?.ccos).map((d) => {
+                        return(<option key={d} value={d}>{d}</option>)
                     })
                 }
                 </select>

@@ -285,7 +285,7 @@ export default function DetailsPage () {
         }
         global?.ccos.forEach(s => {
             if(id === s.service_id) {
-                data.clientdes = s.client_des
+                data.clientdes = s.client_des + ' - ' +s.localidad
                 data.clientid = s.client_id
                 data.serdes = s.service_des,
                 data.serid = s.service_id
@@ -410,7 +410,6 @@ export default function DetailsPage () {
                             ))}
                         </tbody>
                     </table>
-                    {/*insumoAdder()*/}
                 </div>
             )
         }
