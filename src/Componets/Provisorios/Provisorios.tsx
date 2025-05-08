@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
-import { useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import Header from '../Header/Header'
 import { IChangeData } from '../../Utils/Interfaces'
 
@@ -8,13 +8,12 @@ export default function Provisorio () {
 
     const [service, setService] = useState(0)
     const global = useContext(GlobalContext)
-    const params = useParams()
-    const id = params.orderId
+    const navigator = useNavigate()
 
     useEffect(() => {
         if(global?.login === false) global?.sessionFn()
         if(global?.ccos.length === 0) global?.ccosFn()
-        if(global && id) global.uniqPedido(id, global.pedidos, false)
+        if(!global?.pedidoDetail.order_id) navigator('/')
     },[])
 
 
