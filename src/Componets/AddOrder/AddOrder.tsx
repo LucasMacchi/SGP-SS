@@ -47,11 +47,9 @@ export default function AddOrder () {
             setTimeout(() => {
                 setShowForm(true)
             }, waitTime);
-            if(id){
-                global.uniqPedido(id, global.pedidos, false)
-            }
+            if(id) setOrder(global.pedidoDetail)
+            else global?.uniqPedido(0,true)
         }
-
     },[])
 
     useEffect(() => {
@@ -62,9 +60,6 @@ export default function AddOrder () {
         setInsumos2('')
     },[customIn])
 
-    useEffect(() => {
-        if(global?.pedidoDetail) setOrder(global?.pedidoDetail)
-    },[global?.pedidoDetail])
 
     const handleData = (data: string, prop: string) => {
         setOrder({

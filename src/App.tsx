@@ -19,7 +19,7 @@ function App() {
   }
 
   const ping = async () => {
-    console.log(await global?.pingServer())
+    console.log(global?.pingServer())
   }
 
   const loginAction = (e: React.MouseEvent) => {

@@ -26,18 +26,17 @@ export default function DetailsPage () {
 
 
     useEffect(() => {
-        if(global && global.pedidos.length > 0 && id){
-            global.pedidos.forEach(p => {
-                if(p.numero === id) {
-                    setOrder(p)
-                }
-            });
-            if(global.insumos.length === 0) global?.insumosFn()
+        if(global && id){
+            global.uniqPedido(parseInt(id), false)
+            if(global.insumos.length === 0) global.insumosFn()
         }else{
-
             navigator('/')
         }
     },[])
+
+    useEffect(() => {
+        if(global) setOrder(global?.pedidoDetail)
+    },[global?.pedidoDetail])
 
     const rejectFn = (order_id: number) => {
         setLoad(true)

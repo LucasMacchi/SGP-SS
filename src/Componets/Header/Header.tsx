@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { GlobalContext } from '../../Context/GlobalContext'
 import './Header.css'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 export default function Header () {
 
@@ -15,6 +15,8 @@ export default function Header () {
         navigator(link)
     }
 
+    useEffect(() => {if(global)if(!global.login) global.sessionFn()},[])
+
     const logOutHeader = () => {
         if(confirm('¿Seguro que quieres cerrar sesion?')) {
             global?.logoutFn()
@@ -27,6 +29,8 @@ export default function Header () {
             <div className='div-logo'>
                 <img src="/logo_big.webp" alt="" className='logo-big-home'/>
             </div>
+            {global?.user.username &&
+                <h5 className='delete-text'>{global.user.username}</h5>}
             <div className="dropdown">
                 <button className='btn-menu-header' onClick={() => setDrop(!drop)}>Menu</button>
                 {drop && (

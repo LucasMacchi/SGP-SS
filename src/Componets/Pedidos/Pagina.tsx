@@ -27,8 +27,7 @@ export default function PaginaPedidos () {
     const [dateEnd, setDateEnd] = useState('')
     
     useEffect(() => {
-        if(!global?.login) global?.sessionFn()
-            setDateStart(lastMonth())
+        setDateStart(lastMonth())
     },[])
     useEffect(() => {
         setTimeout(() => {
@@ -98,7 +97,7 @@ export default function PaginaPedidos () {
             return(
                 <div key={p.numero+p.date_requested}
                 className={colorChange(p.state)} 
-                onClick={() => navigator('/pedidos/'+p.numero)}>
+                onClick={() => {navigator('/pedidos/'+p.order_id)}}>
                     <h5>{"Nro: "+p.numero}</h5>
                     <h5>{displayDate(p.date_requested)}</h5>
                     <h5>{p.state}</h5>

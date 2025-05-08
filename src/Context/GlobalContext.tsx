@@ -48,6 +48,7 @@ export default function GlobalState (props: IPropsChildren) {
             const token: AxiosResponse = await axios.post(SERVER+'/user/login', {username: username})
             localStorage.setItem('jwToken', token.data)
             window.location.reload()
+            navigation('/pedidos')
         } catch (error) {
             alert("Error a iniciar sesion: usuario incorrecto")
         }
@@ -96,11 +97,11 @@ export default function GlobalState (props: IPropsChildren) {
                 })
             }
 
-            if(LOGS === "1") console.log("User logged in by session ")
-                navigation("/pedidos")
+            console.log("User logged in by session ")
+            if(window.location.pathname === '/') navigation('/pedidos')
         }
         else {
-            if(LOGS === "1") console.log("No session detected")
+            console.log("No session detected")
             navigation('/')
         }
     }
@@ -121,7 +122,6 @@ export default function GlobalState (props: IPropsChildren) {
             }
             else if(rol === rolesNum.admin || rol === rolesNum.administrativo || rol === rolesNum.en_deposito){
                 const pedidos: AxiosResponse<IPedido[]> = await axios.post(SERVER+'/pedido/all',filter ,authReturner())
-                console.log(pedidos)
                 dispatch({
                     type: ac.GET_PEDIDOS,
                     payload: pedidos.data
@@ -259,23 +259,25 @@ export default function GlobalState (props: IPropsChildren) {
     }
 
     //Retorna un pedido especifico
-    function uniqPedido (id: string, pedidos: IPedido[], empty: boolean) {
-        if(empty) {
-            dispatch({
-                type: ac.GET_UNIQUE_PEDIDO,
-                payload: {requester: '', date_requested: '', insumos: [], state: 'Pendiente', cco: ''}
-            })
-        }
-        if(LOGS) console.log("STATE PEDIDO ",pedidos)
-        pedidos.forEach(p => {
-            if(p.numero === id) {
-                if(LOGS) console.log("ORDER TO RETURN ",p)
+    async function uniqPedido (id: number, empty: boolean) {
+        try{
+            if(empty) {
                 dispatch({
                     type: ac.GET_UNIQUE_PEDIDO,
-                    payload: p
+                    payload: {requester: '', date_requested: '', insumos: [], state: 'Pendiente', cco: ''}
                 })
             }
-        });
+            else {
+                const pedido: IPedido[] = await (await axios.get(SERVER+'/pedido/detail/'+id)).data[0]
+                dispatch({
+                    type: ac.GET_UNIQUE_PEDIDO,
+                    payload: pedido
+                })
+            }
+        }catch(error){
+            alert("No se puedo conseguir los datos del pedido.")
+            navigation('/')
+        }
         
     }
 
@@ -378,13 +380,11 @@ export default function GlobalState (props: IPropsChildren) {
         try{
             await axios.post(SERVER+`/pedido/insumo/${orderId}/${insumo}/${amount}`,{} ,authReturner())
             alert("Insumo agregado a la orden correctamente.")
-            navigation('/')
             window.location.reload()
         }catch(error){
             alert("Error a agregar insumo al pedido.")
         }
     }
-
     const innitialState: IGlobalContext = {
         user: {username: '', first_name: '', last_name: '', rol: 3, activated: false},
         pedidoDetail: {order_id: 0, requester: '', date_requested: '', insumos: [], state: '', service_id: 0, client_id: 0, archive: false, numero: '', user_id: 0, first_name: '', last_name: '', email: ''},
@@ -462,7 +462,7 @@ interface IGlobalContext{
     orderArchFn: (order_id: number) => void,
     delUser: (username: string, state: boolean) => void,
     addUser: (user: IUser) => void,
-    uniqPedido: (id: string, pedidos: IPedido[],empty: boolean) => void,
+    uniqPedido: (id: number, empty: boolean) => void,
     addPedido: (user_id: number, requester: string, service_id: number, client_id: number,
         insumos: IInsumo[], prov: boolean, prov_des: string | null) => void,
     orderReadyFn: (order_id: number) => void,
