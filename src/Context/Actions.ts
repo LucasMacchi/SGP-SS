@@ -11,6 +11,7 @@ export default {
     ADD_USER: 'add_user',
     DEL_USER: 'del_user',
     GET_CATEGORIES: 'get_categories',
-    GET_REPORTS: 'get_reports'
+    GET_REPORTS: 'get_reports',
+    GET_ERROR_CATEGORIES: 'ger_error_categories'
     
 }

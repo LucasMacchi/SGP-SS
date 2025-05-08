@@ -15,6 +15,8 @@ const globalReducer = (state: IGlobalContext, action: IAction): IGlobalContext =
     const {type, payload} = action
 
     switch(type){
+        case ac.GET_ERROR_CATEGORIES:
+            return {...state, errorCat: payload}
         case ac.GET_UNIQUE_PEDIDO:
             return {...state, pedidoDetail: payload}
         case ac.GET_ALL_USERS:
@@ -385,6 +387,25 @@ export default function GlobalState (props: IPropsChildren) {
             alert("Error a agregar insumo al pedido.")
         }
     }
+    //Trae todos las categorias de errores
+    async function errorsCatGet () {
+        const res: ICategoriesRes = await (await axios.get(SERVER+'/data/errors', authReturner())).data
+        dispatch({
+            type: ac.GET_ERROR_CATEGORIES,
+            payload: res.categorias
+        })
+    }
+
+    async function emailError (data: IReport) {
+        try{
+            await axios.post(SERVER+'/data/errors',data ,authReturner())
+            alert('Reporte enviado.')
+            //window.location.reload()
+        }catch(error){
+            console.log(error)
+            alert('Error al mandar el reporte.')
+        }
+    }
     const innitialState: IGlobalContext = {
         user: {username: '', first_name: '', last_name: '', rol: 3, activated: false},
         pedidoDetail: {order_id: 0, requester: '', date_requested: '', insumos: [], state: '', service_id: 0, client_id: 0, archive: false, numero: '', user_id: 0, first_name: '', last_name: '', email: ''},
@@ -395,6 +416,7 @@ export default function GlobalState (props: IPropsChildren) {
         insumos: [],
         categories: [],
         reports: [],
+        errorCat: [],
         loginFn,
         logoutFn,
         sessionFn,
@@ -421,7 +443,9 @@ export default function GlobalState (props: IPropsChildren) {
         createReport,
         getReports,
         modProvisorios,
-        addInsumo
+        addInsumo,
+        errorsCatGet,
+        emailError
     }
 
 
@@ -440,6 +464,7 @@ export default function GlobalState (props: IPropsChildren) {
 interface IGlobalContext{
     user: IUser,
     categories: string[],
+    errorCat: string[],
     pedidoDetail: IPedido,
     login: boolean,
     pedidos: IPedido[],
@@ -471,8 +496,10 @@ interface IGlobalContext{
     generateClientPDF: (client_id: number, dateStart: string, dateEnd: string, user_id: number) => Promise<IClientIns[] | undefined>,
     sendEmail: (data:IEmailSender) => void,
     categoriesGet: () => void,
+    errorsCatGet: () => void,
     createReport: (data: IReport, reload: boolean) => void,
     getReports: (numero:string) => void,
     modProvisorios : (data:IChangeData, id: number) => void,
-    addInsumo: (insumo: string, orderId: number, amount: number) => void
+    addInsumo: (insumo: string, orderId: number, amount: number) => void,
+    emailError: (data: IReport) => void
 }
