@@ -99,6 +99,10 @@ const ClientDocument: React.FC<IPedidoClientPDF> = ({pedido}) => (
                 <View >
                     <Text style={stylePedido.title}>Datos del Informe</Text>
                     <Text style={stylePedido.body}>Cliente: {pedido.pedido_client_id+'-'+pedido.pedido_client}</Text>
+                    {pedido.pedido_requester &&
+                        <Text style={stylePedido.body}>
+                        Solicitante: {pedido.pedido_requester}
+                        </Text>}
                 </View>
                 <View style={stylePedido.viewdataReq}>
                     <Text style={stylePedido.title}>Fechas de pedidos</Text>

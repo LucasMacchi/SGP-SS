@@ -83,7 +83,8 @@ export interface IUser {
     rol: number,
     activated?: boolean,
     date_creation?: string
-    email?: string
+    email?: string,
+    usuario_id?: number
 }
 
 export interface IServicio {
@@ -134,6 +135,7 @@ export interface IpedidoClientDataPDF {
     pedido_end: string,
     pedido_client: string,
     pedido_client_id: number,
+    pedido_requester: string,
     pedido_insumos: IInsumo[]
 }
 export interface IPedidoClientPDF {

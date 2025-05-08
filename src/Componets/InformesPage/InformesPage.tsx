@@ -13,9 +13,12 @@ export default function InformesPage () {
     const [startDate, setStartDate] = useState(lastMonth())
     const [endDate, setEndDate] = useState('')
     const [client, setClient] = useState(0)
+    const [userReq, setUser] = useState(0)
 
     useEffect(() => {
         setStartDate(lastMonth())
+        if(global?.ccos.length === 0) global.ccosFn()
+        if(global?.sysUsers.length === 0) global.sysUsersFn()
     },[])
 
     const setClientsSelect = () => {
@@ -44,7 +47,7 @@ export default function InformesPage () {
 
     const generateClientPDF = async () => {
         if(startDate && endDate && client){
-            const response = await global?.generateClientPDF(client, startDate, endDate)
+            const response = await global?.generateClientPDF(client, startDate, endDate, userReq)
             if(response) {
                 const insumosFormat: IInsumo[] = response.map((i) => {
                     const format = i.insumo_des.split('-')
@@ -62,13 +65,20 @@ export default function InformesPage () {
                     }
                     return data
                 })
+                let reqName = ''
+                if(userReq) {
+                    global?.sysUsers.forEach((u) => {
+                        if(u.usuario_id === userReq) reqName = u.last_name +" "+u.first_name
+                    })
+                }
                 const clientedes = clientNameReturner(client)
                 const data: IpedidoClientDataPDF = {
                     pedido_client: clientedes,
                     pedido_start: startDate,
                     pedido_end: endDate,
                     pedido_client_id: client,
-                    pedido_insumos: insumosFormat
+                    pedido_insumos: insumosFormat,
+                    pedido_requester: reqName
                 }
                 const blob: Blob = await pdf(<ClientDocument pedido={data}/>).toBlob()
                 saveAs(blob, ''+clientedes)
@@ -106,6 +116,16 @@ export default function InformesPage () {
                                 <option key={cco?.cliente_id} value={cco?.cliente_id}>{cco?.cliente_id+'-'+cco?.cliente_des}</option>
                             ))
                         }
+                    </select>
+                    <h5 className='filter-sub'>Solicitante</h5>
+                    <select defaultValue={''}
+                    value={userReq} onChange={(e) => setUser(parseInt(e.target.value))} className='select-small-cco'>
+                    <option value={''}>---</option>
+                    {
+                        global?.sysUsers.map((u) => (
+                            <option key={u.usuario_id} value={u.usuario_id}>{u.last_name + ' ' + u.first_name}</option>
+                        ))
+                    }
                     </select>
                     <div>
                     <h5 className='filter-sub'>Fecha de inicio y Final</h5>

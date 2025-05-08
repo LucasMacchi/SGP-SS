@@ -311,12 +311,13 @@ export default function GlobalState (props: IPropsChildren) {
         else return 'Cannot ping the server '+SERVER 
     }
 
-    async function generateClientPDF (client_id: number, dateStart: string, dateEnd: string): Promise<IClientIns[] | undefined> {
+    async function generateClientPDF (client_id: number, dateStart: string, dateEnd: string, user_id: number): Promise<IClientIns[] | undefined> {
         try {
             const data = {
                 client_id,
                 dateEnd,
-                dateStart
+                dateStart,
+                user_id
             }
             const clientInsumos: AxiosResponse<IClientIns[]> = await axios.post(SERVER+'/data/client',data,authReturner())
             return clientInsumos.data
@@ -467,7 +468,7 @@ interface IGlobalContext{
     orderReadyFn: (order_id: number) => void,
     pingServer: () => void,
     problemFn: (order_id: number, comentario: string) => void,
-    generateClientPDF: (client_id: number, dateStart: string, dateEnd: string) => Promise<IClientIns[] | undefined>,
+    generateClientPDF: (client_id: number, dateStart: string, dateEnd: string, user_id: number) => Promise<IClientIns[] | undefined>,
     sendEmail: (data:IEmailSender) => void,
     categoriesGet: () => void,
     createReport: (data: IReport, reload: boolean) => void,
