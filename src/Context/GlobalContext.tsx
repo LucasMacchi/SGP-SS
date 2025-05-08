@@ -99,11 +99,11 @@ export default function GlobalState (props: IPropsChildren) {
                 })
             }
 
-            console.log("User logged in by session ")
+            //console.log("User logged in by session ")
             if(window.location.pathname === '/') navigation('/pedidos')
         }
         else {
-            console.log("No session detected")
+            //console.log("No session detected")
             navigation('/')
         }
     }
@@ -400,7 +400,7 @@ export default function GlobalState (props: IPropsChildren) {
         try{
             await axios.post(SERVER+'/data/errors',data ,authReturner())
             alert('Reporte enviado.')
-            //window.location.reload()
+            window.location.reload()
         }catch(error){
             console.log(error)
             alert('Error al mandar el reporte.')

@@ -59,7 +59,7 @@ export default function Soporte () {
         else {
             return (
                 <div className='data-div-add'>
-                <h4>Correos de los Usuarios: </h4>
+                <h4>Selecciona el asunto: </h4>
                 <select defaultValue={''} value={cat} className="filter-sub"
                 onChange={e => setCat(e.target.value)}>
                 <option value={''}>---</option>
@@ -80,8 +80,11 @@ export default function Soporte () {
         <Header />
         </div>
         <h1 className='title-Homepage' >
-        {'Correo'}
+        {'Soporte Tecnico'}
         </h1>
+        <hr color='#3399ff' className='hr-line'/>
+        <h5 className='filter-sub'>En caso de informar un error, sea los mas especifico </h5>
+        <h5 className='filter-sub'>posible y detalle el paso a paso para replicarlo.</h5>
         <hr color='#3399ff' className='hr-line'/>
         {selectDisplayer()}
         <textarea value={message} className='texarea-details-big' onChange={(e) => setMsg(e.target.value)}/>
