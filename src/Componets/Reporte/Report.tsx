@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
-import { useParams } from 'react-router-dom'
 import Header from '../Header/Header'
 import { useNavigate } from 'react-router-dom'
 import { IReport, IToken } from '../../Utils/Interfaces'
