@@ -114,12 +114,10 @@ export default function DetailsPage () {
         }
     }
 
-    const deleteInsumoRow = (index: number, insumo: string, details_id: number | undefined) => {
+    const deleteInsumoRow = async (index: number, insumo: string, details_id: number | undefined) => {
         if(order && order.insumos.length > 1 && order.state === 'Pendiente' && global?.user.rol !== rolesNum.encargado && details_id) {
             if(confirm('¿Quiere eliminar el insumo '+insumo+ "?")){
-                order.insumos.splice(index, 1)
-                setOrder({...order})
-                details.push(details_id)
+                await global?.deleteInsumo(details_id)
             }
         }
     }

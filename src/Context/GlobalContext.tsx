@@ -387,6 +387,16 @@ export default function GlobalState (props: IPropsChildren) {
             alert("Error a agregar insumo al pedido.")
         }
     }
+    //Delete Insumo
+    async function deleteInsumo (orderId: number) {
+        try{
+            await axios.delete(SERVER+`/pedido/insumo/${orderId}`,authReturner())
+            alert("Insumo insumo eliminado de la orden correctamente.")
+            window.location.reload()
+        }catch(error){
+            alert("Error a eliminar insumo al pedido.")
+        }
+    }
     //Trae todos las categorias de errores
     async function errorsCatGet () {
         const res: ICategoriesRes = await (await axios.get(SERVER+'/data/errors', authReturner())).data
@@ -445,7 +455,8 @@ export default function GlobalState (props: IPropsChildren) {
         modProvisorios,
         addInsumo,
         errorsCatGet,
-        emailError
+        emailError,
+        deleteInsumo
     }
 
 
@@ -501,5 +512,6 @@ interface IGlobalContext{
     getReports: (numero:string) => void,
     modProvisorios : (data:IChangeData, id: number) => void,
     addInsumo: (insumo: string, orderId: number, amount: number) => void,
-    emailError: (data: IReport) => void
+    emailError: (data: IReport) => void,
+    deleteInsumo: (orderId: number) => void
 }
