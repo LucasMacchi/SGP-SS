@@ -62,6 +62,13 @@
     width: 100%;
     font-size: small;
 }
+.data-div-insumo-number {
+    border: 1px solid;
+    padding: 4px;
+    text-align: left;
+    width: 5%;
+    font-size: small;
+}
 .data-div-table-sections {
     border: 1px solid;
     padding: 4px;

@@ -427,7 +427,7 @@ export default function DetailsPage () {
                 <Header />
             </div>
             <h1 className='title-Homepage' >
-                {'Pedido Nro: '+id}
+                {'Pedido Nro: '+global?.pedidoDetail.numero}
             </h1>
             <div className='export-div'>
                 <button disabled={global?.user.rol === 1 ? false : true}

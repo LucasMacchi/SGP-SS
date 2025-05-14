@@ -317,11 +317,13 @@ export default function AddOrder () {
                     <table >
                         <tbody>
                             <tr>
+                                <th className="data-div-insumo-number">Nro</th>
                                 <th className="data-div-table-sections">Producto</th>
                                 <th className="data-div-table-sections">Cantidad</th>
                             </tr>
                             {newOrder.insumos.map((i, index) => (
                                 <tr  key={index} >
+                                    <th className="data-div-insumo-number">{index + 1}</th>
                                     <th className="data-div-insumo-name-row" onClick={() => deleteInsumoRow(index, i.insumo_des)}>{i.insumo_des}</th>
                                     <th className="data-div-insumo-amount-row" onClick={() => changeAmount(i.amount, index)}>{i.amount}</th>
                                 </tr>
