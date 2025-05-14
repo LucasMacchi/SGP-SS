@@ -114,7 +114,7 @@ export default function DetailsPage () {
         }
     }
 
-    const deleteInsumoRow = async (insumo: string, details_id: number | undefined) => {
+    const deleteInsumoRow = async (_index: number, insumo: string, details_id: number | undefined) => {
         if(order && order.insumos.length > 1 && order.state === 'Pendiente' && global?.user.rol !== rolesNum.encargado && details_id) {
             if(confirm('¿Quiere eliminar el insumo '+insumo+ "?")){
                 await global?.deleteInsumo(details_id)
