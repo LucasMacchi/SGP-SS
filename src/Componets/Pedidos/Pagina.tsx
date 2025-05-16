@@ -11,6 +11,7 @@ import { pdf } from '@react-pdf/renderer'
 import saveAs from 'file-saver'
 import filterJSON from '../../Utils/dataFilter.json'
 import clientesReturner from '../../Utils/clientesReturner'
+import tokenExpireChecker from '../../Utils/tokenExpireChecker'
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
 export default function PaginaPedidos () {
@@ -28,6 +29,7 @@ export default function PaginaPedidos () {
     
     useEffect(() => {
         setDateStart(lastMonth())
+        if(tokenExpireChecker()) window.location.reload()
     },[])
     useEffect(() => {
         setTimeout(() => {

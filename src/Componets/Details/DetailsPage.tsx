@@ -2,12 +2,13 @@ import './Details.css'
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
 import { useNavigate, useParams } from 'react-router-dom'
-import { IDetailChange, IInsumo, IPedido, IpedidoDataPDF, rolesNum } from '../../Utils/Interfaces'
+import { IInsumo, IPedido, IpedidoDataPDF, rolesNum } from '../../Utils/Interfaces'
 import dbDateParser from '../../Utils/dbDateParser'
 import {pdf} from '@react-pdf/renderer';
 import PedidoDocument from '../pdfs/pedido'
 import { saveAs } from 'file-saver'
 import Header from '../Header/Header'
+import tokenExpireChecker from '../../Utils/tokenExpireChecker'
 
 export default function DetailsPage () {
     
@@ -20,22 +21,21 @@ export default function DetailsPage () {
     const [addIns, setAddIns] = useState(false)
     const [newIns, setNewAdd] = useState('')
     const [newAmount, setNewAmount] = useState(0)
-    const [details, _setDetails] = useState<number[]>([])
-    const [detailsChange, _setChange] = useState<IDetailChange[]>([])
+
     const [commnet, setComment] = useState<string>('')
 
 
     useEffect(() => {
-        if(global && id){
-            global.uniqPedido(parseInt(id), false)
-            if(global.insumos.length === 0) global.insumosFn()
-        }else{
-            navigator('/')
-        }
+      if(global && id && tokenExpireChecker()){
+          global.uniqPedido(parseInt(id), false)
+          if(global.insumos.length === 0) global.insumosFn()
+      }else{
+          navigator('/')
+      }
     },[])
 
     useEffect(() => {
-        if(global) setOrder(global?.pedidoDetail)
+      if(global) setOrder(global?.pedidoDetail)
     },[global?.pedidoDetail])
 
     const rejectFn = (order_id: number) => {
@@ -44,35 +44,34 @@ export default function DetailsPage () {
         else setLoad(false)
     }
     const aproveFn = (order_id: number) => {
-        setLoad(true)
-        if(confirm('¿Quieres aprobar el pedido?')) global?.orderAproveFn(order_id, commnet , details, detailsChange)
-        else setLoad(false)
-
+      setLoad(true)
+      if(confirm('¿Quieres aprobar el pedido?')) global?.orderAproveFn(order_id, commnet)
+      else setLoad(false)
     }
     const cancelFn = (order_id: number) => {
-        setLoad(true)
-        if(confirm('¿Quieres cancelar el pedido?')) global?.orderCancelFn(order_id)
-        else setLoad(false)
+      setLoad(true)
+      if(confirm('¿Quieres cancelar el pedido?')) global?.orderCancelFn(order_id)
+      else setLoad(false)
     }
     const deliverFn = (order_id: number) => {
-        setLoad(true)
-        if(confirm('¿Quieres informar la entrega del pedido? Al hacerlo, declara que el pedido se entrego correctamente.')) global?.orderDeliveredFn(order_id, commnet)
-        else setLoad(false)
+      setLoad(true)
+      if(confirm('¿Quieres informar la entrega del pedido? Al hacerlo, declara que el pedido se entrego correctamente.')) global?.orderDeliveredFn(order_id, commnet)
+      else setLoad(false)
     }
     const problemFn = (order_id: number) => {
-        setLoad(true)
-        if(confirm('¿Quieres informar un problema? Al hacerlo, declara que el pedido no se entrego correctamente.')) global?.problemFn(order_id, commnet)
-        else setLoad(false)
+      setLoad(true)
+      if(confirm('¿Quieres informar un problema? Al hacerlo, declara que el pedido no se entrego correctamente.')) global?.problemFn(order_id, commnet)
+      else setLoad(false)
     }
     const readyFn = (order_id: number) => {
-        setLoad(true)
-        if(confirm('¿Quieres informar que el pedido esta Listo?')) global?.orderReadyFn(order_id)
-        else setLoad(false)
+      setLoad(true)
+      if(confirm('¿Quieres informar que el pedido esta Listo?')) global?.orderReadyFn(order_id)
+      else setLoad(false)
     }
     const archiveFn = (order_id: number) => {
-        setLoad(true)
-        if(confirm('¿Quieres archivar el pedido?')) global?.orderArchFn(order_id)
-        else setLoad(false)
+      setLoad(true)
+      if(confirm('¿Quieres archivar el pedido?')) global?.orderArchFn(order_id)
+      else setLoad(false)
     }
     const exportPdf = async () => {
         if(order) {
@@ -284,8 +283,6 @@ export default function DetailsPage () {
             if(id === s.service_id) {
                 data.clientdes = s.client_des + ' - ' +s.localidad
                 data.clientid = s.client_id
-                data.serdes = s.service_des,
-                data.serid = s.service_id
             }
         });
         return data
@@ -321,20 +318,15 @@ export default function DetailsPage () {
             )
         }
     }
-    const changeAmount = (nm: number, index: number, detail_id: number | undefined) => {
+    const changeAmount = async (nm: number, detail_id: number | undefined) => {
         if(order && detail_id && order.state === 'Pendiente' && global?.user.rol !== 3) {
-            const newA = prompt('Ingrese la nueva cantidad: ',nm.toString()) ?? nm.toString()
-            if(newA && parseFloat(newA)) {
-                const newAmNum: number = parseFloat(newA)
-                order.insumos[index].amount = newAmNum
-                setOrder({...order})
-                const chang: IDetailChange = {
-                    detail_id: detail_id,
-                    amount: parseFloat(newA)
-                }
-                detailsChange.push(chang)
+          const newA = prompt('Ingrese la nueva cantidad (utilize . en vez de ,) ', nm.toString()) ?? 0;
+            if(newA === 0) return 0
+            else if(newA && parseFloat(newA)) {
+                const newAmNum = parseFloat(newA)
+                await global?.changeAmountFn(detail_id, newAmNum)
                 return 0
-            } else changeAmount(nm, index, detail_id)
+            } else changeAmount(nm, detail_id)
         }
     }
 
@@ -356,6 +348,7 @@ export default function DetailsPage () {
                 <div className='data-div'>
                     <h3>CCO: </h3>
                     <h4>{serviceDisplayer(order.service_id)}</h4>
+                    {order.prov && <h4>{order.prov_des}</h4>}
                     <hr color='#666666' className='hr-details'/>
                     <h3>Solicitante: </h3>
                     <h4>{order.requester}</h4>
@@ -402,7 +395,7 @@ export default function DetailsPage () {
                             {order.insumos.map((i, index) => (
                                 <tr key={i.insumo_id} className={classChange()}>
                                     <th className='data-div-insumo-name-row' onClick={() => deleteInsumoRow(index, i.insumo_des, i.detail_id)}>{i.insumo_des}</th>
-                                    <th className='data-div-insumo-amount-row' onClick={() => changeAmount(i.amount, index, i.detail_id)}>{i.amount}</th>
+                                    <th className='data-div-insumo-amount-row' onClick={() => changeAmount(i.amount, i.detail_id)}>{i.amount}</th>
                                 </tr>
                             ))}
                         </tbody>

@@ -46,6 +46,7 @@ export default function Provisorio () {
             <hr color='#3399ff' className='hr-line'/>
             <form>
             <div className='data-div-add'>
+                <h4>Servicio declarado: {global?.pedidoDetail.prov_des}</h4>
                 <h4>Centro de Costo: </h4>
                 <select defaultValue={''} value={service} className="select-small-cco"
                 onChange={e => setService(parseInt(e.target.value))}>

@@ -1,13 +1,14 @@
 import "./AddOrder.css"
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { IInsumo, IAddPedido, IToken, IServicio } from '../../Utils/Interfaces'
 import clientSearcher from "../../Utils/clientSearcher"
 import { jwtDecode } from "jwt-decode"
 import Header from "../Header/Header"
 import clientesReturner from "../../Utils/clientesReturner"
 import departamentoReturner from "../../Utils/departamentoReturner"
+import tokenExpireChecker from "../../Utils/tokenExpireChecker"
 
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
@@ -15,6 +16,7 @@ export default function AddOrder () {
     const global = useContext(GlobalContext)
     const params = useParams()
     const id = params.orderId
+    const navigator = useNavigate()
     const [btn, setBtn] = useState(true)
     const [searchIns, setSearchIns] = useState('')
     const [searchServ, setSearchServ] = useState('')
@@ -39,7 +41,7 @@ export default function AddOrder () {
     })
 
     useEffect(() => {
-        if(global) {
+        if(global && !tokenExpireChecker()) {
             if(global.insumos.length === 0) global?.insumosFn()
             if(global.ccos.length === 0) {
                 global?.ccosFn()
@@ -49,7 +51,7 @@ export default function AddOrder () {
             }, waitTime);
             if(id) setOrder(global.pedidoDetail)
             else global?.uniqPedido(0,true)
-        }
+        } else navigator('/')
     },[])
 
     useEffect(() => {
