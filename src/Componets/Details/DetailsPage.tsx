@@ -26,12 +26,12 @@ export default function DetailsPage () {
 
 
     useEffect(() => {
-      if(global && id && tokenExpireChecker()){
-          global.uniqPedido(parseInt(id), false)
-          if(global.insumos.length === 0) global.insumosFn()
-      }else{
-          navigator('/')
-      }
+      if(!tokenExpireChecker()) {
+        if(global && id){
+            global.uniqPedido(parseInt(id), false)
+            if(global.insumos.length === 0) global.insumosFn()
+        }
+      } else navigator('/')
     },[])
 
     useEffect(() => {

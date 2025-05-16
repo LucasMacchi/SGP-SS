@@ -77,36 +77,50 @@ export default function PaginaPedidos () {
     const colorChange = (state: string): string => {
         switch(state) {
             case 'Pendiente':
-                return 'pedido-component-yellow'
+                return '#c4c42a'
             case 'Aprobado':
-                return 'pedido-component-green'
+                return '#22d55b'
             case 'Cancelado':
-                return 'pedido-component-red'
+                return '#ff0000'
             case 'Rechazado':
-                return 'pedido-component-red'
+                return '#ff0000'
             case 'Listo':
-                return 'pedido-component-green-black'
+                return '#1c9943'
             case 'Entregado':
-                return 'pedido-component-neutral'
+                return '#3399ff'
             case 'Problemas':
-                return 'pedido-componen-problem'
+                return '#ff9c33'
             default:
-                return 'pedido-component'
+                return '#666666'
         }
     }
-    const displayPedidos = () => (
-        global?.pedidos.map((p) => {
-            return(
-                <div key={p.numero+p.date_requested}
-                className={colorChange(p.state)} 
-                onClick={() => {navigator('/pedidos/'+p.order_id)}}>
-                    <h5>{"Nro: "+p.numero}</h5>
-                    <h5>{displayDate(p.date_requested)}</h5>
-                    <h5>{p.state}</h5>
-                </div>
-            )
-        })
-    )
+    const displayPedidos = () => {
+        return (
+          <div className='div-tables-display'>
+            <table>
+              <tbody>
+                <tr>
+                  <th className="data-div-table" style={{backgroundColor: '#919191'}}>Nro</th>
+                  <th className="data-div-table" style={{backgroundColor: '#919191'}}>Solicitado</th>
+                  <th className="data-div-table" style={{backgroundColor: '#919191'}}>Solicitante</th>
+                  <th className="data-div-table" style={{backgroundColor: '#919191'}}>Estado</th>
+                </tr>
+                  {global?.pedidos.map((p) => (
+                      <tr key={p.numero+p.date_requested}
+                        onClick={() => {navigator('/pedidos/'+p.order_id)}}>
+                        <th className="data-div-table" style={{backgroundColor: colorChange(p.state)}}>{p.numero}</th>
+                        <th className="data-div-table" style={{backgroundColor: colorChange(p.state)}}>{displayDate(p.date_requested)}</th>
+                        <th className="data-div-table" style={{backgroundColor: colorChange(p.state)}}>{p.requester}</th>
+                        <th className="data-div-table" style={{backgroundColor: colorChange(p.state)}}>{p.state}</th>
+                      </tr>
+                    ))
+                  }
+              </tbody>
+            </table>
+          </div>
+        )
+
+    }
     const requesterSearch = (): Array<string> => {
         const reqSet = new Set<string>(global?.pedidos.map(p => p.requester))
         const arr = Array.from(reqSet)
