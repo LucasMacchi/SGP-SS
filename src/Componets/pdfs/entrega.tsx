@@ -207,15 +207,15 @@ const EntregaDocument: React.FC<IEntrega> = ({entrega}) => (
             </View>
             <View style={stylePedido.viewSec2}>
               <View style={stylePedido.viewSec3_name}>
-                <Text style={stylePedido.subtitle}>Apellido y Nombre del Trabajador: </Text>
+            <Text style={stylePedido.subtitle}>Apellido y Nombre del Trabajador: { entrega.fullname}</Text>
               </View>
               <View style={stylePedido.viewSec3_dni}>
-                <Text style={stylePedido.subtitle}>D.N.I: </Text>
+            <Text style={stylePedido.subtitle}>D.N.I: {entrega.dni} </Text>
               </View>
             </View>
             <View style={stylePedido.viewSec2}>
               <View style={stylePedido.viewSec4_lugar}>
-                <Text style={stylePedido.subtitle}>Lugar de Trabajo: </Text>
+            <Text style={stylePedido.subtitle}>Lugar de Trabajo: { entrega.service}</Text>
               </View>
               <View style={stylePedido.viewSec4_dir}>
                 <Text style={stylePedido.subtitle}>Direccion: </Text>
