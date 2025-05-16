@@ -1,0 +1,36 @@
+{
+  "fullname": "Macri Mauricio",
+  "dni": 43266083,
+  "service": "HTAL. GOYA ZONAL CAM MUNIAGURR",
+  "fecha_entrega": "10/10/2025",
+  "insumos": [
+    {
+      "insumo_des": "1564-26- - -Trapo de piso Gris",
+      "amount": 5
+    },
+    {
+      "insumo_des": "1564-26- - -Trapo de piso Gris",
+      "amount": 5
+    },
+    {
+      "insumo_des": "1564-26- - -Trapo de piso Gris",
+      "amount": 5
+    },
+    {
+      "insumo_des": "1564-26- - -Trapo de piso Gris",
+      "amount": 5
+    },
+    {
+      "insumo_des": "1564-26- - -Trapo de piso Gris",
+      "amount": 5
+    },
+    {
+      "insumo_des": "1511-9-7- -Lavamanos Blue Quim 5000cc Generico  ",
+      "amount": 5
+    },
+    {
+      "insumo_des": "1511-9-7- -Lavamanos Blue Quim 5000cc Generico  ",
+      "amount": 5
+    }
+  ]
+}

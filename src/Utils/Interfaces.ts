@@ -186,3 +186,12 @@ export interface IFilter {
     dateStart: string
     dateEnd: string
 }
+export interface IEntrega {
+  entrega: {
+    fullname: string,
+    dni: number,
+    service: string,
+    fecha_entrega: string,
+    insumos: IInsumo[]
+  }
+}

@@ -6,9 +6,11 @@ import { IInsumo, IPedido, IpedidoDataPDF, rolesNum } from '../../Utils/Interfac
 import dbDateParser from '../../Utils/dbDateParser'
 import {pdf} from '@react-pdf/renderer';
 import PedidoDocument from '../pdfs/pedido'
+import Entrega from '../pdfs/entrega'
 import { saveAs } from 'file-saver'
 import Header from '../Header/Header'
 import tokenExpireChecker from '../../Utils/tokenExpireChecker'
+import entregaJSON from './entrega.json'
 
 export default function DetailsPage () {
     
@@ -26,7 +28,7 @@ export default function DetailsPage () {
 
 
     useEffect(() => {
-      if(global && id && tokenExpireChecker()){
+      if(global && id && !tokenExpireChecker()){
           global.uniqPedido(parseInt(id), false)
           if(global.insumos.length === 0) global.insumosFn()
       }else{
@@ -109,6 +111,16 @@ export default function DetailsPage () {
                 pedido_insumos: insumosFormat
             }
             const blob: Blob = await pdf(<PedidoDocument pedido={pedido}/>).toBlob()
+            saveAs(blob, 'SGP-'+order.numero+'.pdf')
+        }
+    }
+    
+    const exportPdfEntrega = async () => {
+        if(order) {
+          const blob: Blob = 
+            await pdf(<Entrega 
+              entrega={entregaJSON}
+            />).toBlob()
             saveAs(blob, 'SGP-'+order.numero+'.pdf')
         }
     }
@@ -427,6 +439,7 @@ export default function DetailsPage () {
                 className={global?.user.rol === 1 ? 'btn-export-txt': 'btn-export-txt-none'}>
                     Exportar txt
                 </button>
+                <button className='btn-export-pdf' onClick={() => exportPdfEntrega()}>Plantilla</button>
                 <button className='btn-export-pdf' onClick={() => exportPdf()}>Exportar pdf</button>
                 <button className='btn-export-pdf' onClick={() => navigator('/reportar/'+order?.numero)}>Reportar</button>
                 {provBtn()}
