@@ -2,13 +2,14 @@ import "./AddOrder.css"
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
 import { useParams, useNavigate } from 'react-router-dom'
-import { IInsumo, IAddPedido, IToken, IServicio } from '../../Utils/Interfaces'
+import { IInsumo, IAddPedido, IServicio } from '../../Utils/Interfaces'
 import clientSearcher from "../../Utils/clientSearcher"
-import { jwtDecode } from "jwt-decode"
 import Header from "../Header/Header"
 import clientesReturner from "../../Utils/clientesReturner"
 import departamentoReturner from "../../Utils/departamentoReturner"
 import tokenExpireChecker from "../../Utils/tokenExpireChecker"
+import serviceDescription from "../../Utils/serviceDescription"
+import sectoresPersonal from "./sectores.json"
 
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
@@ -32,12 +33,17 @@ export default function AddOrder () {
     const [custom, setCustom] = useState(false)
     const [customIn, setCustomIn] = useState(false)
     const [service, setService] = useState('')
+    const [showLegajo, setShowLegajo] = useState(false)
+    const [legajo, setLegajo] = useState(0)
+    const [sector, setSector] = useState('')
     const [newOrder, setOrder] = useState<IAddPedido>({
         requester: '',
         service_id: 0,
         client_id: 0,
         insumos: [],
-        user_id: 0,
+        usuario_id: 0,
+        legajo: 0,
+        service_des: ''
     })
 
     useEffect(() => {
@@ -62,21 +68,28 @@ export default function AddOrder () {
         setInsumos2('')
     },[customIn])
 
-
-    const handleData = (data: string, prop: string) => {
+    useEffect(() => {
+      if(sector) global?.getPersonalBySector(sector, false)
+      else global?.getPersonalBySector(sector, true)
+    },[sector])
+    
+    const handleData = (data: string | number, prop: string) => {
         setOrder({
             ...newOrder,
             [prop]: data
         })
-
     }
 
     useEffect(() => {
-        if((newOrder.service_id && newOrder.insumos.length > 0) || (newOrder.insumos.length > 0 && service && custom)){
-            setBtn(false)
-        }
-        else setBtn(true)
-    },[newOrder, service])
+      if(custom){
+        if(newOrder.insumos.length === 0 || service.length < 3) setBtn(true)
+        else setBtn(false)
+      }
+      else if(newOrder.insumos.length === 0 || !newOrder.service_id) setBtn(true)
+      else setBtn(false)
+      if(showLegajo && !legajo) setBtn(true)
+      else setBtn(false)
+    },[newOrder, service, showLegajo,legajo])
 
     useEffect(() => {
         let arr = global?.ccos
@@ -144,21 +157,26 @@ export default function AddOrder () {
 
     const createOrder = async () => {
         setLoad(true)
-        const token = localStorage.getItem('jwToken')
-        const dataUser: IToken = jwtDecode(token ?? "")
+        newOrder.legajo = legajo ? legajo : 0
+        newOrder.prov = false
+        newOrder.prov_des = ``
         if(service && custom) {
             newOrder.client_id = -1
             newOrder.service_id = -1
             newOrder.prov = true
             newOrder.prov_des = service
-            console.log(newOrder)
-            global?.addPedido(dataUser.usuario_id, dataUser.user, newOrder.service_id, clientSearcher(global.ccos, newOrder.service_id), newOrder.insumos, newOrder.prov, newOrder.prov_des)
+            newOrder.service_des = ``
+            global?.addPedido(newOrder)
         }
         else if (custom) {
             alert("Ingrese un servicio personalizado valido.")
         }
         else {
-            global?.addPedido(dataUser.usuario_id, dataUser.user, newOrder.service_id, clientSearcher(global.ccos, newOrder.service_id), newOrder.insumos, false, '')
+          if(global){
+            newOrder.service_des = serviceDescription(global.ccos, newOrder.service_id)
+            newOrder.client_id = clientSearcher(global.ccos, newOrder.service_id)
+            global?.addPedido(newOrder)
+          }
         }
     }
 
@@ -227,7 +245,7 @@ export default function AddOrder () {
                 <div>
                 <h6>Servicio</h6>
                 <select disabled={id ? true : false} defaultValue={''} value={newOrder.service_id} className="data-div-select"
-                onChange={e => handleData(e.target.value, 'service_id')}>
+                onChange={e => handleData(parseInt(e.target.value), 'service_id')}>
                 <option value={''}>---</option>
                 {
                     filterServ.map((c) => {
@@ -294,6 +312,39 @@ export default function AddOrder () {
             )
         }
     }
+    
+    const displayLegajo = () => {
+      if(showLegajo) {
+        return(
+          <div className='data-div-add'>
+            <div>
+            <h6>Sector</h6>
+            <select value={sector} className="data-div-select"
+            onChange={e => setSector(e.target.value)}>
+            <option value={''}>---</option>
+            {
+                sectoresPersonal.sectores.map((s) => {
+                    return(<option key={s} value={s}>{s}</option>)
+                })
+            }
+            </select>
+            </div>
+              <div>
+                <h6>Personal -  {global?.personal.length && global?.personal.length - 1 + " Encontrados"}</h6>
+              <select value={legajo} className="data-div-select" disabled={sector.length===0}
+              onChange={e => setLegajo(parseInt(e.target.value))}>
+              <option value={0}>---</option>
+              {
+                  global?.personal.map((p) => {
+                      return(<option key={p.legajo} value={p.legajo}>{p.legajo+'-'+p.fullname}</option>)
+                  })
+              }
+              </select>
+              </div>
+          </div>
+        )
+      }
+    }
 
     const displayForms = () => {
         if(showForm) {
@@ -307,6 +358,11 @@ export default function AddOrder () {
                         <h4>Insumo Personalizado: </h4>
                         <input type="checkbox" checked={customIn} onChange={(e) => setCustomIn(e.target.checked)}/>
                     </div>
+                    <div className='data-div-add-special'>
+                        <h4>Entrega a Personal: </h4>
+                        <input type="checkbox" checked={showLegajo} onChange={(e) => setShowLegajo(e.target.checked)}/>
+                    </div>
+                    {displayLegajo()}
                     {displayCustomService()}
                     {displayCustomInsumo()}
                     <div className="data-div-btn-insumo">  
@@ -333,7 +389,7 @@ export default function AddOrder () {
                         </tbody>
                     </table>
                     {loading ? <h3 className='title-Homepage'>Cargando...</h3> : 
-                        <button className='btn-big-forms' disabled={btn}
+                        <button className={btn ? 'btn-big-forms-disable' : 'btn-big-forms'} disabled={btn}
                         onClick={() => createOrder()}>
                             Registrar
                         </button>

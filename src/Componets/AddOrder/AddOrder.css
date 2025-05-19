@@ -108,6 +108,13 @@
     border-color: #3399ff;
     font-size: xx-large;
 }
+.btn-big-forms-disable {
+    margin-top: 30px;
+    color: white;
+    background-color: #999999;
+    border-color: #999999;
+    font-size: xx-large;
+}
 .delete-text {
     font-weight: normal;
     color: #3399ff;

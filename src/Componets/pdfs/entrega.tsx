@@ -131,7 +131,6 @@ const tableElementsReturner = (insumos: IInsumo[], entrega: string) => {
     }
     return data
   })
-  console.log(formated)
   for (let i = 0; i < min; i++){
     elements.push(
       <View style={stylePedido.tableRow}>

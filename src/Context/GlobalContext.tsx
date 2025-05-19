@@ -3,15 +3,14 @@ import { createContext, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   IAction,
+  IAddPedido,
   ICategoriesRes,
   IChangeData,
   IClientIns,
-  IDetailChange,
   IEmailSender,
   IFilter,
-  IInsumo,
   IPedido,
-  IPedidoRequest,
+  IPersonal,
   IPropsChildren,
   IReport,
   IResponseInsumo,
@@ -38,6 +37,8 @@ const globalReducer = (
   switch (type) {
     case ac.GET_ERROR_CATEGORIES:
       return { ...state, errorCat: payload };
+    case ac.GET_PERSONAL:
+      return { ...state, personal: payload };
     case ac.GET_UNIQUE_PEDIDO:
       return { ...state, pedidoDetail: payload };
     case ac.GET_ALL_USERS:
@@ -381,28 +382,19 @@ export default function GlobalState(props: IPropsChildren) {
 
   //Crea un nuevo pedido
   async function addPedido(
-    usuario_id: number,
-    requester: string,
-    service_id: number,
-    client_id: number,
-    insumos: IInsumo[],
-    prov: boolean,
-    prov_des: string | null,
+    pedido: IAddPedido
   ) {
-    const ser: number = service_id;
     try {
-      const data: IPedidoRequest = {
-        usuario_id,
-        requester,
-        service_id: +ser,
-        client_id,
-        insumos,
-        prov: prov,
-        prov_des: prov_des,
-      };
-
-      if (LOGS) console.log("Order to create", data);
-      await axios.post(SERVER + "/pedido/add", data, authReturner());
+      const token = localStorage.getItem("jwToken");
+      const dataUser: IToken = jwtDecode(token ?? "");
+      console.log(pedido)
+      pedido.first_name = dataUser.first_name
+      pedido.last_name = dataUser.last_name
+      pedido.email = dataUser.email
+      pedido.usuario_id = dataUser.usuario_id
+      pedido.requester = dataUser.user
+      console.log("Order to create", pedido);
+      await axios.post(SERVER + "/pedido/add", pedido, authReturner());
       alert("Pedido Creado!");
       navigation("/");
       window.location.reload();
@@ -560,6 +552,46 @@ export default function GlobalState(props: IPropsChildren) {
       alert("Error al mandar el reporte.");
     }
   }
+  
+  //Trae todo el personal por sector
+  async function getPersonalBySector (sector: string, empty: boolean) {
+    try{
+      if(empty) {
+        dispatch({
+          payload: [],
+          type: ac.GET_PERSONAL,
+        });
+      }
+      else {
+        const res: IPersonal[] = await (
+          await axios.get(SERVER + "/data/legajos/"+sector, authReturner())
+        ).data;
+        dispatch({
+          payload: res,
+          type: ac.GET_PERSONAL,
+        });
+      }
+
+    }catch(error) {
+      console.log(error);
+      alert("Error al traer el personal del sector "+sector);
+    }
+  }
+  
+  //Trae los datos de un trabajador especifico
+  async function getPersona (legajo: number): Promise<IPersonal> {
+    try{
+      const res: IPersonal = await (
+        await axios.get(SERVER + "/data/legajo/"+legajo, authReturner())
+      ).data;
+      return res
+    }catch(error) {
+      console.log(error);
+      alert("Error al traer el personal de legajo "+legajo);
+      return {legajo:0,fullname:'',cuil:0,sector:``}
+    }
+  }
+  
   const innitialState: IGlobalContext = {
     user: {
       username: "",
@@ -578,11 +610,13 @@ export default function GlobalState(props: IPropsChildren) {
       client_id: 0,
       archive: false,
       numero: "",
-      user_id: 0,
+      usuario_id: 0,
       first_name: "",
       last_name: "",
       email: "",
+      service_des: ``
     },
+    personal: [],
     sysUsers: [],
     login: false,
     pedidos: [],
@@ -604,6 +638,7 @@ export default function GlobalState(props: IPropsChildren) {
     orderDeliveredFn,
     orderEditFn,
     orderReadyFn,
+    getPersonalBySector,
     orderArchFn,
     delUser,
     addUser,
@@ -621,7 +656,8 @@ export default function GlobalState(props: IPropsChildren) {
     errorsCatGet,
     emailError,
     deleteInsumo,
-    changeAmountFn
+    changeAmountFn,
+    getPersona
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -634,6 +670,7 @@ export default function GlobalState(props: IPropsChildren) {
 
 interface IGlobalContext {
   user: IUser;
+  personal: IPersonal[];
   categories: string[];
   errorCat: string[];
   pedidoDetail: IPedido;
@@ -662,15 +699,7 @@ interface IGlobalContext {
   delUser: (username: string, state: boolean) => void;
   addUser: (user: IUser) => void;
   uniqPedido: (id: number, empty: boolean) => void;
-  addPedido: (
-    user_id: number,
-    requester: string,
-    service_id: number,
-    client_id: number,
-    insumos: IInsumo[],
-    prov: boolean,
-    prov_des: string | null,
-  ) => void;
+  addPedido: (pedido: IAddPedido) => void;
   orderReadyFn: (order_id: number) => void;
   pingServer: () => void;
   problemFn: (order_id: number, comentario: string) => void;
@@ -690,4 +719,6 @@ interface IGlobalContext {
   emailError: (data: IReport) => void;
   deleteInsumo: (orderId: number) => void;
   changeAmountFn: (id: number, cantidad: number) => void;
+  getPersonalBySector: (sector: string, empty: boolean) => void;
+  getPersona: (legajo: number) => Promise<IPersonal>;
 }

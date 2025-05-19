@@ -21,13 +21,18 @@ export interface IAction {
     payload: any
 }
 export interface IAddPedido {
-    requester: string,
-    service_id: number,
-    client_id: number,
-    user_id: number,
-    insumos: IInsumo[],
-    prov?: boolean,
-    prov_des?: string
+  requester: string,
+  service_id: number,
+  client_id: number,
+  usuario_id: number,
+  insumos: IInsumo[],
+  prov?: boolean,
+  prov_des?: string,
+  legajo?: number,
+  service_des: string,
+  first_name?: string,
+  last_name?: string,
+  email?: string,
 }
 export interface IToken {
     user: string,
@@ -48,7 +53,7 @@ export interface IPedido {
     date_delivered?: string | null,
     requester: string,
     service_id: number,
-    user_id: number,
+    usuario_id: number,
     client_id: number,
     archive: boolean | number,
     insumos: IInsumo[],
@@ -56,7 +61,9 @@ export interface IPedido {
     last_name: string,
     email: string,
     prov?: boolean,
-    prov_des?: string
+    prov_des?: string,
+    legajo?: number,
+    service_des: string
 }
 
 export interface IInsumo {
@@ -95,15 +102,6 @@ export interface IServicio {
     localidad: string
 }
 
-export interface IPedidoRequest {
-    usuario_id: number,
-    requester: string,
-    service_id: number,
-    client_id: number,
-    insumos: IInsumo[],
-    prov?: boolean,
-    prov_des?: string | null
-}
 export interface IDetailChange {
     detail_id: number,
     amount: number
@@ -194,4 +192,11 @@ export interface IEntrega {
     fecha_entrega: string,
     insumos: IInsumo[]
   }
+}
+
+export interface IPersonal {
+  legajo: number,
+  fullname: string,
+  cuil: number,
+  sector: string
 }

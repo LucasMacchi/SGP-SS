@@ -2,7 +2,7 @@ import './Details.css'
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
 import { useNavigate, useParams } from 'react-router-dom'
-import { IInsumo, IPedido, IpedidoDataPDF, rolesNum } from '../../Utils/Interfaces'
+import { IEntrega, IInsumo, IPedido, IpedidoDataPDF, IPersonal, rolesNum } from '../../Utils/Interfaces'
 import dbDateParser from '../../Utils/dbDateParser'
 import {pdf} from '@react-pdf/renderer';
 import PedidoDocument from '../pdfs/pedido'
@@ -10,7 +10,7 @@ import Entrega from '../pdfs/entrega'
 import { saveAs } from 'file-saver'
 import Header from '../Header/Header'
 import tokenExpireChecker from '../../Utils/tokenExpireChecker'
-import entregaJSON from './entrega.json'
+import dateParser from '../../Utils/dateParser'
 
 export default function DetailsPage () {
     
@@ -23,8 +23,9 @@ export default function DetailsPage () {
     const [addIns, setAddIns] = useState(false)
     const [newIns, setNewAdd] = useState('')
     const [newAmount, setNewAmount] = useState(0)
-
     const [commnet, setComment] = useState<string>('')
+    const [action, setAction] = useState(0)
+    const [dateEntrega, setDateEntrega] = useState('')
 
 
     useEffect(() => {
@@ -37,8 +38,19 @@ export default function DetailsPage () {
     },[])
 
     useEffect(() => {
-      if(global) setOrder(global?.pedidoDetail)
+      if(global) {
+        setOrder(global?.pedidoDetail)
+        getPersonal()
+      }
     },[global?.pedidoDetail])
+    
+    const getPersonal = async (): Promise<IPersonal> => {
+      if(global && order && order.legajo) {
+        const persona = await global.getPersona(order.legajo)
+        return persona
+      }
+      else return {legajo:0,fullname:'',cuil:0,sector:``}
+    }
 
     const rejectFn = (order_id: number) => {
         setLoad(true)
@@ -116,12 +128,24 @@ export default function DetailsPage () {
     }
     
     const exportPdfEntrega = async () => {
-        if(order) {
+        if(order && order.legajo && dateEntrega) {
+          const d = dateParser(dateEntrega)
+          const personal = await getPersonal()
+          const entrega:IEntrega = {
+            entrega: {
+              fullname: personal.fullname,
+              dni: personal.cuil,
+              service: serviceDisplayer(order.service_id),
+              fecha_entrega: d.day+'/'+d.month+'/'+d.year,
+              insumos: order.insumos
+            }
+          } 
           const blob: Blob = 
-            await pdf(<Entrega 
-              entrega={entregaJSON}
-            />).toBlob()
-            saveAs(blob, 'SGP-'+order.numero+'.pdf')
+            await pdf(<Entrega entrega={entrega.entrega}/>).toBlob()
+            saveAs(blob, 'SGP-Plantilla-'+order.numero+'.pdf')
+        }
+        else {
+          alert('Seleccione una fecha de entrega.')
         }
     }
 
@@ -354,10 +378,69 @@ export default function DetailsPage () {
         else return false
     }
 
+    const displayActions = () => {
+      if(action === 1) {
+        return(
+          <div>
+            <div>
+              <h5 className='filter-sub'>Fecha de entrega</h5>
+              <input type='date' id='date_start' className='date-input'
+              value={dateEntrega} onChange={e => setDateEntrega(e.target.value)}/>
+            </div>
+            <button className='btn-export-pdf' onClick={() => exportPdfEntrega()}>Exportar</button>
+          </div>
+        )
+      }
+      else if(action === 2) {
+        return(
+          <button className='btn-export-pdf' onClick={() => exportPdf()}>Exportar</button>
+        )
+      }
+      else if(action === 3) {
+        return(
+          <button className='btn-export-pdf' onClick={() => navigator('/reportar/'+order?.numero)}>Reportar</button>
+        )
+      }
+      else if(action === 4) {
+        return(
+          <button className='btn-export-txt'>Exportar</button>
+        )
+      }
+      else if(action === 5) {
+        return(
+          <button className='btn-export-pdf' onClick={() => navigator('/provisorio/'+order?.numero)}>Asignar Servicio</button>
+        )
+      }
+      else {
+        return(
+          <></>
+        )
+      }
+    }
+    
     const dataDisplay = () => {
         if(order) {
             return(
                 <div className='data-div'>
+                  <div>
+                    <div>
+                        <h5 className='filter-sub'>Otras Acciones</h5>
+                        <select value={action} onChange={(e) => setAction(parseInt(e.target.value))} className='select-actions'>
+                          <option value={0}>---</option>
+                          {order.legajo && <option value={1}>Exportar plantilla de entrega</option>}
+                          <option value={2}>Exportar a pdf</option>
+                          <option value={3}>Reportar</option>
+                          {global?.user.rol && <option value={4}>Exportar a TXT</option>}
+                          {order.prov && <option value={5}>Provisional</option>}
+                        </select>
+                        
+                    </div>
+                    <div>
+                      {displayActions()}
+                    </div>
+                  </div>
+
+                    <hr color='#666666' className='hr-details'/>
                     <h3>CCO: </h3>
                     <h4>{serviceDisplayer(order.service_id)}</h4>
                     {order.prov && <h4>{order.prov_des}</h4>}
@@ -369,6 +452,14 @@ export default function DetailsPage () {
                     <h3>Estado del Pedido: </h3>
                     <h4>{order.state}</h4>
                     <hr color='#666666' className='hr-details'/>
+                    {order.legajo ?
+                      <div>
+                        <h3>Entregar a legajo: {order.legajo}</h3>
+                        <hr color='#666666' className='hr-details'/>
+                      </div>
+                      :
+                      ''
+                    }
                     <h3>Fecha:</h3>
                     <h4>{'Ordenado: '+dbDateParser(order.date_requested, false)}</h4>
                     <h4>{order.date_aproved ? 'Aprobado: '+dbDateParser(order.date_aproved, false) : 'Aprobacion: pendiente'}</h4>
@@ -432,18 +523,8 @@ export default function DetailsPage () {
                 <Header />
             </div>
             <h1 className='title-Homepage' >
-                {'Pedido Nro: '+global?.pedidoDetail.numero}
+                {'Pedido: '+global?.pedidoDetail.numero}
             </h1>
-            <div className='export-div'>
-                <button disabled={global?.user.rol === 1 ? false : true}
-                className={global?.user.rol === 1 ? 'btn-export-txt': 'btn-export-txt-none'}>
-                    Exportar txt
-                </button>
-                <button className='btn-export-pdf' onClick={() => exportPdfEntrega()}>Plantilla</button>
-                <button className='btn-export-pdf' onClick={() => exportPdf()}>Exportar pdf</button>
-                <button className='btn-export-pdf' onClick={() => navigator('/reportar/'+order?.numero)}>Reportar</button>
-                {provBtn()}
-            </div>
             <hr color='#3399ff' className='hr-line'/>
             {dataDisplay()}
             {commentText()}
