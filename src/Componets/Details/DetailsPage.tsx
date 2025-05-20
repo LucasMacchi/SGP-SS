@@ -510,12 +510,14 @@ export default function DetailsPage () {
             return(<h3 className='title-Homepage'>Cargando...</h3>)
         }
     }
-
-    const provBtn = () => {
-        if(order?.prov && global?.user.rol === 1){
-            return(<button className='btn-export-pdf' onClick={() => navigator('/provisorio/'+order?.numero)}>Provisorio</button>)
-        }
+/*
+const provBtn = () => {
+    if(order?.prov && global?.user.rol === 1){
+        return(<button className='btn-export-pdf' onClick={() => navigator('/provisorio/'+order?.numero)}>Provisorio</button>)
     }
+}
+*/
+
 
     return(
         <div className='detaail-all-div'>
