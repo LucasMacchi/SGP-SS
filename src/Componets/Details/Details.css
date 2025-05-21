@@ -5,7 +5,9 @@
     color: #666666;
     text-align: left;
 }
-
+.data-div-non {
+    display: none;
+}
 .date-div {
     border: 1px solid;
     padding: 4px;

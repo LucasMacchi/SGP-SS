@@ -28,7 +28,6 @@ export interface IAddPedido {
   insumos: IInsumo[],
   prov?: boolean,
   prov_des?: string,
-  legajo?: number,
   service_des: string,
   first_name?: string,
   last_name?: string,

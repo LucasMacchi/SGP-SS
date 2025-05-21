@@ -9,7 +9,6 @@ import clientesReturner from "../../Utils/clientesReturner"
 import departamentoReturner from "../../Utils/departamentoReturner"
 import tokenExpireChecker from "../../Utils/tokenExpireChecker"
 import serviceDescription from "../../Utils/serviceDescription"
-import sectoresPersonal from "./sectores.json"
 
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
@@ -33,16 +32,13 @@ export default function AddOrder () {
     const [custom, setCustom] = useState(false)
     const [customIn, setCustomIn] = useState(false)
     const [service, setService] = useState('')
-    const [showLegajo, setShowLegajo] = useState(false)
-    const [legajo, setLegajo] = useState(0)
-    const [sector, setSector] = useState('')
+
     const [newOrder, setOrder] = useState<IAddPedido>({
         requester: '',
         service_id: 0,
         client_id: 0,
         insumos: [],
         usuario_id: 0,
-        legajo: 0,
         service_des: ''
     })
 
@@ -68,10 +64,6 @@ export default function AddOrder () {
         setInsumos2('')
     },[customIn])
 
-    useEffect(() => {
-      if(sector) global?.getPersonalBySector(sector, false)
-      else global?.getPersonalBySector(sector, true)
-    },[sector])
     
     const handleData = (data: string | number, prop: string) => {
         setOrder({
@@ -87,9 +79,7 @@ export default function AddOrder () {
       }
       else if(newOrder.insumos.length === 0 || !newOrder.service_id) setBtn(true)
       else setBtn(false)
-      if(showLegajo && !legajo) setBtn(true)
-      else setBtn(false)
-    },[newOrder, service, showLegajo,legajo])
+    },[newOrder, service])
 
     useEffect(() => {
         let arr = global?.ccos
@@ -157,7 +147,6 @@ export default function AddOrder () {
 
     const createOrder = async () => {
         setLoad(true)
-        newOrder.legajo = legajo ? legajo : 0
         newOrder.prov = false
         newOrder.prov_des = ``
         if(service && custom) {
@@ -313,38 +302,7 @@ export default function AddOrder () {
         }
     }
     
-    const displayLegajo = () => {
-      if(showLegajo) {
-        return(
-          <div className='data-div-add'>
-            <div>
-            <h6>Sector</h6>
-            <select value={sector} className="data-div-select"
-            onChange={e => setSector(e.target.value)}>
-            <option value={''}>---</option>
-            {
-                sectoresPersonal.sectores.map((s) => {
-                    return(<option key={s} value={s}>{s}</option>)
-                })
-            }
-            </select>
-            </div>
-              <div>
-                <h6>Personal -  {global?.personal.length && global?.personal.length - 1 + " Encontrados"}</h6>
-              <select value={legajo} className="data-div-select" disabled={sector.length===0}
-              onChange={e => setLegajo(parseInt(e.target.value))}>
-              <option value={0}>---</option>
-              {
-                  global?.personal.map((p) => {
-                      return(<option key={p.legajo} value={p.legajo}>{p.legajo+'-'+p.fullname}</option>)
-                  })
-              }
-              </select>
-              </div>
-          </div>
-        )
-      }
-    }
+
 
     const displayForms = () => {
         if(showForm) {
@@ -358,11 +316,6 @@ export default function AddOrder () {
                         <h4>Insumo Personalizado: </h4>
                         <input type="checkbox" checked={customIn} onChange={(e) => setCustomIn(e.target.checked)}/>
                     </div>
-                    <div className='data-div-add-special'>
-                        <h4>Entrega a Personal: </h4>
-                        <input type="checkbox" checked={showLegajo} onChange={(e) => setShowLegajo(e.target.checked)}/>
-                    </div>
-                    {displayLegajo()}
                     {displayCustomService()}
                     {displayCustomInsumo()}
                     <div className="data-div-btn-insumo">  

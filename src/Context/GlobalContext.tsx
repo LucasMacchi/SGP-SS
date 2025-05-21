@@ -223,6 +223,40 @@ export default function GlobalState(props: IPropsChildren) {
     window.location.reload();
     return true;
   }
+  async function createPersonal (personal: IPersonal) {
+    try{
+      await axios.post(
+        SERVER + `/data/personal`,personal,
+        authReturner()
+      );
+    }catch(error){
+      console.log(error);
+      alert("Error al crear personal.");
+    }
+  }
+  async function deletePersonal (legajo: number) {
+    try{
+      await axios.delete(
+        SERVER + `/data/personal/`+legajo,
+        authReturner()
+      );
+    }catch(error){
+      console.log(error);
+      alert("Error al eliminar personal provisorio.");
+    }
+  }
+  async function orderLegajo (id:number, legajo: number) {
+    try{
+      await axios.patch(
+        SERVER + `/pedido/legajo/${id}/${legajo}`,{},
+        authReturner()
+      );
+      window.location.reload()
+    }catch(error){
+      console.log(error);
+      alert("Error a asignar un legajo.");
+    }
+  }
   //Rechaza pedido
   async function orderRejectFn(
     order_id: number,
@@ -657,7 +691,10 @@ export default function GlobalState(props: IPropsChildren) {
     emailError,
     deleteInsumo,
     changeAmountFn,
-    getPersona
+    getPersona,
+    orderLegajo,
+    createPersonal,
+    deletePersonal
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -670,6 +707,7 @@ export default function GlobalState(props: IPropsChildren) {
 
 interface IGlobalContext {
   user: IUser;
+  createPersonal: (personal: IPersonal) => void;
   personal: IPersonal[];
   categories: string[];
   errorCat: string[];
@@ -721,4 +759,6 @@ interface IGlobalContext {
   changeAmountFn: (id: number, cantidad: number) => void;
   getPersonalBySector: (sector: string, empty: boolean) => void;
   getPersona: (legajo: number) => Promise<IPersonal>;
+  orderLegajo: (id: number, legajo: number) => void;
+  deletePersonal: (legajo: number) => void;
 }
