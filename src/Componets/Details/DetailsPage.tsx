@@ -356,6 +356,8 @@ export default function DetailsPage () {
             if(id === s.service_id) {
                 data.clientdes = s.client_des + ' - ' +s.localidad
                 data.clientid = s.client_id
+                data.serid = s.service_id
+                data.serdes = s.service_des
             }
         });
         return data
