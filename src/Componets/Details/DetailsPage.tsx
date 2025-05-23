@@ -35,7 +35,8 @@ export default function DetailsPage () {
     const [filteredArr, setFiltered] = useState<IPersonal[]>([])
     const [dni, setDni] = useState(0)
     const [fullname, setFullname] = useState('')
-
+    const [categories, setCategories] = useState('')
+    const [rubro, setRubro] = useState('')
 
     useEffect(() => {
       if(sector) global?.getPersonalBySector(sector, false)
@@ -45,11 +46,15 @@ export default function DetailsPage () {
     useEffect(() => {
       if(global && id && !tokenExpireChecker()){
           global.uniqPedido(parseInt(id), false)
-          //if(global.insumos.length === 0) global.insumosFn()
+            if(global.insCategroies.categorias.length === 0) global.getCategoriasInsumos()
       }else{
           navigator('/')
       }
     },[])
+
+    useEffect(() => {
+        if(categories && rubro) global?.insumosFn(categories, rubro)
+    },[categories, rubro])
     
     useEffect(() => {
       let array = global?.personal
@@ -595,19 +600,50 @@ export default function DetailsPage () {
 
                     {addIns &&
                         <div>
-                        <select defaultValue={''} value={newIns} className="data-div-select"
-                        onChange={e => setNewAdd(e.target.value)}>
-                        <option value={''}>---</option>
-                        {
-                            global?.insumos.map((i, index) => (
-                                <option key={index} value={i}>{i}</option>
-                            ))
-                        }
-                        </select>
-                        <input type="number" step='any' id='amount' min={0}
-                        value={newAmount} onChange={(e) => setNewAmount(parseFloat(e.target.value))}
-                        className="data-div-textfield-amount"/>
-                        <button className='btn-export-pdf' onClick={() => addNewInsumo()}>Agregar</button>
+                            <div>
+                                <h6>Rubro</h6>
+                                <select value={rubro} className="data-div-select"
+                                onChange={e => {
+                                  setRubro(e.target.value)}}>
+                                <option value={''}>---</option>
+                                {
+                                    global?.insCategroies.rubros.map((c) => {
+                                        return(<option key={c} value={c}>{c}</option>)
+                                    })
+                                }
+                                </select>
+                            </div>
+                            <div>
+                                <h6>Categoria</h6>
+                                <select value={categories} className="data-div-select"
+                                onChange={e => {
+                                  setCategories(e.target.value)}}>
+                                <option value={''}>---</option>
+                                {
+                                    global?.insCategroies.categorias.map((c) => {
+                                        return(<option key={c} value={c}>{c}</option>)
+                                    })
+                                }
+                                </select>
+                            </div>  
+                            <div>
+                                <h6>Insumo - {global?.insumos && global?.insumos.length > 0 ? global?.insumos.length - 1 + " Encontrados" : 0 + " Encontrados"}</h6>
+                                <select defaultValue={''} value={newIns} className="data-div-select"
+                                disabled={(!categories || !rubro)}
+                                onChange={e => setNewAdd(e.target.value)}>
+                                <option value={''}>---</option>
+                                {
+                                    global?.insumos.map((i, index) => (
+                                        <option key={index} value={i}>{i}</option>
+                                    ))
+                                }
+                                </select>
+                                <input type="number" step='any' id='amount' min={0}
+                                value={newAmount} onChange={(e) => setNewAmount(parseFloat(e.target.value))}
+                                className="data-div-textfield-amount"/>
+                                <button className='btn-export-pdf' onClick={() => addNewInsumo()}>Agregar</button>
+                            </div>
+
                         </div>
                     }
                     <table >

@@ -637,7 +637,6 @@ export default function GlobalState(props: IPropsChildren) {
         payload: res,
         type: ac.GET_INS_CATEGROIES
       })
-      console.log(res)
     } catch (error) {
       console.log(error);
       alert("Error al traer las categorias de los insumos.");
