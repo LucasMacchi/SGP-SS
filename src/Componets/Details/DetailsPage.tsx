@@ -518,7 +518,7 @@ export default function DetailsPage () {
                 </div>
                 :
                 <div>
-                  <h6>Personal -  {global?.personal.length && global?.personal.length - 1 + " Encontrados"}</h6>
+                  <h6>Personal -  {global?.personal.length && global?.personal.length + " Encontrados"}</h6>
                   <select value={legajo} className="data-div-select" disabled={sector.length===0}
                   onChange={e => {
                     setLegajo(parseInt(e.target.value))
@@ -627,7 +627,7 @@ export default function DetailsPage () {
                                 </select>
                             </div>  
                             <div>
-                                <h6>Insumo - {global?.insumos && global?.insumos.length > 0 ? global?.insumos.length - 1 + " Encontrados" : 0 + " Encontrados"}</h6>
+                                <h6>Insumo - {global?.insumos && global?.insumos.length > 0 ? global?.insumos.length + " Encontrados" : 0 + " Encontrados"}</h6>
                                 <select defaultValue={''} value={newIns} className="data-div-select"
                                 disabled={(!categories || !rubro)}
                                 onChange={e => setNewAdd(e.target.value)}>

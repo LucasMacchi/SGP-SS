@@ -79,6 +79,13 @@ export default function AddOrder () {
     },[global?.personal, search])
 
     useEffect(() => {
+        if(showLegajo) {
+            setRubro('Indumentar')
+            newOrder.insumos = []
+        }
+    },[showLegajo])
+
+    useEffect(() => {
       if(sector) global?.getPersonalBySector(sector, false)
       else global?.getPersonalBySector(sector, true)
     },[sector])
@@ -323,6 +330,7 @@ export default function AddOrder () {
                 <div>
                     <h6>Rubro</h6>
                     <select value={rubro} className="data-div-select"
+                    disabled={showLegajo}
                     onChange={e => {
                       setRubro(e.target.value)}}>
                     <option value={''}>---</option>
@@ -347,7 +355,7 @@ export default function AddOrder () {
                     </select>
                 </div>  
                 <div>
-                <h6>Insumo - {global?.insumos && global?.insumos.length > 0 ? global?.insumos.length - 1 + " Encontrados" : 0 + " Encontrados"}</h6>
+                <h6>Insumo - {global?.insumos && global?.insumos.length > 0 ? global?.insumos.length + " Encontrados" : 0 + " Encontrados"}</h6>
                 <select defaultValue={''} value={insumos} className="data-div-select"
                 disabled={(insumos2.length > 0 || !categories || !rubro)}
                 onChange={e => setInsumos(e.target.value)}>
@@ -428,7 +436,7 @@ export default function AddOrder () {
                     </div>
                     :
                     <div>
-                      <h6>Personal -  {global?.personal.length && global?.personal.length - 1 + " Encontrados"}</h6>
+                      <h6>Personal -  {global?.personal.length && global?.personal.length + " Encontrados"}</h6>
                       <select value={legajo} className="data-div-select" disabled={sector.length===0}
                       onChange={e => {
                         setLegajo(parseInt(e.target.value))}}>
@@ -461,7 +469,7 @@ export default function AddOrder () {
                         <input type="checkbox" checked={customIn} onChange={(e) => setCustomIn(e.target.checked)}/>
                     </div>
                         <div className='data-div-add-special'>
-                          <h4>{"Entrega a Personal:"} </h4>
+                          <h4>{"Indumentaria al Personal:"} </h4>
                           <input type="checkbox" checked={showLegajo} onChange={(e) => setShowLegajo(e.target.checked)}/>
                       </div>
                     {displayLegajo()}
