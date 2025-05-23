@@ -73,7 +73,8 @@ export interface IInsumo {
     ins_cod2?: number,
     ins_cod3?: number,
     order_id?: number,
-    insumo_des: string
+    insumo_des: string,
+    categoria?: string
 }
 
 export interface IResponseInsumo {
@@ -198,4 +199,9 @@ export interface IPersonal {
   fullname: string,
   cuil: number,
   sector: string
+}
+
+export interface ICatRub {
+    categorias: string[],
+    rubros: string[]
 }

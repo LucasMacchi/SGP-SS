@@ -17,7 +17,7 @@ export default function ServicesPage () {
     useEffect(() => {
         if(global) {
             if(global.login === false) global.sessionFn()
-            if(global.insumos.length === 0) global?.insumosFn()
+            //if(global.insumos.length === 0) global?.insumosFn()
             if(global.ccos.length === 0) global?.ccosFn()
         }
     },[])

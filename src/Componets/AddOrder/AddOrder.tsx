@@ -32,6 +32,8 @@ export default function AddOrder () {
     const [custom, setCustom] = useState(false)
     const [customIn, setCustomIn] = useState(false)
     const [service, setService] = useState('')
+    const [categories, setCategories] = useState('')
+    const [rubro, setRubro] = useState('')
 
     const [newOrder, setOrder] = useState<IAddPedido>({
         requester: '',
@@ -44,7 +46,7 @@ export default function AddOrder () {
 
     useEffect(() => {
         if(global && !tokenExpireChecker()) {
-            if(global.insumos.length === 0) global?.insumosFn()
+            if(global.insCategroies.categorias.length === 0) global.getCategoriasInsumos()
             if(global.ccos.length === 0) {
                 global?.ccosFn()
             }
@@ -63,6 +65,10 @@ export default function AddOrder () {
     useEffect(() => {
         setInsumos2('')
     },[customIn])
+
+    useEffect(() => {
+        if(categories && rubro) global?.insumosFn(categories, rubro)
+    },[categories, rubro])
 
     
     const handleData = (data: string | number, prop: string) => {
@@ -274,8 +280,34 @@ export default function AddOrder () {
                     <input type="text" id='otherins' className="data-div-select" 
                     onChange={(e) => setSearchIns(e.target.value)} value={searchIns}/>
                 </div>
+                    <div>
+                    <h6>Rubro</h6>
+                    <select value={rubro} className="data-div-select"
+                    onChange={e => {
+                      setRubro(e.target.value)}}>
+                    <option value={''}>---</option>
+                    {
+                        global?.insCategroies.rubros.map((c) => {
+                            return(<option key={c} value={c}>{c}</option>)
+                        })
+                    }
+                    </select>
+                </div>
                 <div>
-                <h6>Insumo</h6>
+                    <h6>Categoria</h6>
+                    <select value={categories} className="data-div-select"
+                    onChange={e => {
+                      setCategories(e.target.value)}}>
+                    <option value={''}>---</option>
+                    {
+                        global?.insCategroies.categorias.map((c) => {
+                            return(<option key={c} value={c}>{c}</option>)
+                        })
+                    }
+                    </select>
+                </div>  
+                <div>
+                <h6>Insumo - {global?.insumos && global?.insumos.length > 0 ? global?.insumos.length - 1 + " Encontrados" : 0 + " Encontrados"}</h6>
                 <select defaultValue={''} value={insumos} className="data-div-select"
                 disabled={insumos2 ? true : false}
                 onChange={e => setInsumos(e.target.value)}>

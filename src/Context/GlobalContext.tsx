@@ -5,6 +5,7 @@ import {
   IAction,
   IAddPedido,
   ICategoriesRes,
+  ICatRub,
   IChangeData,
   IClientIns,
   IEmailSender,
@@ -57,6 +58,8 @@ const globalReducer = (
       return { ...state, categories: payload };
     case ac.GET_REPORTS:
       return { ...state, reports: payload };
+    case ac.GET_INS_CATEGROIES:
+      return { ...state, insCategroies: payload };
     default:
       return state;
   }
@@ -171,9 +174,9 @@ export default function GlobalState(props: IPropsChildren) {
     } else alert("No valid rol");
   }
   //Trae todos los insumos para la creacion de nuevos pedidos
-  async function insumosFn() {
+  async function insumosFn(categoria: string, rubro: string) {
     const insumos: AxiosResponse<IResponseInsumo[]> = await axios.get(
-      SERVER + "/data/insumos",
+      SERVER + "/data/insumos/"+categoria+'/'+rubro,
       authReturner(),
     );
 
@@ -625,6 +628,21 @@ export default function GlobalState(props: IPropsChildren) {
       return {legajo:0,fullname:'',cuil:0,sector:``}
     }
   }
+
+  //Trae toda las categorias de los insumos
+  async function getCategoriasInsumos() {
+    try {
+        const res: string[] = await (await axios.get(SERVER + "/data/categories/insumos", authReturner())).data;
+      dispatch({
+        payload: res,
+        type: ac.GET_INS_CATEGROIES
+      })
+      console.log(res)
+    } catch (error) {
+      console.log(error);
+      alert("Error al traer las categorias de los insumos.");
+    }
+  }
   
   const innitialState: IGlobalContext = {
     user: {
@@ -658,6 +676,7 @@ export default function GlobalState(props: IPropsChildren) {
     insumos: [],
     categories: [],
     reports: [],
+    insCategroies: {rubros: [], categorias: []},
     errorCat: [],
     loginFn,
     logoutFn,
@@ -694,7 +713,8 @@ export default function GlobalState(props: IPropsChildren) {
     getPersona,
     orderLegajo,
     createPersonal,
-    deletePersonal
+    deletePersonal,
+    getCategoriasInsumos
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -710,6 +730,7 @@ interface IGlobalContext {
   createPersonal: (personal: IPersonal) => void;
   personal: IPersonal[];
   categories: string[];
+  insCategroies: ICatRub,
   errorCat: string[];
   pedidoDetail: IPedido;
   login: boolean;
@@ -722,7 +743,7 @@ interface IGlobalContext {
   logoutFn: () => void;
   sessionFn: () => void;
   pedidosFn: (rol: number, filter: IFilter) => void;
-  insumosFn: () => void;
+  insumosFn: (categoria: string, rubro: string) => void;
   ccosFn: () => void;
   sysUsersFn: () => void;
   orderAproveFn: (
@@ -761,4 +782,5 @@ interface IGlobalContext {
   getPersona: (legajo: number) => Promise<IPersonal>;
   orderLegajo: (id: number, legajo: number) => void;
   deletePersonal: (legajo: number) => void;
+  getCategoriasInsumos: () => void
 }
