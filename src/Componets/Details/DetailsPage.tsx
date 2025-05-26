@@ -422,6 +422,16 @@ export default function DetailsPage () {
         else return false
     }
 
+    const deletePedido = () => {
+        if(global && order && order.order_id) {
+            if(prompt('Ingrese el numero de pedido para eliminar: ') === order.numero) {
+                if(confirm('Seguro que quieres eliminar el pedido '+order.numero+'? (Esto sera permanente y el pedido no podra repertirse.)')) global.eliminarPedido(order.order_id)
+                else alert('Pedido no eliminado')
+            }
+            else alert('Pedido no eliminado')
+        }
+    }
+
     const displayActions = () => {
       if(action === 1) {
         return(
@@ -453,6 +463,11 @@ export default function DetailsPage () {
       else if(action === 5) {
         return(
           <button className='btn-export-pdf' onClick={() => navigator('/provisorio/'+order?.numero)}>Asignar Servicio</button>
+        )
+      }
+        else if(action === 6) {
+        return(
+          <button className='btn-export-pdf' onClick={() => deletePedido()}>Eliminar Pedido</button>
         )
       }
       else {
@@ -552,6 +567,7 @@ export default function DetailsPage () {
                           <option value={3}>Reportar</option>
                           {global?.user.rol === rolesNum.admin && <option value={4}>Exportar a TXT</option>}
                           {order.prov && <option value={5}>Provisional</option>}
+                          {global?.user.rol === rolesNum.admin && <option value={6}>Eliminar Pedido</option>}
                         </select>
                         
                     </div>

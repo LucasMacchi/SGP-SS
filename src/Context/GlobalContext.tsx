@@ -642,6 +642,19 @@ export default function GlobalState(props: IPropsChildren) {
       alert("Error al traer las categorias de los insumos.");
     }
   }
+
+  //Eliminar pedido
+  async function eliminarPedido(id:number) {
+    try {
+      await axios.delete(SERVER+'/pedido/eliminar/'+id,authReturner())
+      alert('Pedido eliminado')
+      navigation("/");
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+      alert("Error al eliminar pedido.");
+    }   
+  }
   
   const innitialState: IGlobalContext = {
     user: {
@@ -713,7 +726,8 @@ export default function GlobalState(props: IPropsChildren) {
     orderLegajo,
     createPersonal,
     deletePersonal,
-    getCategoriasInsumos
+    getCategoriasInsumos,
+    eliminarPedido
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -781,5 +795,6 @@ interface IGlobalContext {
   getPersona: (legajo: number) => Promise<IPersonal>;
   orderLegajo: (id: number, legajo: number) => void;
   deletePersonal: (legajo: number) => void;
-  getCategoriasInsumos: () => void
+  getCategoriasInsumos: () => void;
+  eliminarPedido: (id: number) => void;
 }
