@@ -532,9 +532,13 @@ export default function GlobalState(props: IPropsChildren) {
   //Agrega un insumo al pedido
   async function addInsumo(insumo: string, orderId: number, amount: number) {
     try {
+      const data = {
+        insumo,
+        cantidad: amount
+      }
       await axios.post(
-        SERVER + `/pedido/insumo/${orderId}/${insumo}/${amount}`,
-        {},
+        SERVER + `/pedido/insumo/${orderId}`,
+        data,
         authReturner(),
       );
       alert("Insumo agregado a la orden correctamente.");
