@@ -46,6 +46,7 @@ export default function DetailsPage () {
       if(global && id && !tokenExpireChecker()){
           global.uniqPedido(parseInt(id), false)
           if(global.insCategroies.rubros.length === 0) global.getCategoriasInsumos()
+          if(global.ccos.length === 0) global.ccosFn()
       }else{
           navigator('/')
       }
