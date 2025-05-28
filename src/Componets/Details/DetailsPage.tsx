@@ -35,7 +35,6 @@ export default function DetailsPage () {
     const [filteredArr, setFiltered] = useState<IPersonal[]>([])
     const [dni, setDni] = useState(0)
     const [fullname, setFullname] = useState('')
-    const [categories, setCategories] = useState('')
     const [rubro, setRubro] = useState('')
 
     useEffect(() => {
@@ -46,15 +45,14 @@ export default function DetailsPage () {
     useEffect(() => {
       if(global && id && !tokenExpireChecker()){
           global.uniqPedido(parseInt(id), false)
-            if(global.insCategroies.categorias.length === 0) global.getCategoriasInsumos()
       }else{
           navigator('/')
       }
     },[])
 
     useEffect(() => {
-        if(categories && rubro) global?.insumosFn(categories, rubro)
-    },[categories, rubro])
+        if( rubro) global?.insumosFn(rubro)
+    },[, rubro])
     
     useEffect(() => {
       let array = global?.personal
@@ -630,22 +628,9 @@ export default function DetailsPage () {
                                 </select>
                             </div>
                             <div>
-                                <h6>Categoria</h6>
-                                <select value={categories} className="data-div-select"
-                                onChange={e => {
-                                  setCategories(e.target.value)}}>
-                                <option value={''}>---</option>
-                                {
-                                    global?.insCategroies.categorias.map((c) => {
-                                        return(<option key={c} value={c}>{c}</option>)
-                                    })
-                                }
-                                </select>
-                            </div>  
-                            <div>
                                 <h6>Insumo - {global?.insumos && global?.insumos.length > 0 ? global?.insumos.length + " Encontrados" : 0 + " Encontrados"}</h6>
                                 <select defaultValue={''} value={newIns} className="data-div-select"
-                                disabled={(!categories || !rubro)}
+                                disabled={!rubro}
                                 onChange={e => setNewAdd(e.target.value)}>
                                 <option value={''}>---</option>
                                 {
@@ -683,13 +668,6 @@ export default function DetailsPage () {
             return(<h3 className='title-Homepage'>Cargando...</h3>)
         }
     }
-/*
-const provBtn = () => {
-    if(order?.prov && global?.user.rol === 1){
-        return(<button className='btn-export-pdf' onClick={() => navigator('/provisorio/'+order?.numero)}>Provisorio</button>)
-    }
-}
-*/
 
 
     return(
