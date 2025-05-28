@@ -248,7 +248,12 @@ export default function AddOrder () {
     const displayCustomService = () => {
         if(custom) {
             return(
-                <div className='data-div-add'>
+                <div className='data-div-add-border'>
+                    <h4>Centro de Costo: </h4>
+                    <div className='data-div-add-special'>
+                        <h4>Servicio Especial: </h4>
+                        <input type="checkbox" checked={custom} onChange={(e) => setCustom(e.target.checked)}/>
+                    </div>
                     <div className='data-div-add' >
                         <h6>Servicio personalizado </h6>
                         <input type="text" id='otherins' className="data-div-select" 
@@ -258,8 +263,12 @@ export default function AddOrder () {
             )
         } else {
             return (
-            <div className='data-div-add'>
+            <div className='data-div-add-border'>
                 <h4>Centro de Costo: </h4>
+                <div className='data-div-add-special'>
+                    <h4>Servicio Especial: </h4>
+                    <input type="checkbox" checked={custom} onChange={(e) => setCustom(e.target.checked)}/>
+                </div>
                 <div className='data-div-add' >
                     <h6>Busqueda</h6>
                     <input type="text" id='otherins' className="data-div-select" 
@@ -310,8 +319,12 @@ export default function AddOrder () {
     const displayCustomInsumo = () => {
         if(customIn) {
             return(
-                <div className='data-div-add'>
+                <div className='data-div-add-border'>
                 <h4>Insumos: </h4>
+                <div className='data-div-add-special'>
+                    <h4>Insumo Personalizado: </h4>
+                    <input type="checkbox" checked={customIn} onChange={(e) => setCustomIn(e.target.checked)}/>
+                </div>
                 <div className='data-div-add' >
                     <h6>Insumo personalizado </h6>
                     <input type="text" id='otherins' className="data-div-select" 
@@ -325,8 +338,12 @@ export default function AddOrder () {
         }
         else{
             return(
-                <div className='data-div-add'>
+                <div className='data-div-add-border'>
                 <h4>Insumos: </h4>
+                <div className='data-div-add-special'>
+                    <h4>Insumo Personalizado: </h4>
+                    <input type="checkbox" checked={customIn} onChange={(e) => setCustomIn(e.target.checked)}/>
+                </div>
                 <div className='data-div-add' >
                     <h6>Busqueda</h6>
                     <input type="text" id='otherins' className="data-div-select" 
@@ -386,7 +403,7 @@ export default function AddOrder () {
     const displayLegajo = () => {
         if(showLegajo) {
         return(
-          <div className='data-div-add'>
+          <div className='data-div-add-border'>
             <div>
             <h6>Sector</h6>
             <select value={sector} className="data-div-select"
@@ -447,14 +464,6 @@ export default function AddOrder () {
         if(showForm) {
             return(
                 <div className="add-form-page">
-                    <div className='data-div-add-special'>
-                        <h4>Servicio Especial: </h4>
-                        <input type="checkbox" checked={custom} onChange={(e) => setCustom(e.target.checked)}/>
-                    </div>
-                    <div className='data-div-add-special'>
-                        <h4>Insumo Personalizado: </h4>
-                        <input type="checkbox" checked={customIn} onChange={(e) => setCustomIn(e.target.checked)}/>
-                    </div>
                         <div className='data-div-add-special'>
                           <h4>{"Indumentaria al Personal:"} </h4>
                           <input type="checkbox" checked={showLegajo} onChange={(e) => setShowLegajo(e.target.checked)}/>

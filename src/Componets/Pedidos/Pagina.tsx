@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
-import { IFilter, IInsumo, IpedidoDataPDF, rolesNum } from '../../Utils/Interfaces'
+import { IFilter, IInsumo, IpedidoDataPDF, IServicio, rolesNum } from '../../Utils/Interfaces'
 import "./Pagina.css"
 import dateParser from '../../Utils/dateParser'
 import { useNavigate } from 'react-router-dom'
@@ -26,6 +26,7 @@ export default function PaginaPedidos () {
     const [state, setState] = useState('')
     const [dateStart, setDateStart] = useState('')
     const [dateEnd, setDateEnd] = useState('')
+    const [ccoArr, setCcoArr] = useState<IServicio[]>([])
     
     useEffect(() => {
         setDateStart(lastMonth())
@@ -73,6 +74,17 @@ export default function PaginaPedidos () {
         const d = dateParser(date)
         return d.day + '/'+d.month+'/'+d.year
     }
+
+    useEffect(() => {
+        if(global && global.ccos) {
+            let arr = global.ccos
+            if(client) {
+                arr = arr.filter((s) => s.client_id === client)
+            }
+            setCcoArr(arr)
+        }
+
+    },[client, cco])
 
     const colorChange = (state: string): string => {
         switch(state) {
@@ -187,25 +199,25 @@ export default function PaginaPedidos () {
                     value={nro} onChange={e => setNro(e.target.value)}/>
                 </div>
                 <div>
-                    <h5 className='filter-sub'>CCO</h5>
-                    <select defaultValue={''} disabled={parseInt(nro) ? true : false}
-                    value={cco} onChange={(e) => setCco(parseInt(e.target.value))} className='select-small-cco'>
-                        <option value={''}>---</option>
-                        {
-                            global?.ccos.map((cco) => (
-                                <option key={cco.service_id} value={cco.service_id}>{cco.service_id+'-'+cco.service_des}</option>
+                    <h5 className='filter-sub'>Cliente</h5>
+                    <select disabled={parseInt(nro) ? true : false}
+                    value={client} onChange={(e) => setClient(parseInt(e.target.value))} className='select-small-cco'>
+                        <option value={0}>---</option>
+                        {global?.ccos &&
+                            clientesReturner(global.ccos)?.map((cco) => (
+                                <option key={cco.client_id} value={cco.client_id}>{cco.client_id+'-'+cco.client_des}</option>
                             ))
                         }
                     </select>
                 </div>
                 <div>
-                    <h5 className='filter-sub'>Cliente</h5>
-                    <select defaultValue={''} disabled={parseInt(nro) ? true : false}
-                    value={client} onChange={(e) => setClient(parseInt(e.target.value))} className='select-small-cco'>
-                        <option value={''}>---</option>
-                        {global?.ccos &&
-                            clientesReturner(global.ccos)?.map((cco) => (
-                                <option key={cco.client_id} value={cco.client_id}>{cco.client_id+'-'+cco.client_des}</option>
+                    <h5 className='filter-sub'>CCO</h5>
+                    <select disabled={parseInt(nro) ? true : false}
+                    value={cco} onChange={(e) => setCco(parseInt(e.target.value))} className='select-small-cco'>
+                        <option value={0}>---</option>
+                        {
+                            ccoArr.map((cco) => (
+                                <option key={cco.service_id} value={cco.service_id}>{cco.service_id+'-'+cco.service_des}</option>
                             ))
                         }
                     </select>
@@ -235,9 +247,14 @@ export default function PaginaPedidos () {
                       </select>
                   </div>
                   <div>
-                      <h5 className='filter-sub'>Cantidad</h5>
-                      <input type='number' id='limit' className='textfield-limit' min={10}
-                      value={limit} onChange={e => setLimit(parseInt(e.target.value))}/>
+                    <h5 className='filter-sub'>Cantidad</h5>
+                    <select className='select-small' value={limit}
+                    onChange={e => setLimit(parseInt(e.target.value))}>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                        <option value={150}>150</option>
+                        <option value={200}>200</option>
+                    </select>
                   </div>
                 </div>
 

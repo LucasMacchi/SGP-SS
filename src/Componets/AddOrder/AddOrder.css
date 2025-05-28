@@ -1,6 +1,12 @@
 .data-div-add {
     color: #666666;
     text-align: left;
+
+}
+.data-div-add-border {
+    color: #666666;
+    text-align: left;
+    border: 2px solid;
 }
 .data-div-add, h4, h6 {
     margin: 5px;
