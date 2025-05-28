@@ -174,7 +174,8 @@ export default function GlobalState(props: IPropsChildren) {
     } else alert("No valid rol");
   }
   //Trae todos los insumos para la creacion de nuevos pedidos
-  async function insumosFn(rubro: string) {
+  async function insumosFn(rubro: string, empty: boolean) {
+    if(!empty) {
     const insumos: AxiosResponse<IResponseInsumo[]> = await axios.get(
       SERVER + "/data/insumos/"+rubro,
       authReturner(),
@@ -185,6 +186,14 @@ export default function GlobalState(props: IPropsChildren) {
       type: ac.GET_INSUMOS,
       payload: filtered,
     });
+    }
+    else {
+      dispatch({
+      type: ac.GET_INSUMOS,
+      payload: [],
+    });
+    }
+
   }
   //Trae los Centros de Costos para la creacion de pedidos
   async function ccosFn() {
@@ -760,7 +769,7 @@ interface IGlobalContext {
   logoutFn: () => void;
   sessionFn: () => void;
   pedidosFn: (rol: number, filter: IFilter) => void;
-  insumosFn: (rubro: string) => void;
+  insumosFn: (rubro: string, empty: boolean) => void;
   ccosFn: () => void;
   sysUsersFn: () => void;
   orderAproveFn: (

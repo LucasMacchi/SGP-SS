@@ -34,7 +34,6 @@ export default function AddOrder () {
     const [custom, setCustom] = useState(false)
     const [customIn, setCustomIn] = useState(false)
     const [service, setService] = useState('')
-    const [categories, setCategories] = useState('')
     const [rubro, setRubro] = useState('')
     const [dni, setDni] = useState(0)
     const [fullname, setFullname] = useState('')
@@ -56,6 +55,7 @@ export default function AddOrder () {
 
     useEffect(() => {
         if(global && !tokenExpireChecker()) {
+            global.insumosFn('', true)
             if(global.insCategroies.categorias.length === 0) global.getCategoriasInsumos()
             if(global.ccos.length === 0) {
                 global?.ccosFn()
@@ -99,8 +99,8 @@ export default function AddOrder () {
     },[customIn])
 
     useEffect(() => {
-        if(categories && rubro) global?.insumosFn(categories, rubro)
-    },[categories, rubro])
+        if(rubro) global?.insumosFn(rubro, false)
+    },[rubro])
 
     
     const handleData = (data: string | number, prop: string) => {
@@ -137,11 +137,16 @@ export default function AddOrder () {
     },[searchServ, filterClient, filterDepartment, global?.ccos])
 
     useEffect(() => {
-        if(searchIns.length > 2){
-            const filtered = global?.insumos.filter(c => c.toUpperCase().includes(searchIns.toUpperCase()))
-            if(filtered) setFilterIns(filtered)
+        if(global) {
+            let arr = global.insumos
+            if(searchIns.length > 2){
+                arr = global?.insumos.filter(c => c.toUpperCase().includes(searchIns.toUpperCase()))
+            }
+            
+            setFilterIns(arr)
         }
-    },[searchIns])
+
+    },[searchIns, global?.insumos])
 
     const addIns = () => {
         if(amount && insumos2) {
@@ -340,33 +345,15 @@ export default function AddOrder () {
                         })
                     }
                     </select>
-                </div>
+                </div> 
                 <div>
-                    <h6>Categoria</h6>
-                    <select value={categories} className="data-div-select"
-                    onChange={e => {
-                      setCategories(e.target.value)}}>
-                    <option value={''}>---</option>
-                    {
-                        global?.insCategroies.categorias.map((c) => {
-                            return(<option key={c} value={c}>{c}</option>)
-                        })
-                    }
-                    </select>
-                </div>  
-                <div>
-                <h6>Insumo - {global?.insumos && global?.insumos.length > 0 ? global?.insumos.length + " Encontrados" : 0 + " Encontrados"}</h6>
+                <h6>Insumo - {filterIns.length > 0 ? filterIns.length + " Encontrados" : 0 + " Encontrados"}</h6>
                 <select defaultValue={''} value={insumos} className="data-div-select"
-                disabled={(insumos2.length > 0 || !categories || !rubro)}
+                disabled={(insumos2.length > 0 || !rubro)}
                 onChange={e => setInsumos(e.target.value)}>
                 <option value={''}>---</option>
                 {
-                    searchIns.length > 2 ?
                     filterIns.map((i, index) => (
-                        <option key={index} value={i}>{i}</option>
-                    ))
-                    :
-                    global?.insumos.map((i, index) => (
                         <option key={index} value={i}>{i}</option>
                     ))
                 }

@@ -45,13 +45,14 @@ export default function DetailsPage () {
     useEffect(() => {
       if(global && id && !tokenExpireChecker()){
           global.uniqPedido(parseInt(id), false)
+          if(global.insCategroies.rubros.length === 0) global.getCategoriasInsumos()
       }else{
           navigator('/')
       }
     },[])
 
     useEffect(() => {
-        if( rubro) global?.insumosFn(rubro)
+        if( rubro) global?.insumosFn(rubro, false)
     },[, rubro])
     
     useEffect(() => {
