@@ -42,7 +42,7 @@ export default function Correopage () {
                         msg: message,
                         sender: dataUser.first_name + ' ' + dataUser.last_name
                     }
-                    await global?.sendEmail(data)
+                    global?.sendEmail(data)
                     console.log('Correo enviado a: ',u.email)
                 });
                 alert('Correos enviados a todos los usuarios.')
@@ -57,7 +57,7 @@ export default function Correopage () {
                 setLoad(true)
                 setEmail('')
                 setMsg('')
-                await global?.sendEmail(data)
+                global?.sendEmail(data)
                 alert('Correo enviado')
                 navigator('/')
             }

@@ -1,10 +1,8 @@
 
 export default function (dbdate: string, rDate: boolean) : string | Date {
     const date = dbdate.split('T')
-    const dateParsed = new Date(date[0])
-    const year = dateParsed.getFullYear()
-    const month = dateParsed.getMonth() + 1
-    const day = dateParsed.getDate()
-    return rDate ? dateParsed : day + '/' + month + '/' + year
+    const dateParsed = date[0].split('-')
+    const dateD = new Date(parseInt(dateParsed[0]), parseInt(dateParsed[1]), parseInt(dateParsed[2]))
+    return rDate ? dateD : dateParsed[2] + '/' + dateParsed[1] + '/' + dateParsed[0]
 
 }

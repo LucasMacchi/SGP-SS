@@ -5,7 +5,9 @@
     color: #666666;
     text-align: left;
 }
-
+.data-div-non {
+    display: none;
+}
 .date-div {
     border: 1px solid;
     padding: 4px;
@@ -85,4 +87,9 @@
     max-width: 300px;
     height: 120px;
     resize: none;
+}
+.select-actions {
+    font-size: medium;
+    border-color: #3399ff;
+    width: 230px;
 }

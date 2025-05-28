@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
-import { useParams } from 'react-router-dom'
 import Header from '../Header/Header'
+import { useNavigate } from 'react-router-dom'
 import { IReport, IToken } from '../../Utils/Interfaces'
 import { jwtDecode } from 'jwt-decode'
 import './reportpage.css'
@@ -14,16 +14,12 @@ export default function Report () {
     const [report, setReport] = useState('')
     const [category, setCategory] = useState('')
     const [load, setLoad] = useState(true)
-    const params = useParams()
-
-    const id = params.orderId
+    const navigator = useNavigate()
 
         useEffect(() => {
             if(global?.login === false) global?.sessionFn()
             if(global?.categories.length === 0) global.categoriesGet()
-            if(global && id){
-                global.uniqPedido(id, global.pedidos, false)
-            }
+            if(!global?.pedidoDetail.order_id) navigator('/')
             setTimeout(() => {
                 setLoad(false)
             }, waitTime);
@@ -43,7 +39,7 @@ export default function Report () {
                     user_id: dataUser.usuario_id,
                     email: dataUser.email
                 }
-                await global.createReport(data, true)
+                global.createReport(data, true)
                 
             }
         }

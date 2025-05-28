@@ -11,6 +11,9 @@ export default {
     ADD_USER: 'add_user',
     DEL_USER: 'del_user',
     GET_CATEGORIES: 'get_categories',
-    GET_REPORTS: 'get_reports'
+    GET_REPORTS: 'get_reports',
+    GET_ERROR_CATEGORIES: 'get_error_categories',
+    GET_PERSONAL: 'get_personal',
+    GET_INS_CATEGROIES: 'get_categories_insumos'
     
 }

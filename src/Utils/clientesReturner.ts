@@ -1,21 +1,28 @@
 import { IServicio } from "./Interfaces";
 
-export default function (services: IServicio[]) {
-    let aux: number = 0
-    const data = services.map((s) => {
-        if(s.client_id > 0) {
-            if(!aux) {
-                aux = s.client_id
-                return {cliente_id: s.client_id, cliente_des: s.client_des}
-            }
-            else{
-                if(s.client_id !== aux) {
-                    aux = s.client_id
-                    return {cliente_id: s.client_id, cliente_des: s.client_des}
-                }
-            }
-        }
+interface Iclient {
+    client_id: number,
+    client_des: string
+}
 
+export default function (services: IServicio[]): Iclient[] {
+    const arrD = services.map((s) => {
+        const data: Iclient = {
+        client_des: s.client_des,
+        client_id: s.client_id
+        }
+        return data
     })
-    return data.filter(s => s)
+    let aux = 0
+    const arr = arrD.filter((s) => {
+        if(aux === 0 ){
+            aux = s.client_id
+            return s
+        }
+        if(s.client_id !== aux) {
+            aux = s.client_id
+            return s
+        }
+    })
+    return arr
 }

@@ -1,12 +1,16 @@
 import "./AddOrder.css"
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
-import { useParams } from 'react-router-dom'
-import { IInsumo, IAddPedido, IToken, IServicio } from '../../Utils/Interfaces'
+import { useParams, useNavigate } from 'react-router-dom'
+import { IInsumo, IAddPedido, IServicio, IPersonal } from '../../Utils/Interfaces'
 import clientSearcher from "../../Utils/clientSearcher"
-import { jwtDecode } from "jwt-decode"
 import Header from "../Header/Header"
 import clientesReturner from "../../Utils/clientesReturner"
+import departamentoReturner from "../../Utils/departamentoReturner"
+import tokenExpireChecker from "../../Utils/tokenExpireChecker"
+import serviceDescription from "../../Utils/serviceDescription"
+import sectoresPersonal from "../Details/sectores.json"
+
 
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
@@ -14,10 +18,12 @@ export default function AddOrder () {
     const global = useContext(GlobalContext)
     const params = useParams()
     const id = params.orderId
+    const navigator = useNavigate()
     const [btn, setBtn] = useState(true)
     const [searchIns, setSearchIns] = useState('')
     const [searchServ, setSearchServ] = useState('')
     const [filterClient, setFilterClient] = useState(0)
+    const [filterDepartment, setDepartment] = useState('')
     const [filterIns, setFilterIns] = useState<string[]>([])
     const [filterServ, setFilterServ] = useState<IServicio[]>([])
     const [insumos, setInsumos] = useState('')
@@ -28,29 +34,61 @@ export default function AddOrder () {
     const [custom, setCustom] = useState(false)
     const [customIn, setCustomIn] = useState(false)
     const [service, setService] = useState('')
+    const [rubro, setRubro] = useState('')
+    const [dni, setDni] = useState(0)
+    const [fullname, setFullname] = useState('')
+    const [showLegajo, setShowLegajo] = useState(false)
+    const [search, setSearch] = useState('')
+    const [filteredArr, setFiltered] = useState<IPersonal[]>([])
+    const [legajo, setLegajo] = useState(0)
+    const [sector, setSector] = useState('')
+
     const [newOrder, setOrder] = useState<IAddPedido>({
         requester: '',
         service_id: 0,
         client_id: 0,
         insumos: [],
-        user_id: 0,
+        usuario_id: 0,
+        service_des: '',
+        legajo: 0
     })
 
     useEffect(() => {
-        if(global) {
-            if(global.insumos.length === 0) global?.insumosFn()
+        if(global && !tokenExpireChecker()) {
+            global.insumosFn('', true)
+            if(global.insCategroies.categorias.length === 0) global.getCategoriasInsumos()
             if(global.ccos.length === 0) {
                 global?.ccosFn()
             }
             setTimeout(() => {
                 setShowForm(true)
             }, waitTime);
-            if(id){
-                global.uniqPedido(id, global.pedidos, false)
-            }
-        }
-
+            if(id) setOrder(global.pedidoDetail)
+            else global?.uniqPedido(0,true)
+        } else navigator('/')
     },[])
+
+    useEffect(() => {
+      let array = global?.personal
+      if(array){
+        if(search.length > 0 && array) {
+          array = array.filter(p => p.fullname.toLowerCase().includes(search.toLowerCase()))
+        }
+        setFiltered(array)
+      }
+    },[global?.personal, search])
+
+    useEffect(() => {
+        if(showLegajo) {
+            setRubro('Indumentar')
+            newOrder.insumos = []
+        }
+    },[showLegajo])
+
+    useEffect(() => {
+      if(sector) global?.getPersonalBySector(sector, false)
+      else global?.getPersonalBySector(sector, true)
+    },[sector])
 
     useEffect(() => {
         setService('')
@@ -61,32 +99,24 @@ export default function AddOrder () {
     },[customIn])
 
     useEffect(() => {
-        if(global?.pedidoDetail) setOrder(global?.pedidoDetail)
-    },[global?.pedidoDetail])
+        if(rubro) global?.insumosFn(rubro, false)
+    },[rubro])
 
-    useEffect(() => {
-        setOrder({
-            requester: '',
-            service_id: 0,
-            client_id: 0,
-            insumos: [],
-            user_id: 0,
-        })
-    },[loading])
-
-    const handleData = (data: string, prop: string) => {
+    
+    const handleData = (data: string | number, prop: string) => {
         setOrder({
             ...newOrder,
             [prop]: data
         })
-
     }
 
     useEffect(() => {
-        if((newOrder.service_id && newOrder.insumos.length > 0) || (newOrder.insumos.length > 0 && service && custom)){
-            setBtn(false)
-        }
-        else setBtn(true)
+      if(custom){
+        if(newOrder.insumos.length === 0 || service.length < 3) setBtn(true)
+        else setBtn(false)
+      }
+      else if(newOrder.insumos.length === 0 || !newOrder.service_id) setBtn(true)
+      else setBtn(false)
     },[newOrder, service])
 
     useEffect(() => {
@@ -99,16 +129,24 @@ export default function AddOrder () {
             if(filterClient > 0) {
                 arr = arr.filter(c => c.client_id === filterClient)
             }
+            if(filterDepartment) {
+                arr = arr.filter(c => c.localidad === filterDepartment)
+            }
             setFilterServ(arr)
         }
-    },[searchServ, filterClient, global?.ccos])
+    },[searchServ, filterClient, filterDepartment, global?.ccos])
 
     useEffect(() => {
-        if(searchIns.length > 2){
-            const filtered = global?.insumos.filter(c => c.toUpperCase().includes(searchIns.toUpperCase()))
-            if(filtered) setFilterIns(filtered)
+        if(global) {
+            let arr = global.insumos
+            if(searchIns.length > 2){
+                arr = global?.insumos.filter(c => c.toUpperCase().includes(searchIns.toUpperCase()))
+            }
+            
+            setFilterIns(arr)
         }
-    },[searchIns])
+
+    },[searchIns, global?.insumos])
 
     const addIns = () => {
         if(amount && insumos2) {
@@ -152,22 +190,40 @@ export default function AddOrder () {
 
     const createOrder = async () => {
         setLoad(true)
-        const token = localStorage.getItem('jwToken')
-        const dataUser: IToken = jwtDecode(token ?? "")
+        newOrder.prov = false
+        newOrder.prov_des = ``
+        if(showLegajo) {
+                console.log('AA')
+                if(sector === 'PROVISORIO') {
+                    createPersonal()
+                    newOrder.legajo = dni
+                }
+                else {
+                    console.log('BB')
+                    if(legajo) {
+                        newOrder.legajo = legajo
+                    }
+                }
+        }
         if(service && custom) {
             newOrder.client_id = -1
             newOrder.service_id = -1
             newOrder.prov = true
             newOrder.prov_des = service
-            console.log(newOrder)
-            global?.addPedido(dataUser.usuario_id, dataUser.user, newOrder.service_id, clientSearcher(global.ccos, newOrder.service_id), newOrder.insumos, newOrder.prov, newOrder.prov_des)
-
+            newOrder.service_des = ``
         }
         else if (custom) {
             alert("Ingrese un servicio personalizado valido.")
         }
         else {
-            global?.addPedido(dataUser.usuario_id, dataUser.user, newOrder.service_id, clientSearcher(global.ccos, newOrder.service_id), newOrder.insumos, false, '')
+          if(global){
+            newOrder.service_des = serviceDescription(global.ccos, newOrder.service_id)
+            newOrder.client_id = clientSearcher(global.ccos, newOrder.service_id)
+            setTimeout(() => {
+                global?.addPedido(newOrder)
+            }, 1000);
+            
+          }
         }
     }
 
@@ -216,7 +272,19 @@ export default function AddOrder () {
                 <option value={0}>---</option>
                 {global?.ccos &&
                     clientesReturner(global?.ccos).map((c) => {
-                        return(<option key={c?.cliente_id} value={c?.cliente_id}>{c?.cliente_id+'-'+c?.cliente_des}</option>)
+                        return(<option key={c.client_id} value={c.client_id}>{c.client_id+'-'+c.client_des}</option>)
+                    })
+                }
+                </select>
+                </div>
+                <div>
+                <h6>Departamento</h6>
+                <select disabled={id ? true : false} defaultValue={''} value={filterDepartment} className="data-div-select"
+                onChange={e => setDepartment(e.target.value)}>
+                <option value={''}>---</option>
+                {global?.ccos &&
+                    departamentoReturner(global?.ccos).map((d) => {
+                        return(<option key={d} value={d}>{d}</option>)
                     })
                 }
                 </select>
@@ -224,7 +292,7 @@ export default function AddOrder () {
                 <div>
                 <h6>Servicio</h6>
                 <select disabled={id ? true : false} defaultValue={''} value={newOrder.service_id} className="data-div-select"
-                onChange={e => handleData(e.target.value, 'service_id')}>
+                onChange={e => handleData(parseInt(e.target.value), 'service_id')}>
                 <option value={''}>---</option>
                 {
                     filterServ.map((c) => {
@@ -265,18 +333,27 @@ export default function AddOrder () {
                     onChange={(e) => setSearchIns(e.target.value)} value={searchIns}/>
                 </div>
                 <div>
-                <h6>Insumo</h6>
+                    <h6>Rubro</h6>
+                    <select value={rubro} className="data-div-select"
+                    disabled={showLegajo}
+                    onChange={e => {
+                      setRubro(e.target.value)}}>
+                    <option value={''}>---</option>
+                    {
+                        global?.insCategroies.rubros.map((c) => {
+                            return(<option key={c} value={c}>{c}</option>)
+                        })
+                    }
+                    </select>
+                </div> 
+                <div>
+                <h6>Insumo - {filterIns.length > 0 ? filterIns.length + " Encontrados" : 0 + " Encontrados"}</h6>
                 <select defaultValue={''} value={insumos} className="data-div-select"
-                disabled={insumos2 ? true : false}
+                disabled={(insumos2.length > 0 || !rubro)}
                 onChange={e => setInsumos(e.target.value)}>
                 <option value={''}>---</option>
                 {
-                    searchIns.length > 2 ?
                     filterIns.map((i, index) => (
-                        <option key={index} value={i}>{i}</option>
-                    ))
-                    :
-                    global?.insumos.map((i, index) => (
                         <option key={index} value={i}>{i}</option>
                     ))
                 }
@@ -292,6 +369,80 @@ export default function AddOrder () {
         }
     }
 
+    const createPersonal = () => {
+        const personal: IPersonal = {
+        cuil: dni,
+        fullname: fullname,
+        sector: sector,
+        legajo: dni
+      }
+    if(dni && fullname) {
+        global?.createPersonal(personal)
+      }
+      else alert('Compruebe que los datos del ingresante son correctos')
+
+    }
+
+    const displayLegajo = () => {
+        if(showLegajo) {
+        return(
+          <div className='data-div-add'>
+            <div>
+            <h6>Sector</h6>
+            <select value={sector} className="data-div-select"
+            onChange={e => {
+            setSearch('')
+            setSector(e.target.value)}}>
+            <option value={''}>---</option>
+                {
+                    sectoresPersonal.sectores.map((s) => {
+                        return(<option key={s} value={s}>{s}</option>)
+                    })
+                }
+                </select>
+                </div>  
+                <div className='data-div-add' >
+                    <h6 className={sector === 'PROVISORIO' ? "data-div-non"  : ''}>Busqueda por nombre de personal</h6>
+                    <input type="text" id='otherins' 
+                    className={sector === 'PROVISORIO' ? "data-div-non"  : 'data-div-select'}
+                    onChange={(e) => setSearch(e.target.value)} disabled={sector.length===0}
+                    value={search}/>
+                </div>
+                  {sector === 'PROVISORIO' ?
+                    <div>
+                      <div>
+                        <h6>Apellido y Nombre</h6>
+                        <input type="text" id='otherins' className="data-div-select" 
+                        onChange={(e) => setFullname(e.target.value)} value={fullname}/>
+                      </div>
+                      <div>
+                        <h6>CUIL</h6>
+                        <input type="number" id='otherins' className="data-div-select" 
+                        onChange={(e) => setDni(parseInt(e.target.value))} value={dni}/>
+                      </div>
+                    </div>
+                    :
+                    <div>
+                      <h6>Personal -  {global?.personal.length && global?.personal.length + " Encontrados"}</h6>
+                      <select value={legajo} className="data-div-select" disabled={sector.length===0}
+                      onChange={e => {
+                        setLegajo(parseInt(e.target.value))}}>
+                      <option value={0}>---</option>
+                      {
+                          filteredArr.map((p) => {
+                              return(<option key={p.legajo} value={p.legajo}>{p.legajo+'-'+p.fullname}</option>)
+                          })
+                      }
+                      </select>
+                    </div>
+                  }
+    
+              </div>
+            )
+          }
+        }
+
+
     const displayForms = () => {
         if(showForm) {
             return(
@@ -304,6 +455,11 @@ export default function AddOrder () {
                         <h4>Insumo Personalizado: </h4>
                         <input type="checkbox" checked={customIn} onChange={(e) => setCustomIn(e.target.checked)}/>
                     </div>
+                        <div className='data-div-add-special'>
+                          <h4>{"Indumentaria al Personal:"} </h4>
+                          <input type="checkbox" checked={showLegajo} onChange={(e) => setShowLegajo(e.target.checked)}/>
+                      </div>
+                    {displayLegajo()}
                     {displayCustomService()}
                     {displayCustomInsumo()}
                     <div className="data-div-btn-insumo">  
@@ -316,11 +472,13 @@ export default function AddOrder () {
                     <table >
                         <tbody>
                             <tr>
+                                <th className="data-div-insumo-number">Nro</th>
                                 <th className="data-div-table-sections">Producto</th>
                                 <th className="data-div-table-sections">Cantidad</th>
                             </tr>
                             {newOrder.insumos.map((i, index) => (
                                 <tr  key={index} >
+                                    <th className="data-div-insumo-number">{index + 1}</th>
                                     <th className="data-div-insumo-name-row" onClick={() => deleteInsumoRow(index, i.insumo_des)}>{i.insumo_des}</th>
                                     <th className="data-div-insumo-amount-row" onClick={() => changeAmount(i.amount, index)}>{i.amount}</th>
                                 </tr>
@@ -328,7 +486,7 @@ export default function AddOrder () {
                         </tbody>
                     </table>
                     {loading ? <h3 className='title-Homepage'>Cargando...</h3> : 
-                        <button className='btn-big-forms' disabled={btn}
+                        <button className={btn ? 'btn-big-forms-disable' : 'btn-big-forms'} disabled={btn}
                         onClick={() => createOrder()}>
                             Registrar
                         </button>

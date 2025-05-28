@@ -106,10 +106,12 @@
 .select-small {
     font-size: medium;
     border-color: #3399ff;
+    width: 110px;
 }
 .select-small-cco {
     font-size: small;
     border-color: #3399ff;
+    width: 350px;
 }
 .filter-sub {
     margin: 5px;
@@ -118,10 +120,25 @@
 .textfield-search    {
     font-size: small;
     border-color: #3399ff;
+    width: 150px;
+}
+.textfield-limit   {
+    font-size: small;
+    border-color: #3399ff;
     width: 60px;
 }
 .date-input {
     font-size: small;
     border-color: #3399ff;
-    width: 80px;
+    width: 100px;
+}
+.div-filter-other {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+}
+@media (max-width: 600px) {
+  div-filter-other {
+    width: 350px;
+  }
 }

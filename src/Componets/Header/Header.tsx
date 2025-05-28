@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { GlobalContext } from '../../Context/GlobalContext'
 import './Header.css'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 export default function Header () {
 
@@ -13,9 +13,9 @@ export default function Header () {
     const navigateTo = (link: string) => {
         setDrop(false)
         navigator(link)
-        if(link === '/pedidos') window.location.reload()
-
     }
+
+    useEffect(() => {if(global)if(!global.login) global.sessionFn()},[])
 
     const logOutHeader = () => {
         if(confirm('¿Seguro que quieres cerrar sesion?')) {
@@ -29,6 +29,8 @@ export default function Header () {
             <div className='div-logo'>
                 <img src="/logo_big.webp" alt="" className='logo-big-home'/>
             </div>
+            {global?.user.username &&
+                <h5 className='delete-text'>{global.user.username}</h5>}
             <div className="dropdown">
                 <button className='btn-menu-header' onClick={() => setDrop(!drop)}>Menu</button>
                 {drop && (
@@ -41,15 +43,21 @@ export default function Header () {
                         </li>
                         <li className='dropdown-li' onClick={() => navigateTo('/add')}>
                             Nuevo Pedido
-                            </li>
+                        </li>
                         <li className='dropdown-li' onClick={() => navigateTo('/informes')}>
                             Generar Informes
-                            </li>
+                        </li>
+                        <li className='dropdown-li' onClick={() => navigateTo('/services')}>
+                        Servicios
+                        </li>
                         <li className='dropdown-li' onClick={() => navigateTo('/correo')}>
                             Correo
                         </li>
                         <li className='dropdown-li' onClick={() => navigateTo('/reportes')}>
                             Buscar Reportes
+                        </li>
+                        <li className='dropdown-li' onClick={() => navigateTo('/soporte')}>
+                        Soporte Tecnico
                         </li>
                         {global?.user.rol === 1 && 
                         <li className='dropdown-li' onClick={() => navigateTo('/admin/users')}>

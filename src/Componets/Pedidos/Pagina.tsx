@@ -11,6 +11,7 @@ import { pdf } from '@react-pdf/renderer'
 import saveAs from 'file-saver'
 import filterJSON from '../../Utils/dataFilter.json'
 import clientesReturner from '../../Utils/clientesReturner'
+import tokenExpireChecker from '../../Utils/tokenExpireChecker'
 const waitTime = parseInt(import.meta.env.VITE_WAITTIME)
 
 export default function PaginaPedidos () {
@@ -27,8 +28,8 @@ export default function PaginaPedidos () {
     const [dateEnd, setDateEnd] = useState('')
     
     useEffect(() => {
-        if(!global?.login) global?.sessionFn()
-            setDateStart(lastMonth())
+        setDateStart(lastMonth())
+        if(tokenExpireChecker()) window.location.reload()
     },[])
     useEffect(() => {
         setTimeout(() => {
@@ -53,7 +54,7 @@ export default function PaginaPedidos () {
     const filterArray = async () => {
         const filterData: IFilter = {
             limit: limit,
-            client,
+            client: client ? client : 0,
             service: cco,
             requester: req,
             numero: nro,
@@ -96,10 +97,10 @@ export default function PaginaPedidos () {
     const displayPedidos = () => (
         global?.pedidos.map((p) => {
             return(
-                <div key={p.numero} 
+                <div key={p.numero+p.date_requested}
                 className={colorChange(p.state)} 
-                onClick={() => navigator('/pedidos/'+p.numero)}>
-                    <h5>{"Nro: "+p.numero}</h5>
+                onClick={() => {navigator('/pedidos/'+p.order_id)}}>
+                    <h5>{p.numero}</h5>
                     <h5>{displayDate(p.date_requested)}</h5>
                     <h5>{p.state}</h5>
                 </div>
@@ -125,8 +126,7 @@ export default function PaginaPedidos () {
             if(id === s.service_id) {
                 data.clientdes = s.client_des
                 data.clientid = s.client_id
-                data.serdes = s.service_des,
-                data.serid = s.service_id
+
             }
         });
         return data
@@ -183,7 +183,7 @@ export default function PaginaPedidos () {
             <div className='div-filter'>
                 <div>
                     <h5 className='filter-sub'>Nro Pedido</h5>
-                    <input type='number' id='nro_pedido' className='textfield-search' min={0}
+                    <input type='text' id='nro_pedido' className='textfield-search' min={0}
                     value={nro} onChange={e => setNro(e.target.value)}/>
                 </div>
                 <div>
@@ -205,39 +205,42 @@ export default function PaginaPedidos () {
                         <option value={''}>---</option>
                         {global?.ccos &&
                             clientesReturner(global.ccos)?.map((cco) => (
-                                <option key={cco?.cliente_id} value={cco?.cliente_id}>{cco?.cliente_id+'-'+cco?.cliente_des}</option>
+                                <option key={cco.client_id} value={cco.client_id}>{cco.client_id+'-'+cco.client_des}</option>
                             ))
                         }
                     </select>
                 </div>
-                <div>
-                    <h5 className='filter-sub'>Solicitante</h5>
-                    <select defaultValue={''} disabled={parseInt(nro) ||  global?.user.rol === rolesNum.encargado ? true : false}
-                    value={req} onChange={(e) => setReq(e.target.value)} className='select-small'>
-                        <option value={''}>---</option>
-                        {
-                            requesterSearch().map((r) => (
-                                <option key={r} value={r}>{r}</option>
-                            ))
-                        }
-                    </select>
+                <div className='div-filter-other'>
+                  <div>
+                      <h5 className='filter-sub'>Solicitante</h5>
+                      <select defaultValue={''} disabled={parseInt(nro) ||  global?.user.rol === rolesNum.encargado ? true : false}
+                      value={req} onChange={(e) => setReq(e.target.value)} className='select-small'>
+                          <option value={''}>---</option>
+                          {
+                              requesterSearch().map((r) => (
+                                  <option key={r} value={r}>{r}</option>
+                              ))
+                          }
+                      </select>
+                  </div>
+                  <div>
+                      <h5 className='filter-sub'>Estado</h5>
+                      <select defaultValue={''} value={state} onChange={(e) => setState(e.target.value)} className='select-small'>
+                          <option value={''}>---</option>
+                          {
+                              stateSearch().map((s) => (
+                                  <option key={s} value={s}>{s}</option>
+                              ))
+                          }
+                      </select>
+                  </div>
+                  <div>
+                      <h5 className='filter-sub'>Cantidad</h5>
+                      <input type='number' id='limit' className='textfield-limit' min={10}
+                      value={limit} onChange={e => setLimit(parseInt(e.target.value))}/>
+                  </div>
                 </div>
-                <div>
-                    <h5 className='filter-sub'>Estado</h5>
-                    <select defaultValue={''} value={state} onChange={(e) => setState(e.target.value)} className='select-small'>
-                        <option value={''}>---</option>
-                        {
-                            stateSearch().map((s) => (
-                                <option key={s} value={s}>{s}</option>
-                            ))
-                        }
-                    </select>
-                </div>
-                <div>
-                    <h5 className='filter-sub'>Cantidad de Pedidos</h5>
-                    <input type='number' id='limit' className='textfield-search' min={10}
-                    value={limit} onChange={e => setLimit(parseInt(e.target.value))}/>
-                </div>
+
                 <div>
                     <h5 className='filter-sub'>Fecha de inicio y Final</h5>
                     <input disabled={parseInt(nro) ? true : false} 
