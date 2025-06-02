@@ -22,7 +22,7 @@ export default function PaginaPedidos () {
     const [cco, setCco] = useState(0)
     const [client, setClient] = useState(0)
     const [nro, setNro] = useState('')
-    const [req, setReq] = useState('')
+    const [req, setReq] = useState(0)
     const [state, setState] = useState('')
     const [dateStart, setDateStart] = useState('')
     const [dateEnd, setDateEnd] = useState('')
@@ -39,14 +39,15 @@ export default function PaginaPedidos () {
                     limit,
                     client,
                     service: cco,
-                    requester: req,
+                    user_id: req,
                     numero: nro,
                     state: state,
                     dateStart,
-                    dateEnd
+                    dateEnd,
                 }
                 if(global.pedidos.length === 0) global?.pedidosFn( global.user.rol, filtro)
                 if(global.ccos.length === 0 ) global.ccosFn()
+                if(global.sysUsers.length === 0 && (global.user.rol === rolesNum.en_deposito || global.user.rol === rolesNum.admin)) global.sysUsersFn()
             }
         }, waitTime);
     },[global?.user])
@@ -57,7 +58,7 @@ export default function PaginaPedidos () {
             limit: limit,
             client: client ? client : 0,
             service: cco,
-            requester: req,
+            user_id: req,
             numero: nro,
             state: state,
             dateStart,
@@ -119,11 +120,6 @@ export default function PaginaPedidos () {
             )
         })
     )
-    const requesterSearch = (): Array<string> => {
-        const reqSet = new Set<string>(global?.pedidos.map(p => p.requester))
-        const arr = Array.from(reqSet)
-        return arr
-    }
     const stateSearch = () => {
         return filterJSON.states
     }
@@ -226,11 +222,11 @@ export default function PaginaPedidos () {
                   <div>
                       <h5 className='filter-sub'>Solicitante</h5>
                       <select defaultValue={''} disabled={parseInt(nro) ||  global?.user.rol === rolesNum.encargado ? true : false}
-                      value={req} onChange={(e) => setReq(e.target.value)} className='select-small'>
-                          <option value={''}>---</option>
+                      value={req} onChange={(e) => setReq(parseInt(e.target.value))} className='select-small'>
+                          <option value={0}>---</option>
                           {
-                              requesterSearch().map((r) => (
-                                  <option key={r} value={r}>{r}</option>
+                              global?.sysUsers.map((r) => (
+                                  <option key={r.usuario_id} value={r.usuario_id}>{r.username}</option>
                               ))
                           }
                       </select>

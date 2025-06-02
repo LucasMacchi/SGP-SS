@@ -2,11 +2,13 @@ import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
 import './informes.css'
 import lastMonth from '../../Utils/lastMonth'
-import { IInsumo, IpedidoClientDataPDF } from '../../Utils/Interfaces'
+import { IClientIns, ICollectionPDF, IInsumo, IpedidoClientDataPDF } from '../../Utils/Interfaces'
 import {pdf} from '@react-pdf/renderer';
 import { saveAs } from 'file-saver'
 import ClientDocument from '../pdfs/client'
 import Header from '../Header/Header'
+import CollectionDocument from '../pdfs/collection'
+import infoMsg from '../../Utils/infoMsg'
 
 export default function InformesPage () {
     const global = useContext(GlobalContext)
@@ -14,6 +16,8 @@ export default function InformesPage () {
     const [endDate, setEndDate] = useState('')
     const [client, setClient] = useState(0)
     const [userReq, setUser] = useState(0)
+    const [collection, setCollection] = useState('')
+    const [orders, setOrders] = useState<string[]>([])
 
     useEffect(() => {
         setStartDate(lastMonth())
@@ -44,6 +48,14 @@ export default function InformesPage () {
         return name ?? 'No name'
         
     }
+
+    useEffect(() => {
+        const col: string | null = localStorage.getItem(collection)
+        if(localStorage.getItem(collection) && col) {
+            setOrders(JSON.parse(col))
+        }
+        else setOrders([])
+    },[collection])
 
     const generateClientPDF = async () => {
         if(startDate && endDate && client){
@@ -89,6 +101,95 @@ export default function InformesPage () {
             alert('Seleccione fechas y clientes validos.')
         }
         
+    }
+
+    const deleteInsumoRow = (index: number, nro: string, orders: string[]) => {
+        if(confirm('¿Quiere eliminar el pedido '+nro+ "?")){
+            orders.splice(index, 1)
+            localStorage.setItem(collection, JSON.stringify(orders))
+            setOrders(orders)
+            setCollection('')
+        }
+    }
+
+    const deleteCollection = () => {
+        if(collection && confirm('Quieres eliminar los pedidos de la coleccion?')) {
+            localStorage.removeItem(collection)
+            setCollection('')
+        }
+        else {
+            alert('Coleccion no tiene pedidos.')
+        }
+    }
+
+    const requestCollection = async () => {
+        if(orders.length > 0) {
+            const res = await global?.collectionOrders(orders)
+            if(res) {
+                let insumos: IClientIns[] = []
+                insumos = res.insumos.map((i) => {
+                    const format = i.insumo_des.split('-')
+                    const cod = parseInt(format[0])
+                    const cod1 = parseInt(format[1])
+                    const cod2 = parseInt(format[2])
+                    const cod3 = parseInt(format[3])
+                    const data: IClientIns = {
+                        insumo_id: Number.isNaN(cod) ? 0 : cod,
+                        ins_cod1: Number.isNaN(cod1) ? 0 : cod1,
+                        ins_cod2: Number.isNaN(cod2) ? 0 : cod2,
+                        ins_cod3: Number.isNaN(cod3) ? 0 : cod3,
+                        insumo_des: format[4],
+                        sum: i.sum
+                    }
+                    return data
+                })
+                const data: ICollectionPDF = {
+                    collection: {
+                        insumos: insumos,
+                        orders: res.servicios
+                    }
+                }
+                console.log(data)
+                const blob: Blob = await pdf(<CollectionDocument collection={data.collection}/>).toBlob()
+                saveAs(blob, 'SGP_'+collection)
+            }
+
+        }
+        else alert('Selecciones uno o mas pedidos.')
+    }
+    const displaySelection = () => {
+        return (
+            <div className='table-div'>
+                <div>
+                <h5 className='filter-sub'>Selecciona la Coleccion</h5>
+                <select value={collection} onChange={(e) => setCollection(e.target.value)} className='select-small'>
+                  <option value={''}>---</option>
+                  <option value={'Coleccion1'}>Coleccion 1</option>
+                  <option value={'Coleccion2'}>Coleccion 2</option>
+                  <option value={'Coleccion3'}>Coleccion 3</option>
+                  <option value={'Coleccion4'}>Coleccion 4</option>
+                  <option value={'Coleccion5'}>Coleccion 5</option>
+                </select>
+                {orders.length > 0 && <button className='btn-export-pdf' onClick={() => requestCollection()}>Crear</button>}
+                {orders.length > 0 && <button className='btn-export-pdf' onClick={() => deleteCollection()}>Eliminar</button>}
+                <button className="info-popup" onClick={() => infoMsg(9)}>?</button>
+            </div>
+            <div>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th className='data-div-insumo-name-row'>Pedidos Seleccionados</th>
+                        </tr>
+                        {orders.map((o, i) => (
+                            <tr key={o+i}>
+                                <th key={o} onClick={() => deleteInsumoRow(i,o, orders)} className='data-div-insumo-name-row'>{o}</th>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        )
     }
 
     return(
@@ -138,6 +239,13 @@ export default function InformesPage () {
                     <button className='btn-big' onClick={() => generateClientPDF()}>
                         Generar
                     </button>
+                </div>
+                <hr color='#3399ff' className='hr-line'/>
+                <div>
+                    <h2 className='title-Homepage' >
+                        Conjunto de Pedidos
+                    </h2>
+                    {displaySelection()}
                 </div>
             </div>
         </div>

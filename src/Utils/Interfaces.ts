@@ -148,11 +148,30 @@ export interface IClientIns {
     ins_cod2?: number,
     ins_cod3?: number,
 }
+export interface ICollectionInsumo {
+    insumo_des: string,
+    sum: number
+}
+export interface ICollectionsServ {
+    numero: string,
+    service_des: string,
+    requester: string
+}
+export interface ICollectionoRes {
+    insumos: ICollectionInsumo[],
+    servicios: ICollectionsServ []
+}
 export interface IClientResponse {
     insumos: IClientIns[]
 }
 export interface ICategoriesRes {
     categorias: string[]
+}
+export interface ICollectionPDF {
+    collection: {
+        insumos: IClientIns[],
+        orders: ICollectionsServ []
+    }
 }
 export interface IEmailSender {
     to_send:string,
@@ -179,11 +198,11 @@ export interface IFilter {
     limit: number,
     client: number,
     service: number,
-    requester: string,
     numero: string
     state: string
     dateStart: string
-    dateEnd: string
+    dateEnd: string,
+    user_id: number
 }
 export interface IEntrega {
   entrega: {
@@ -205,4 +224,12 @@ export interface IPersonal {
 export interface ICatRub {
     categorias: string[],
     rubros: string[]
+}
+
+export interface ICollection {
+    collection1: string[],
+    collection2: string[],
+    collection3: string[],
+    collection4: string[],
+    collection5: string[],
 }

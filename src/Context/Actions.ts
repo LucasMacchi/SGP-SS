@@ -14,6 +14,7 @@ export default {
     GET_REPORTS: 'get_reports',
     GET_ERROR_CATEGORIES: 'get_error_categories',
     GET_PERSONAL: 'get_personal',
-    GET_INS_CATEGROIES: 'get_categories_insumos'
+    GET_INS_CATEGROIES: 'get_categories_insumos',
+    SET_COLECCION: 'set_coleccion'
     
 }

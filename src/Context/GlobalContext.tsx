@@ -8,6 +8,8 @@ import {
   ICatRub,
   IChangeData,
   IClientIns,
+  ICollection,
+  ICollectionoRes,
   IEmailSender,
   IFilter,
   IPedido,
@@ -144,18 +146,15 @@ export default function GlobalState(props: IPropsChildren) {
     const token = localStorage.getItem("jwToken");
     const dataUser: IToken = jwtDecode(token ?? "");
     if (rol === rolesNum.encargado) {
-      filter.requester = dataUser.user;
+      filter.user_id = dataUser.usuario_id;
       const pedidos: AxiosResponse<IPedido[]> = await axios.post(
         SERVER + "/pedido/all",
         filter,
         authReturner(),
       );
-      const pedidosFiltered = pedidos.data.filter(
-        (p) => p.requester === dataUser.user,
-      );
       dispatch({
         type: ac.GET_PEDIDOS,
-        payload: pedidosFiltered,
+        payload: pedidos.data,
       });
     } else if (
       rol === rolesNum.admin ||
@@ -174,10 +173,10 @@ export default function GlobalState(props: IPropsChildren) {
     } else alert("No valid rol");
   }
   //Trae todos los insumos para la creacion de nuevos pedidos
-  async function insumosFn(rubro: string, empty: boolean) {
+  async function insumosFn(empty: boolean) {
     if(!empty) {
     const insumos: AxiosResponse<IResponseInsumo[]> = await axios.get(
-      SERVER + "/data/insumos/"+rubro,
+      SERVER + "/data/insumos",
       authReturner(),
     );
     console.log(insumos)
@@ -231,7 +230,6 @@ export default function GlobalState(props: IPropsChildren) {
       detailsToDelete,
       authReturner(),
     );
-    navigation("/");
     window.location.reload();
     return true;
   }
@@ -283,7 +281,6 @@ export default function GlobalState(props: IPropsChildren) {
       data,
       authReturner(),
     );
-    navigation("/");
     window.location.reload();
     return true;
   }
@@ -456,6 +453,13 @@ export default function GlobalState(props: IPropsChildren) {
     );
     if (pingRes.data) return pingRes.data + " / " + SERVER;
     else return "Cannot ping the server " + SERVER;
+  }
+
+  async function collectionOrders(orders:string []): Promise<ICollectionoRes> {
+    
+    const collectionInsumos: ICollectionoRes = (await axios.post(SERVER+'/data/collection',{orders},authReturner())).data
+    return collectionInsumos
+
   }
 
   async function generateClientPDF(
@@ -668,6 +672,16 @@ export default function GlobalState(props: IPropsChildren) {
       alert("Error al eliminar pedido.");
     }   
   }
+
+  //Check if order exists
+  async function checkExistsPedido(nro:string): Promise<boolean> {
+    const resAx: boolean = (await axios.get(SERVER+'/pedido/uniq/'+nro, authReturner())).data
+    console.log(resAx)
+    if(resAx) return resAx
+    else resAx 
+    return false
+  }
+
   
   const innitialState: IGlobalContext = {
     user: {
@@ -695,6 +709,9 @@ export default function GlobalState(props: IPropsChildren) {
     },
     personal: [],
     sysUsers: [],
+    coleccion: {collection1: [],collection2: [],
+      collection3: [],collection5: [],collection4: [],
+    },
     login: false,
     pedidos: [],
     ccos: [],
@@ -740,7 +757,9 @@ export default function GlobalState(props: IPropsChildren) {
     createPersonal,
     deletePersonal,
     getCategoriasInsumos,
-    eliminarPedido
+    eliminarPedido,
+    checkExistsPedido,
+    collectionOrders,
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -763,13 +782,14 @@ interface IGlobalContext {
   pedidos: IPedido[];
   insumos: string[];
   sysUsers: IUser[];
+  coleccion: ICollection;
   ccos: IServicio[];
   reports: IReport[];
   loginFn: (username: string) => void;
   logoutFn: () => void;
   sessionFn: () => void;
   pedidosFn: (rol: number, filter: IFilter) => void;
-  insumosFn: (rubro: string, empty: boolean) => void;
+  insumosFn: ( empty: boolean) => void;
   ccosFn: () => void;
   sysUsersFn: () => void;
   orderAproveFn: (
@@ -810,4 +830,6 @@ interface IGlobalContext {
   deletePersonal: (legajo: number) => void;
   getCategoriasInsumos: () => void;
   eliminarPedido: (id: number) => void;
+  checkExistsPedido: (nro: string) => Promise<boolean>;
+  collectionOrders: (orders:string []) => Promise<ICollectionoRes>;
 }

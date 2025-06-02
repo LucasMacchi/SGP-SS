@@ -126,4 +126,11 @@
     color: #3399ff;
     margin: 3px;
 }
+.info-popup {
+    color: white;
+    background-color: #3399ff;
+    border-color: #3399ff;
+    font-size: small;
+    border-radius: 5px;
+}
 
