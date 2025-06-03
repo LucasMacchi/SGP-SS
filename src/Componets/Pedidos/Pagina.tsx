@@ -134,7 +134,8 @@ export default function PaginaPedidos () {
             if(id === s.service_id) {
                 data.clientdes = s.client_des
                 data.clientid = s.client_id
-
+                data.serdes = s.service_des
+                data.serid = s.service_id
             }
         });
         return data
