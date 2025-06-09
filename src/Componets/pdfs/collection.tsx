@@ -20,9 +20,11 @@ const stylePedido = StyleSheet.create({
     },
     view: {
         padding: 2,
+        paddingLeft: 40
     },
     view_title: {
-        display: 'flex'
+        display: 'flex',
+        paddingLeft: 40
     },
     table: {
         width: 'auto',

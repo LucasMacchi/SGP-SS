@@ -20,9 +20,11 @@ const stylePedido = StyleSheet.create({
     },
     view: {
         padding: 2,
+        paddingLeft: 40
     },
     view_title: {
-        display: 'flex'
+        display: 'flex',
+        paddingLeft: 40
     },
     table: {
         width: 'auto',
@@ -71,12 +73,14 @@ const stylePedido = StyleSheet.create({
         borderBottomWidth: 1,
         padding: 4,
         justifyContent: 'flex-start',
+        paddingLeft: 40
       },
       viewdataHeader: {
         flexDirection: 'row',
         borderBottomWidth: 1,
         padding: 4,
         justifyContent: 'space-between',
+        
       },
       viewdataReq: {
         marginLeft: 20
