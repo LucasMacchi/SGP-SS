@@ -35,13 +35,6 @@ export default function AddOrder () {
     const [custom, setCustom] = useState(false)
     const [customIn, setCustomIn] = useState(false)
     const [service, setService] = useState('')
-    //const [dni, setDni] = useState(0)
-    //const [fullname, setFullname] = useState('')
-    //const [showLegajo, setShowLegajo] = useState(false)
-    //const [search, setSearch] = useState('')
-    //const [filteredArr, setFiltered] = useState<IPersonal[]>([])
-    //const [legajo, setLegajo] = useState(0)
-    //const [sector, setSector] = useState('')
 
     const [newOrder, setOrder] = useState<IAddPedido>({
         requester: '',
@@ -68,32 +61,6 @@ export default function AddOrder () {
         } else navigator('/')
     },[])
 
-    /*
-    useEffect(() => {
-      let array = global?.personal
-      if(array){
-        if(search.length > 0 && array) {
-          array = array.filter(p => p.fullname.toLowerCase().includes(search.toLowerCase()))
-        }
-        setFiltered(array)
-      }
-    },[global?.personal, search])
-    */
-    /*
-    useEffect(() => {
-        if(showLegajo) {
-            setRubro('Indumentar')
-            newOrder.insumos = []
-        }
-    },[showLegajo])
-    */
-
-    /*
-    useEffect(() => {
-      if(sector) global?.getPersonalBySector(sector, false)
-      else global?.getPersonalBySector(sector, true)
-    },[sector])
-    */
     useEffect(() => {
         setService('')
     },[custom])
@@ -191,21 +158,6 @@ export default function AddOrder () {
         setLoad(true)
         newOrder.prov = false
         newOrder.prov_des = ``
-        /*
-        if(showLegajo) {
-                console.log('AA')
-                if(sector === 'PROVISORIO') {
-                    createPersonal()
-                    newOrder.legajo = dni
-                }
-                else {
-                    console.log('BB')
-                    if(legajo) {
-                        newOrder.legajo = legajo
-                    }
-                }
-        }
-        */
         if(service && custom) {
             newOrder.client_id = -1
             newOrder.service_id = -1
@@ -369,88 +321,10 @@ export default function AddOrder () {
         }
     }
 
-    /*
-    const createPersonal = () => {
-        const personal: IPersonal = {
-        cuil: dni,
-        fullname: fullname,
-        sector: sector,
-        legajo: dni
-      }
-    if(dni && fullname) {
-        global?.createPersonal(personal)
-      }
-      else alert('Compruebe que los datos del ingresante son correctos')
-
-    }
-    */
-    /*
-    const displayLegajo = () => {
-        if(showLegajo) {
-        return(
-          <div className='data-div-add-border'>
-            <div>
-            <h6>Sector</h6>
-            <select value={sector} className="data-div-select"
-            onChange={e => {
-            setSearch('')
-            setSector(e.target.value)}}>
-            <option value={''}>---</option>
-                {
-                    sectoresPersonal.sectores.map((s) => {
-                        return(<option key={s} value={s}>{s}</option>)
-                    })
-                }
-                </select>
-                <button className="info-popup" onClick={() => infoMsg(4)}>?</button>
-                </div>  
-                <div className='data-div-add' >
-                    <h6 className={sector === 'PROVISORIO' ? "data-div-non"  : ''}>Busqueda por nombre de personal</h6>
-                    <input type="text" id='otherins' 
-                    className={sector === 'PROVISORIO' ? "data-div-non"  : 'data-div-select'}
-                    onChange={(e) => setSearch(e.target.value)} disabled={sector.length===0}
-                    value={search}/>
-                </div>
-                  {sector === 'PROVISORIO' ?
-                    <div>
-                      <div>
-                        <h6>Apellido y Nombre</h6>
-                        <input type="text" id='otherins' className="data-div-select" 
-                        onChange={(e) => setFullname(e.target.value)} value={fullname}/>
-                      </div>
-                      <div>
-                        <h6>CUIL</h6>
-                        <input type="number" id='otherins' className="data-div-select" 
-                        onChange={(e) => setDni(parseInt(e.target.value))} value={dni}/>
-                      </div>
-                    </div>
-                    :
-                    <div>
-                      <h6>Personal -  {global?.personal.length && global?.personal.length + " Encontrados"}</h6>
-                      <select value={legajo} className="data-div-select" disabled={sector.length===0}
-                      onChange={e => {
-                        setLegajo(parseInt(e.target.value))}}>
-                      <option value={0}>---</option>
-                      {
-                          filteredArr.map((p) => {
-                              return(<option key={p.legajo} value={p.legajo}>{p.legajo+'-'+p.fullname}</option>)
-                          })
-                      }
-                      </select>
-                    </div>
-                  }
-    
-              </div>
-            )
-          }
-        }
-
-    */
     const displayForms = () => {
         if(showForm) {
             return(
                 <div className="add-form-page">
-                    {/*displayLegajo()*/}
                     {displayCustomService()}
                     {displayCustomInsumo()}
                     <div className="data-div-btn-insumo">  

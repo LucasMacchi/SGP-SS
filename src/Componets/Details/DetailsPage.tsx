@@ -32,20 +32,7 @@ export default function DetailsPage () {
     const [collection, setCollectionArr] = useState('')
     const [searchIns, setSearchIns] = useState('')
     const [filteredIns, setFilteredIns] = useState<string[]>([])
-    //const [legajo, setLegajo] = useState(0)
-    //const [sector, setSector] = useState('')
-    //const [showLegajo, setShowLegajo] = useState(false)
-    //const [search, setSearch] = useState('')
-    //const [filteredArr, setFiltered] = useState<IPersonal[]>([])
-    //const [dni, setDni] = useState(0)
-    //const [fullname, setFullname] = useState('')
 
-    /*
-    useEffect(() => {
-      if(sector) global?.getPersonalBySector(sector, false)
-      else global?.getPersonalBySector(sector, true)
-    },[sector])
-    */
     useEffect(() => {
       if(global && id && !tokenExpireChecker()){
           global.uniqPedido(parseInt(id), false)
@@ -57,17 +44,6 @@ export default function DetailsPage () {
       }
     },[])
     
-    /*
-    useEffect(() => {
-      let array = global?.personal
-      if(array){
-        if(search.length > 0 && array) {
-          array = array.filter(p => p.fullname.toLowerCase().includes(search.toLowerCase()))
-        }
-        setFiltered(array)
-      }
-    },[global?.personal, search])
-    */
     useEffect(() => {
       if(global) {
         setOrder(global?.pedidoDetail)
@@ -217,7 +193,7 @@ export default function DetailsPage () {
                 <h3 className='title-Homepage'>Cargando...</h3>
             )
         }
-        else if(global?.user.rol === rolesNum.encargado) {
+        else if(global?.user.rol === rolesNum.encargado || global?.user.rol === rolesNum.cocina) {
             switch(order?.state){
                 case 'Pendiente':
                     return(
@@ -411,7 +387,7 @@ export default function DetailsPage () {
         }
     }
     const changeAmount = async (nm: number, detail_id: number | undefined) => {
-        if(order && detail_id && order.state === 'Pendiente' && global?.user.rol !== 3) {
+        if(order && detail_id && order.state === 'Pendiente' && global?.user.rol !== rolesNum.encargado && global?.user.rol !== rolesNum.cocina) {
           const newA = prompt('Ingrese la nueva cantidad (utilize . en vez de ,) ', nm.toString()) ?? 0;
             if(newA === 0) return 0
             else if(newA && parseFloat(newA)) {
@@ -524,85 +500,6 @@ export default function DetailsPage () {
         )
       }
     }
-    /*
-    const createPersonalLink = async () => {
-      const personal: IPersonal = {
-        cuil: dni,
-        fullname: fullname,
-        sector: sector,
-        legajo: dni
-      }
-      if(dni && fullname && order) {
-        await global?.createPersonal(personal)
-        await setTimeout(() => {global?.orderLegajo(order.order_id, dni)},(1000))
-      }
-      else alert('Compruebe que los datos son correctos')
-
-    }
-    */
-    /*
-    const displayLegajo = () => {
-      if(showLegajo) {
-        return(
-          <div className='data-div-add'>
-            <div>
-            <h6>Sector</h6>
-            <select value={sector} className="data-div-select"
-            onChange={e => {
-              setSearch('')
-              setSector(e.target.value)}}>
-            <option value={''}>---</option>
-            {
-                sectoresPersonal.sectores.map((s) => {
-                    return(<option key={s} value={s}>{s}</option>)
-                })
-            }
-            </select>
-                {global?.user.rol === rolesNum.en_deposito && <button className="info-popup" onClick={() => infoMsg(4)}>?</button>}
-            </div>  
-            <div className='data-div-add' >
-                <h6 className={sector === 'PROVISORIO' ? "data-div-non"  : ''}>Busqueda por nombre de personal</h6>
-                <input type="text" id='otherins' 
-                className={sector === 'PROVISORIO' ? "data-div-non"  : 'data-div-select'}
-                onChange={(e) => setSearch(e.target.value)} disabled={sector.length===0}
-                value={search}/>
-            </div>
-              {sector === 'PROVISORIO' ?
-                <div>
-                  <div>
-                    <h6>Apellido y Nombre</h6>
-                    <input type="text" id='otherins' className="data-div-select" 
-                    onChange={(e) => setFullname(e.target.value)} value={fullname}/>
-                  </div>
-                  <div>
-                    <h6>CUIL</h6>
-                    <input type="number" id='otherins' className="data-div-select" 
-                    onChange={(e) => setDni(parseInt(e.target.value))} value={dni}/>
-                  </div>
-                  <button className='btn-export-pdf' onClick={() => createPersonalLink()}>Registrar</button>
-                </div>
-                :
-                <div>
-                  <h6>Personal -  {global?.personal.length && global?.personal.length + " Encontrados"}</h6>
-                  <select value={legajo} className="data-div-select" disabled={sector.length===0}
-                  onChange={e => {
-                    setLegajo(parseInt(e.target.value))
-                    setPersonal(parseInt(e.target.value))}}>
-                  <option value={0}>---</option>
-                  {
-                      filteredArr.map((p) => {
-                          return(<option key={p.legajo} value={p.legajo}>{p.legajo+'-'+p.fullname}</option>)
-                      })
-                  }
-                  </select>
-                </div>
-              }
-
-          </div>
-        )
-      }
-    }
-    */
     const dataDisplay = () => {
         if(order) {
             return(
@@ -663,12 +560,6 @@ export default function DetailsPage () {
                             
                         </div>
                     }
-                    {/*global?.user.rol === 4 &&
-                      <div className='data-div-add-special'>
-                          <h4>{order.legajo ?"Modificar entrega a Personal":"Entrega a Personal:"} </h4>
-                          <input type="checkbox" checked={showLegajo} onChange={(e) => setShowLegajo(e.target.checked)}/>
-                      </div>*/}
-                    {/*displayLegajo()*/}
 
                     {addIns &&
                         <div>

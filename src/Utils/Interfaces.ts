@@ -4,7 +4,8 @@ export const rolesNum = {
     admin: 1,
     administrativo: 2,
     encargado: 3,
-    en_deposito: 4
+    en_deposito: 4,
+    cocina: 5,
 }
 
 export type TEstado = 'Pendiente' | 'Aprobado' | 'Cancelado' | 'Rechazado' | 'Entregado';

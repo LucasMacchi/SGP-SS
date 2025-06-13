@@ -145,7 +145,7 @@ export default function GlobalState(props: IPropsChildren) {
     if (LOGS === "1") console.log("ROL ", rol);
     const token = localStorage.getItem("jwToken");
     const dataUser: IToken = jwtDecode(token ?? "");
-    if (rol === rolesNum.encargado) {
+    if (rol === rolesNum.encargado || rol === rolesNum.cocina) {
       filter.user_id = dataUser.usuario_id;
       const pedidos: AxiosResponse<IPedido[]> = await axios.post(
         SERVER + "/pedido/all",

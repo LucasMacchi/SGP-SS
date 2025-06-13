@@ -177,6 +177,7 @@ export default function UsersPagina () {
                     <option value={2}>Administrativo</option>
                     <option value={3}>Encargado</option>
                     <option value={4}>Encargado de Deposito</option>
+                    <option value={5}>Cocina</option>
                 </select>
             </div>
                 <div className='div-btns'>
