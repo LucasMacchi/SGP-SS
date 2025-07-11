@@ -10,6 +10,7 @@ import {
   IClientIns,
   ICollection,
   ICollectionoRes,
+  ICompraDto,
   IEmailSender,
   IFilter,
   IPedido,
@@ -650,10 +651,10 @@ export default function GlobalState(props: IPropsChildren) {
   async function getCategoriasInsumos() {
     try {
         const res: string[] = await (await axios.get(SERVER + "/data/categories/insumos", authReturner())).data;
-      dispatch({
-        payload: res,
-        type: ac.GET_INS_CATEGROIES
-      })
+        dispatch({
+          payload: res,
+          type: ac.GET_INS_CATEGROIES
+        })
     } catch (error) {
       console.log(error);
       alert("Error al traer las categorias de los insumos.");
@@ -680,6 +681,23 @@ export default function GlobalState(props: IPropsChildren) {
     if(resAx) return resAx
     else resAx 
     return false
+  }
+
+  //Get areas for compras
+  async function getAreasFn(): Promise<string[]> {
+    const areas: string[] = (await axios.get(SERVER+"/compras/areas", authReturner())).data
+    return areas
+  }
+
+  //Register Compra
+  async function registerCompra(data: ICompraDto) {
+    try {
+      await axios.post(SERVER+"/compras/registrar",data,authReturner())
+      alert("Compra creada")
+    } catch (error) {
+      console.log(error);
+      alert("Error al crear una compra.");
+    }
   }
 
   
@@ -760,6 +778,8 @@ export default function GlobalState(props: IPropsChildren) {
     eliminarPedido,
     checkExistsPedido,
     collectionOrders,
+    getAreasFn,
+    registerCompra
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -829,7 +849,9 @@ interface IGlobalContext {
   orderLegajo: (id: number, legajo: number) => void;
   deletePersonal: (legajo: number) => void;
   getCategoriasInsumos: () => void;
+  getAreasFn: () => Promise<string[]>;
   eliminarPedido: (id: number) => void;
   checkExistsPedido: (nro: string) => Promise<boolean>;
   collectionOrders: (orders:string []) => Promise<ICollectionoRes>;
+  registerCompra: (data: ICompraDto) => void;
 }

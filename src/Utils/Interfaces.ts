@@ -234,3 +234,33 @@ export interface ICollection {
     collection4: string[],
     collection5: string[],
 }
+
+export interface IinsumoCompra {
+    descripcion: string,
+    cantidad: number
+}
+
+export interface ICompra {
+    area: string,
+    tipo: string,
+    compras: IinsumoCompra[],
+    descripcion: string,
+    lugar: string
+    fecha_aprobado?: string,
+    activado: boolean,
+    aprobado: boolean,
+    anulado: boolean,
+    fullname: string,
+    proveedor: string,
+
+}
+
+export interface ICompraDto {
+    area: string,
+    tipo: string,
+    descripcion: string,
+    lugar: string
+    fullname: string,
+    proveedor: string,
+    compras: IinsumoCompra[],
+}

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { GlobalContext } from '../../Context/GlobalContext'
 import './Header.css'
 import { useContext, useEffect, useState } from 'react'
+import { rolesNum } from '../../Utils/Interfaces'
 
 export default function Header () {
 
@@ -59,7 +60,10 @@ export default function Header () {
                         <li className='dropdown-li' onClick={() => navigateTo('/soporte')}>
                         Soporte Tecnico
                         </li>
-                        {global?.user.rol === 1 && 
+                        <li className='dropdown-li' onClick={() => navigateTo('/compras')}>
+                            Compras
+                        </li>
+                        {global?.user.rol === rolesNum.admin && 
                         <li className='dropdown-li' onClick={() => navigateTo('/admin/users')}>
                             Admin - Usuarios
                         </li>
