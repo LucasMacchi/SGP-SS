@@ -237,7 +237,8 @@ export interface ICollection {
 
 export interface IinsumoCompra {
     descripcion: string,
-    cantidad: number
+    cantidad: number,
+    detail_id?: number
 }
 
 export interface ICompra {
@@ -252,6 +253,8 @@ export interface ICompra {
     anulado: boolean,
     fullname: string,
     proveedor: string,
+    compra_id: number,
+    fecha: string
 
 }
 

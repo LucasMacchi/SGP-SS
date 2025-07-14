@@ -15,6 +15,8 @@ export default {
     GET_ERROR_CATEGORIES: 'get_error_categories',
     GET_PERSONAL: 'get_personal',
     GET_INS_CATEGROIES: 'get_categories_insumos',
-    SET_COLECCION: 'set_coleccion'
+    SET_COLECCION: 'set_coleccion',
+    GET_COMPRAS: 'get_compras',
+    SET_COMPRA_DETAIL: "set_compra_detail"
     
 }

@@ -17,6 +17,7 @@ import Provisorio from './Componets/Provisorios/Provisorios.tsx'
 import ServicesPage from './Componets/Servicios/ServicesPage.tsx'
 import Soporte from './Componets/Soporte/Soporte.tsx'
 import Compras from './Componets/Compras/Compras.tsx'
+import CompraDetail from './Componets/Compras/CompraDetail.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -36,6 +37,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path='/admin/users' element={<UsersPagina/>}/>
           <Route path='/correo' element={<Correopage/>}/>
           <Route path='/compras' element={<Compras/>}/>
+          <Route path='/compras/:id' element={<CompraDetail/>}/>
           <Route path='/add' element={<AddOrder/>}/>
           <Route path='/add/:orderId' element={<AddOrder/>}/>
         </Routes>

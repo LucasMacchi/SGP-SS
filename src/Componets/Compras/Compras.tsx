@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react"
 import Header from "../Header/Header"
 import { GlobalContext } from "../../Context/GlobalContext"
-import { ICompraDto, IinsumoCompra, rolesNum } from "../../Utils/Interfaces"
+import { ICompra, ICompraDto, IinsumoCompra, rolesNum } from "../../Utils/Interfaces"
 
 export default function Compras () {
     
@@ -37,6 +37,12 @@ export default function Compras () {
         setCompra({area: '',tipo: '',descripcion: '',lugar: '',fullname: '',
             compras: [],proveedor: ''})
         setInsumo({descripcion: '', cantidad: 0})
+        if(display === 2) {
+            global?.getAllCompras(true)
+        }
+        else if(display === 3) {
+            global?.getAllCompras(false)
+        }
 
     },[display])
 
@@ -120,6 +126,16 @@ export default function Compras () {
         }
     }
 
+    const colorCheck = (compra: ICompra): string => {
+        if(compra.aprobado) {
+            return "#32CD32"
+        }
+        else if(compra.anulado) {
+            return "#FF0000"
+        }
+        else return "white"
+    }
+
     const displayCompras = () => {
         
         if(display === 1) {
@@ -196,10 +212,30 @@ export default function Compras () {
                 </div>
             )
         }
-        else if(display === 2) {
+        else if(display === 2 || display === 3) {
             return(
-                <div>
-                    <hr color='#3399ff' className='hr-line'/>
+                <div style={{width: "400px"}}>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th style={{border: "1px solid", width: "10%"}}>ID</th>
+                                <th style={{border: "1px solid", width: "22%"}}>Area</th>
+                                <th style={{border: "1px solid", width: "22%"}}>Tipo</th>
+                                <th style={{border: "1px solid", width: "22%"}}>Lugar</th>
+                                <th style={{border: "1px solid", width: "22%"}}>Nombre</th>
+                            </tr>
+                            {global?.compras.map((c) => (
+                            <tr style={{backgroundColor: colorCheck(c)}} key={c.compra_id}
+                            onClick={() => window.location.href = "/compras/"+c.compra_id}>
+                                <th style={{border: "1px solid", width: "10%"}}>{c.compra_id}</th>
+                                <th style={{border: "1px solid", width: "22%"}}>{c.area}</th>
+                                <th style={{border: "1px solid", width: "22%"}}>{c.tipo}</th>
+                                <th style={{border: "1px solid", width: "22%"}}>{c.lugar}</th>
+                                <th style={{border: "1px solid", width: "22%"}}>{c.fullname}</th>
+                            </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             )
         }
@@ -227,7 +263,9 @@ export default function Compras () {
                             <option value={0}>---</option>
                             <option value={1}>Solicitar una Compra</option>
                             {(global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin) &&
-                            <option value={2}>Revisar Compras</option> }
+                            <option value={2}>Compras Pendientes</option> }
+                            {(global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin) &&
+                            <option value={3}>Compras Aprobadas o nulas</option> }
                         </select>
                     </div>
                     {displayCompras()}

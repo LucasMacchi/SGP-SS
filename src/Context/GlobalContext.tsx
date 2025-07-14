@@ -10,6 +10,7 @@ import {
   IClientIns,
   ICollection,
   ICollectionoRes,
+  ICompra,
   ICompraDto,
   IEmailSender,
   IFilter,
@@ -63,6 +64,10 @@ const globalReducer = (
       return { ...state, reports: payload };
     case ac.GET_INS_CATEGROIES:
       return { ...state, insCategroies: payload };
+    case ac.GET_COMPRAS:
+      return {...state, compras: payload}
+    case ac.SET_COMPRA_DETAIL:
+      return {...state, compraDetail: payload}
     default:
       return state;
   }
@@ -700,6 +705,62 @@ export default function GlobalState(props: IPropsChildren) {
     }
   }
 
+  //Cambiar estado compra
+  async function changeStateCompra(aprobar:boolean, id: number) {
+    try {
+      if(aprobar) {
+        await axios.patch(SERVER+"/compras/aprovar/"+id,authReturner())
+        alert("Compra aprobada")
+      }
+      else {
+        await axios.patch(SERVER+"/compras/null/"+id,authReturner())
+        alert("Compra anulada")
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Error al cambiar la compra.");
+    }
+  }
+
+  //Traer todos las compras
+  async function getAllCompras(revised:boolean) {
+    try {
+      const compras: ICompra[] = await (await axios.get(SERVER+"/compras/all", authReturner())).data
+      if(revised) {
+        const newArr = compras.filter((c) => c.anulado === false && c.aprobado === false)
+        dispatch({
+          payload: newArr,
+          type: ac.GET_COMPRAS
+        })
+        console.log(newArr)
+      }
+      else {
+        const newArr = compras.filter((c) => c.anulado === true || c.aprobado === true)
+        dispatch({
+          payload: newArr,
+          type: ac.GET_COMPRAS
+        })
+        console.log(newArr)
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Error al traer las compras.");
+    }
+  }
+
+  async function getUniqCompra(id:number) {
+    try {
+      const compra: ICompra = await (await axios.get(SERVER+"/compras/uniq/"+id, authReturner())).data
+        dispatch({
+          payload: compra,
+          type: ac.SET_COMPRA_DETAIL
+        })
+        console.log(compra)
+    } catch (error) {
+      console.log(error);
+      alert("Error al traer la compra.");
+    }
+  }
   
   const innitialState: IGlobalContext = {
     user: {
@@ -725,6 +786,21 @@ export default function GlobalState(props: IPropsChildren) {
       email: "",
       service_des: ``
     },
+    compraDetail: {
+        area: "",
+        tipo: "",
+        compras: [],
+        descripcion: "",
+        lugar: "",
+        fecha_aprobado: "",
+        activado: true,
+        aprobado: false,
+        anulado: false,
+        fullname: "",
+        proveedor: "",
+        compra_id: 0,
+        fecha: ""
+    },
     personal: [],
     sysUsers: [],
     coleccion: {collection1: [],collection2: [],
@@ -733,6 +809,7 @@ export default function GlobalState(props: IPropsChildren) {
     login: false,
     pedidos: [],
     ccos: [],
+    compras: [],
     insumos: [],
     categories: [],
     reports: [],
@@ -779,7 +856,10 @@ export default function GlobalState(props: IPropsChildren) {
     checkExistsPedido,
     collectionOrders,
     getAreasFn,
-    registerCompra
+    registerCompra,
+    changeStateCompra,
+    getAllCompras,
+    getUniqCompra
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -799,12 +879,14 @@ interface IGlobalContext {
   errorCat: string[];
   pedidoDetail: IPedido;
   login: boolean;
+  compras: ICompra[];
   pedidos: IPedido[];
   insumos: string[];
   sysUsers: IUser[];
   coleccion: ICollection;
   ccos: IServicio[];
   reports: IReport[];
+  compraDetail: ICompra,
   loginFn: (username: string) => void;
   logoutFn: () => void;
   sessionFn: () => void;
@@ -854,4 +936,7 @@ interface IGlobalContext {
   checkExistsPedido: (nro: string) => Promise<boolean>;
   collectionOrders: (orders:string []) => Promise<ICollectionoRes>;
   registerCompra: (data: ICompraDto) => void;
+  changeStateCompra: (aprobar:boolean, id: number) => void;
+  getAllCompras: (revised:boolean) => void;
+  getUniqCompra: (id:number) => void;
 }
