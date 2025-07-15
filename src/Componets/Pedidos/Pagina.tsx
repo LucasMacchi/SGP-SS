@@ -87,6 +87,15 @@ export default function PaginaPedidos () {
 
     },[client, cco])
 
+    useEffect(() => {
+        setDateEnd("")
+        setDateStart("")
+        setReq(0)
+        setCco(0)
+        setClient(0)
+        setState("")
+    },[nro])
+
     const colorChange = (state: string): string => {
         switch(state) {
             case 'Pendiente':
@@ -197,7 +206,7 @@ export default function PaginaPedidos () {
                 </div>
                 <div>
                     <h5 className='filter-sub'>Cliente</h5>
-                    <select disabled={parseInt(nro) ? true : false}
+                    <select disabled={nro.length > 0 ? true : false}
                     value={client} onChange={(e) => setClient(parseInt(e.target.value))} className='select-small-cco'>
                         <option value={0}>---</option>
                         {global?.ccos &&
@@ -209,7 +218,7 @@ export default function PaginaPedidos () {
                 </div>
                 <div>
                     <h5 className='filter-sub'>CCO</h5>
-                    <select disabled={parseInt(nro) ? true : false}
+                    <select disabled={nro.length > 0 ? true : false}
                     value={cco} onChange={(e) => setCco(parseInt(e.target.value))} className='select-small-cco'>
                         <option value={0}>---</option>
                         {
@@ -222,7 +231,7 @@ export default function PaginaPedidos () {
                 <div className='div-filter-other'>
                   <div>
                       <h5 className='filter-sub'>Solicitante</h5>
-                      <select defaultValue={''} disabled={parseInt(nro) ||  global?.user.rol === rolesNum.encargado ? true : false}
+                      <select defaultValue={''} disabled={nro.length > 0 ||  global?.user.rol === rolesNum.encargado ? true : false}
                       value={req} onChange={(e) => setReq(parseInt(e.target.value))} className='select-small'>
                           <option value={0}>---</option>
                           {
@@ -257,11 +266,11 @@ export default function PaginaPedidos () {
 
                 <div>
                     <h5 className='filter-sub'>Fecha de inicio y Final</h5>
-                    <input disabled={parseInt(nro) ? true : false} 
+                    <input disabled={nro.length > 0 ? true : false} 
                     type='date' id='date_start' className='date-input'
                     value={dateStart} onChange={e => setDateStart(e.target.value)}/>
                     <a> - </a>
-                    <input disabled={parseInt(nro) ? true : false} 
+                    <input disabled={nro.length > 0 ? true : false} 
                     type='date' id='date_end' className='date-input'
                     value={dateEnd} onChange={e => setDateEnd(e.target.value)}/>
                 </div>
