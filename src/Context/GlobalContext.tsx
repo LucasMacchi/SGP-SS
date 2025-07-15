@@ -706,15 +706,17 @@ export default function GlobalState(props: IPropsChildren) {
   }
 
   //Cambiar estado compra
-  async function changeStateCompra(aprobar:boolean, id: number) {
+  async function changeStateCompra(aprobar:boolean, id: number, comentario: string) {
     try {
       if(aprobar) {
-        await axios.patch(SERVER+"/compras/aprovar/"+id,authReturner())
+        await axios.patch(SERVER+"/compras/aprove/"+id,{comentario},authReturner())
         alert("Compra aprobada")
+        window.location.reload()
       }
       else {
-        await axios.patch(SERVER+"/compras/null/"+id,authReturner())
+        await axios.patch(SERVER+"/compras/null/"+id,{comentario},authReturner())
         alert("Compra anulada")
+        window.location.reload()
       }
     } catch (error) {
       console.log(error);
@@ -761,6 +763,39 @@ export default function GlobalState(props: IPropsChildren) {
       alert("Error al traer la compra.");
     }
   }
+
+  async function editDesProdCompra(detailID: number, descripcion: string) {
+    try {
+      await axios.patch(SERVER+"/compras/edit/des",{detailID,descripcion}, authReturner())
+      alert("Compra modificada")
+      window.location.reload()
+    } catch (error) {
+      console.log(error);
+      alert("Error al editar la compra.");
+    }
+  }
+
+  async function editCantProdCompra(detailID: number, cantidad: number) {
+    try {
+      await axios.patch(SERVER+"/compras/edit/cant",{detailID,cantidad}, authReturner())
+      alert("Compra modificada")
+      window.location.reload()
+    } catch (error) {
+      console.log(error);
+      alert("Error al editar la compra.");
+    }
+  }
+
+  async function deleteProdCompra(detailID: number) {
+    try {
+      await axios.delete(SERVER+"/compras/delete/"+detailID, authReturner())
+      alert("Compra modificada")
+      window.location.reload()
+    } catch (error) {
+      console.log(error);
+      alert("Error al editar la compra.");
+    }
+  }
   
   const innitialState: IGlobalContext = {
     user: {
@@ -799,7 +834,9 @@ export default function GlobalState(props: IPropsChildren) {
         fullname: "",
         proveedor: "",
         compra_id: 0,
-        fecha: ""
+        fecha: "",
+        comentario: "",
+        nro: ""
     },
     personal: [],
     sysUsers: [],
@@ -859,7 +896,10 @@ export default function GlobalState(props: IPropsChildren) {
     registerCompra,
     changeStateCompra,
     getAllCompras,
-    getUniqCompra
+    getUniqCompra,
+    editDesProdCompra,
+    editCantProdCompra,
+    deleteProdCompra
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -936,7 +976,11 @@ interface IGlobalContext {
   checkExistsPedido: (nro: string) => Promise<boolean>;
   collectionOrders: (orders:string []) => Promise<ICollectionoRes>;
   registerCompra: (data: ICompraDto) => void;
-  changeStateCompra: (aprobar:boolean, id: number) => void;
+  changeStateCompra: (aprobar:boolean, id: number,comentario: string) => void;
   getAllCompras: (revised:boolean) => void;
   getUniqCompra: (id:number) => void;
+  editDesProdCompra: (detailID: number, descripcion: string) => void;
+  editCantProdCompra: (detailID: number, cantidad: number) => void;
+  deleteProdCompra: (detailID: number) => void;
+  
 }

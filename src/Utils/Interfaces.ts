@@ -215,6 +215,10 @@ export interface IEntrega {
   }
 }
 
+export interface ICompraDocu {
+    c: ICompra  
+}
+
 export interface IPersonal {
   legajo: number,
   fullname: string,
@@ -254,7 +258,9 @@ export interface ICompra {
     fullname: string,
     proveedor: string,
     compra_id: number,
-    fecha: string
+    fecha: string,
+    comentario: string,
+    nro: string
 
 }
 

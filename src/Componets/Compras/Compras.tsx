@@ -227,7 +227,7 @@ export default function Compras () {
                             {global?.compras.map((c) => (
                             <tr style={{backgroundColor: colorCheck(c)}} key={c.compra_id}
                             onClick={() => window.location.href = "/compras/"+c.compra_id}>
-                                <th style={{border: "1px solid", width: "10%"}}>{c.compra_id}</th>
+                                <th style={{border: "1px solid", width: "10%"}}>{c.nro}</th>
                                 <th style={{border: "1px solid", width: "22%"}}>{c.area}</th>
                                 <th style={{border: "1px solid", width: "22%"}}>{c.tipo}</th>
                                 <th style={{border: "1px solid", width: "22%"}}>{c.lugar}</th>
