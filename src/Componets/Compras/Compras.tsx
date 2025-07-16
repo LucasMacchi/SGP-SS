@@ -9,6 +9,7 @@ export default function Compras () {
     const [display, setDisplay] = useState(0)
     const [custom, setCustom] = useState(false)
     const [areas, setAreas] = useState<string[]>([])
+    const [nro, setNro] = useState("")
     const [compra, setCompra] = useState<ICompraDto>({
         area: '',
         tipo: '',
@@ -37,11 +38,22 @@ export default function Compras () {
         setCompra({area: '',tipo: '',descripcion: '',lugar: '',fullname: '',
             compras: [],proveedor: ''})
         setInsumo({descripcion: '', cantidad: 0})
+        setNro("")
         if(display === 2) {
-            global?.getAllCompras(true)
+            if(global?.user.rol !== rolesNum.admin || global?.user.rol !== rolesNum.administrativo) {
+                global?.getAllCompras(true, global.user.last_name+" "+global.user.first_name) 
+            }
+            else {
+               global?.getAllCompras(true) 
+            }
         }
         else if(display === 3) {
-            global?.getAllCompras(false)
+            if(global?.user.rol !== rolesNum.admin || global?.user.rol !== rolesNum.administrativo) {
+                global?.getAllCompras(false, global.user.last_name+" "+global.user.first_name) 
+            }
+            else {
+               global?.getAllCompras(false) 
+            }
         }
 
     },[display])
@@ -214,28 +226,39 @@ export default function Compras () {
         }
         else if(display === 2 || display === 3) {
             return(
-                <div style={{width: "400px"}}>
-                    <table>
+                <div style={{width: "380px", margin: "3px"}}>
+                    <table style={{fontSize: "small"}}>
                         <tbody>
                             <tr>
                                 <th style={{border: "1px solid", width: "10%"}}>ID</th>
                                 <th style={{border: "1px solid", width: "22%"}}>Area</th>
-                                <th style={{border: "1px solid", width: "22%"}}>Tipo</th>
                                 <th style={{border: "1px solid", width: "22%"}}>Lugar</th>
-                                <th style={{border: "1px solid", width: "22%"}}>Nombre</th>
+                                <th style={{border: "1px solid", width: "22%"}}>Fecha</th>
                             </tr>
                             {global?.compras.map((c) => (
                             <tr style={{backgroundColor: colorCheck(c)}} key={c.compra_id}
                             onClick={() => window.location.href = "/compras/"+c.compra_id}>
                                 <th style={{border: "1px solid", width: "10%"}}>{c.nro}</th>
                                 <th style={{border: "1px solid", width: "22%"}}>{c.area}</th>
-                                <th style={{border: "1px solid", width: "22%"}}>{c.tipo}</th>
                                 <th style={{border: "1px solid", width: "22%"}}>{c.lugar}</th>
-                                <th style={{border: "1px solid", width: "22%"}}>{c.fullname}</th>
+                                <th style={{border: "1px solid", width: "22%"}}>{c.fecha.split("T")[0]}</th>
                             </tr>
                             ))}
                         </tbody>
                     </table>
+                </div>
+            )
+        }
+        else if(display === 4) {
+            return (
+                <div className='data-div-add'>
+                    <h5 style={{margin: "2px"}}>Ingrese el Numero de Compra: </h5>
+                    <input type='text' className='textfield-search'
+                    value={nro} onChange={e => setNro(e.target.value)}/>
+                    <button className='btn-export-pdf' onClick={() => {
+                        global?.getUniqCompraNro(nro)
+                        setNro("")
+                    }}>Buscar</button>
                 </div>
             )
         }
@@ -262,10 +285,9 @@ export default function Compras () {
                         onChange={(e)=>setDisplay(parseInt(e.target.value))}>
                             <option value={0}>---</option>
                             <option value={1}>Solicitar una Compra</option>
-                            {(global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin) &&
-                            <option value={2}>Compras Pendientes</option> }
-                            {(global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin) &&
-                            <option value={3}>Compras Aprobadas o nulas</option> }
+                            <option value={2}>Compras Pendientes</option>
+                            <option value={3}>Compras Aprobadas o nulas</option>
+                            <option value={4}>Buscar una Compra</option>
                         </select>
                     </div>
                     {displayCompras()}

@@ -114,7 +114,7 @@ export default function CompraDetail () {
                         <textarea value={global?.compraDetail.comentario} className='texarea-details'
                         disabled/>
                     </div>
-                    <h4>Estado: ANULADO</h4>
+                    <h4>Estado: RECHAZADO</h4>
                 </div>
             )
             }
@@ -127,7 +127,7 @@ export default function CompraDetail () {
             }
 
         }
-        else{
+        else if(global?.user.rol === rolesNum.admin || global?.user.rol === rolesNum.administrativo) {
             return(
                 <div>
                     <div className='data-div-info'>
@@ -141,6 +141,13 @@ export default function CompraDetail () {
                         <button className='btn-accept' onClick={() => changeEstado(true)}>APROBAR</button>
                         <button className='btn-negative' onClick={() => changeEstado(false)}>RECHAZAR</button>
                     </div>
+                </div>
+            )
+        }
+        else{
+            return(
+                <div className='data-div-info'>
+                    <h4>Estado: PENDIENTE</h4>
                 </div>
             )
 

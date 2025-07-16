@@ -725,11 +725,15 @@ export default function GlobalState(props: IPropsChildren) {
   }
 
   //Traer todos las compras
-  async function getAllCompras(revised:boolean) {
+  async function getAllCompras(revised:boolean,fullname?: string) {
     try {
       const compras: ICompra[] = await (await axios.get(SERVER+"/compras/all", authReturner())).data
       if(revised) {
-        const newArr = compras.filter((c) => c.anulado === false && c.aprobado === false)
+        let newArr = compras.filter((c) => c.anulado === false && c.aprobado === false)
+        if(fullname) {
+          newArr = newArr.filter((c) => c.fullname === fullname)
+          console.log("Compras de "+fullname)
+        }
         dispatch({
           payload: newArr,
           type: ac.GET_COMPRAS
@@ -737,7 +741,11 @@ export default function GlobalState(props: IPropsChildren) {
         console.log(newArr)
       }
       else {
-        const newArr = compras.filter((c) => c.anulado === true || c.aprobado === true)
+        let newArr = compras.filter((c) => c.anulado === true || c.aprobado === true)
+        if(fullname) {
+          newArr = newArr.filter((c) => c.fullname === fullname)
+          console.log("Compras de "+fullname)
+        }
         dispatch({
           payload: newArr,
           type: ac.GET_COMPRAS
@@ -762,6 +770,22 @@ export default function GlobalState(props: IPropsChildren) {
       console.log(error);
       alert("Error al traer la compra.");
     }
+  }
+
+  async function getUniqCompraNro(nro: string) {
+    try {
+      const compraID: number = await (await axios.get(SERVER+"/compras/uniqbynro/"+nro, authReturner())).data
+      if(compraID) {
+        window.location.href = "/compras/"+compraID
+      }
+      else {
+        alert("Error al encontrar la compra.");
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Error al encontrar la compra.");
+    }
+    return 0
   }
 
   async function editDesProdCompra(detailID: number, descripcion: string) {
@@ -899,7 +923,8 @@ export default function GlobalState(props: IPropsChildren) {
     getUniqCompra,
     editDesProdCompra,
     editCantProdCompra,
-    deleteProdCompra
+    deleteProdCompra,
+    getUniqCompraNro
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -977,10 +1002,11 @@ interface IGlobalContext {
   collectionOrders: (orders:string []) => Promise<ICollectionoRes>;
   registerCompra: (data: ICompraDto) => void;
   changeStateCompra: (aprobar:boolean, id: number,comentario: string) => void;
-  getAllCompras: (revised:boolean) => void;
+  getAllCompras: (revised:boolean, fullname?: string) => void;
   getUniqCompra: (id:number) => void;
   editDesProdCompra: (detailID: number, descripcion: string) => void;
   editCantProdCompra: (detailID: number, cantidad: number) => void;
   deleteProdCompra: (detailID: number) => void;
+  getUniqCompraNro: (nro: string) => void;
   
 }
