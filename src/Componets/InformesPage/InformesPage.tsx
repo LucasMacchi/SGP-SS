@@ -2,13 +2,15 @@ import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
 import './informes.css'
 import lastMonth from '../../Utils/lastMonth'
-import { IClientIns, ICollectionPDF, IInsumo, IpedidoClientDataPDF } from '../../Utils/Interfaces'
+import { IClientIns, ICollectionoRes, ICollectionPDF, IInsumo, IpedidoClientDataPDF } from '../../Utils/Interfaces'
 import {pdf} from '@react-pdf/renderer';
 import { saveAs } from 'file-saver'
 import ClientDocument from '../pdfs/client'
 import Header from '../Header/Header'
 import CollectionDocument from '../pdfs/collection'
+import RemitoDocument, { divisionTable} from '../pdfs/remito'
 import infoMsg from '../../Utils/infoMsg'
+
 
 export default function InformesPage () {
     const global = useContext(GlobalContext)
@@ -18,6 +20,7 @@ export default function InformesPage () {
     const [userReq, setUser] = useState(0)
     const [collection, setCollection] = useState('')
     const [orders, setOrders] = useState<string[]>([])
+    const [remit, setRemit] = useState(false)
 
     useEffect(() => {
         setStartDate(lastMonth())
@@ -73,34 +76,52 @@ export default function InformesPage () {
                         ins_cod2: Number.isNaN(cod2) ? 0 : cod2,
                         ins_cod3: Number.isNaN(cod3) ? 0 : cod3,
                         insumo_des: format[4],
-                        amount: i.sum
+                        amount: Math.round(i.sum * 100) / 100
                     }
                     return data
                 })
-                let reqName = ''
-                if(userReq) {
-                    global?.sysUsers.forEach((u) => {
-                        if(u.usuario_id === userReq) reqName = u.last_name +" "+u.first_name
-                    })
-                }
-                const clientedes = clientNameReturner(client)
-                const data: IpedidoClientDataPDF = {
-                    pedido_client: clientedes,
-                    pedido_start: startDate,
-                    pedido_end: endDate,
-                    pedido_client_id: client,
-                    pedido_insumos: insumosFormat,
-                    pedido_requester: reqName
-                }
-                const blob: Blob = await pdf(<ClientDocument pedido={data}/>).toBlob()
-                saveAs(blob, ''+clientedes)
-            } else alert('No existen datos del pedido.')
+                console.log(insumosFormat)
+                if(insumosFormat.length > 0) {
+                    if(remit) await createRemito(insumosFormat, true)
+                    else await createClientePdf(insumosFormat)
+                } else alert('No existen datos del pedido.')
+                
 
+            } else alert('No existen datos del pedido.')
+            
         }
         else{
             alert('Seleccione fechas y clientes validos.')
         }
         
+    }
+
+    const createRemito = async (insumos: IInsumo[], cliente: boolean) => {
+        const dataF = divisionTable(insumos)
+        const clientedes = clientNameReturner(client)
+        const blob: Blob = await pdf(<RemitoDocument c={dataF} />).toBlob()
+        if(cliente) saveAs(blob, 'REMITO_'+clientedes)
+        else saveAs(blob, 'REMITO_'+collection)
+    }
+
+    const createClientePdf = async (insumos: IInsumo[]) => {
+        let reqName = ''
+        if(userReq) {
+            global?.sysUsers.forEach((u) => {
+                if(u.usuario_id === userReq) reqName = u.last_name +" "+u.first_name
+            })
+        }
+        const clientedes = clientNameReturner(client)
+        const data: IpedidoClientDataPDF = {
+            pedido_client: clientedes,
+            pedido_start: startDate,
+            pedido_end: endDate,
+            pedido_client_id: client,
+            pedido_insumos: insumos,
+            pedido_requester: reqName
+        }
+        const blob: Blob = await pdf(<ClientDocument pedido={data}/>).toBlob()
+        saveAs(blob, ''+clientedes)
     }
 
     const deleteInsumoRow = (index: number, nro: string, orders: string[]) => {
@@ -126,37 +147,64 @@ export default function InformesPage () {
         if(orders.length > 0) {
             const res = await global?.collectionOrders(orders)
             if(res) {
-                let insumos: IClientIns[] = []
-                insumos = res.insumos.map((i) => {
-                    const format = i.insumo_des.split('-')
-                    const cod = parseInt(format[0])
-                    const cod1 = parseInt(format[1])
-                    const cod2 = parseInt(format[2])
-                    const cod3 = parseInt(format[3])
-                    const data: IClientIns = {
-                        insumo_id: Number.isNaN(cod) ? 0 : cod,
-                        ins_cod1: Number.isNaN(cod1) ? 0 : cod1,
-                        ins_cod2: Number.isNaN(cod2) ? 0 : cod2,
-                        ins_cod3: Number.isNaN(cod3) ? 0 : cod3,
-                        insumo_des: format[4],
-                        sum: i.sum
-                    }
-                    return data
-                })
-                const data: ICollectionPDF = {
-                    collection: {
-                        insumos: insumos,
-                        orders: res.servicios
-                    }
+                if(remit) {
+                    let insumos: IInsumo[] = []
+                    insumos = res.insumos.map((i) => {
+                        const format = i.insumo_des.split('-')
+                        const cod = parseInt(format[0])
+                        const cod1 = parseInt(format[1])
+                        const cod2 = parseInt(format[2])
+                        const cod3 = parseInt(format[3])
+                        const data: IInsumo = {
+                            insumo_id: Number.isNaN(cod) ? 0 : cod,
+                            ins_cod1: Number.isNaN(cod1) ? 0 : cod1,
+                            ins_cod2: Number.isNaN(cod2) ? 0 : cod2,
+                            ins_cod3: Number.isNaN(cod3) ? 0 : cod3,
+                            insumo_des: format[4],
+                            amount: Math.round(i.sum * 100) / 100
+                        }
+                        return data
+                    })
+                    await createRemito(insumos, false)
                 }
-                console.log(data)
-                const blob: Blob = await pdf(<CollectionDocument collection={data.collection}/>).toBlob()
-                saveAs(blob, 'SGP_'+collection)
+                else{
+                    await printCollection(res)
+                }
+
             }
 
         }
         else alert('Selecciones uno o mas pedidos.')
     }
+
+    const printCollection = async (res: ICollectionoRes) => {
+        let insumos: IClientIns[] = []
+        insumos = res.insumos.map((i) => {
+            const format = i.insumo_des.split('-')
+            const cod = parseInt(format[0])
+            const cod1 = parseInt(format[1])
+            const cod2 = parseInt(format[2])
+            const cod3 = parseInt(format[3])
+            const data: IClientIns = {
+                insumo_id: Number.isNaN(cod) ? 0 : cod,
+                ins_cod1: Number.isNaN(cod1) ? 0 : cod1,
+                ins_cod2: Number.isNaN(cod2) ? 0 : cod2,
+                ins_cod3: Number.isNaN(cod3) ? 0 : cod3,
+                insumo_des: format[4],
+                sum: Math.round(i.sum * 100) / 100
+            }
+            return data
+        })
+        const data: ICollectionPDF = {
+            collection: {
+                insumos: insumos,
+                orders: res.servicios
+            }
+        }
+        const blob: Blob = await pdf(<CollectionDocument collection={data.collection}/>).toBlob()
+        saveAs(blob, 'SGP_'+collection)
+    }
+
     const displaySelection = () => {
         return (
             <div className='table-div'>
@@ -203,6 +251,7 @@ export default function InformesPage () {
                 </h1>
                 <h5 className='filter-sub'>Los informes generados son sobre los pedidos </h5>
                 <h5 className='filter-sub'>que ya estan Aprobados, Listos o Entregados.</h5>
+                <h5 className='filter-sub'>Generar Remitos: <input type="checkbox" checked={remit} onChange={(e) => setRemit(e.target.checked)}/></h5>
                 <hr color='#3399ff' className='hr-line'/>
                 <div>
                     <h2 className='title-Homepage' >

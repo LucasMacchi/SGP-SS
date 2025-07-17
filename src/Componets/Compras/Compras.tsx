@@ -40,7 +40,7 @@ export default function Compras () {
         setInsumo({descripcion: '', cantidad: 0})
         setNro("")
         if(display === 2) {
-            if(global?.user.rol !== rolesNum.admin || global?.user.rol !== rolesNum.administrativo) {
+            if(global?.user.rol !== rolesNum.admin && global?.user.rol !== rolesNum.administrativo) {
                 global?.getAllCompras(true, global.user.last_name+" "+global.user.first_name) 
             }
             else {
@@ -48,7 +48,7 @@ export default function Compras () {
             }
         }
         else if(display === 3) {
-            if(global?.user.rol !== rolesNum.admin || global?.user.rol !== rolesNum.administrativo) {
+            if(global?.user.rol !== rolesNum.admin && global?.user.rol !== rolesNum.administrativo) {
                 global?.getAllCompras(false, global.user.last_name+" "+global.user.first_name) 
             }
             else {

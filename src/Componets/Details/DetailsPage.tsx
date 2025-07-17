@@ -13,6 +13,7 @@ import tokenExpireChecker from '../../Utils/tokenExpireChecker'
 import dateParser from '../../Utils/dateParser'
 //import sectoresPersonal from "./sectores.json"
 import infoMsg from '../../Utils/infoMsg'
+import RemitoDocument, { divisionTable } from '../pdfs/remito'
 
 
 export default function DetailsPage () {
@@ -67,21 +68,31 @@ export default function DetailsPage () {
       }
       else return {legajo:0,fullname:'',cuil:0,sector:``}
     }
-    
-    /*
-    const setPersonal = async (legajo: number) => {
-      if(legajo){
-        if(confirm('Quieres asignar el pedido a '+legajo) && global && order){
-          const oldLegajo = order.legajo ? order.legajo : 0
-          await global.orderLegajo(order.order_id, legajo)
-          if(oldLegajo && oldLegajo > 1000000) await global.deletePersonal(oldLegajo)
+
+    const createRemito = async () => {
+        if(order){
+            const insumosFormat: IInsumo[] = order.insumos.map((i) => {
+                const format = i.insumo_des.split('-')
+                const cod = parseInt(format[0])
+                const cod1 = parseInt(format[1])
+                const cod2 = parseInt(format[2])
+                const cod3 = parseInt(format[3])
+                const data: IInsumo = {
+                    insumo_id: Number.isNaN(cod) ? 0 : cod,
+                    ins_cod1: Number.isNaN(cod1) ? 0 : cod1,
+                    ins_cod2: Number.isNaN(cod2) ? 0 : cod2,
+                    ins_cod3: Number.isNaN(cod3) ? 0 : cod3,
+                    insumo_des: format[4],
+                    amount: Math.round(i.amount * 100) / 100
+                }
+                return data
+            })
+            const dataF = divisionTable(insumosFormat)
+            const blob: Blob = await pdf(<RemitoDocument c={dataF} />).toBlob()
+            saveAs(blob, 'REMITO_'+order?.numero)
         }
-      }
-      else {
-        alert('Ingrese pesonal valido.')
-      }
     }
-    */
+
     const rejectFn = (order_id: number) => {
         setLoad(true)
         if(confirm('¿Quieres rechazar el pedido?')) global?.orderRejectFn(order_id, commnet)
@@ -494,6 +505,11 @@ export default function DetailsPage () {
             </div>
         )
       }
+      else if(action === 8) {
+        return(
+          <button className='btn-export-pdf' onClick={() => createRemito()}>Crear Remito</button>
+        )
+      }
       else {
         return(
           <></>
@@ -511,6 +527,7 @@ export default function DetailsPage () {
                           <option value={0}>---</option>
                           {(order.legajo && global?.user.rol === rolesNum.en_deposito) && <option value={1}>Exportar plantilla de entrega</option>}
                           <option value={2}>Exportar a pdf</option>
+                          <option value={8}>Crear remito</option>
                           <option value={3}>Reportar</option>
                           {global?.user.rol === rolesNum.admin && <option value={4}>Exportar a TXT</option>}
                           {order.prov && <option value={5}>Provisional</option>}
