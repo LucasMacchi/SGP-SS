@@ -14,6 +14,7 @@ import {
   ICompraDto,
   IEmailSender,
   IFilter,
+  IOrderRemito,
   IPedido,
   IPersonal,
   IPropsChildren,
@@ -820,6 +821,17 @@ export default function GlobalState(props: IPropsChildren) {
       alert("Error al editar la compra.");
     }
   }
+
+  async function collectionRemito(orders:string []): Promise<IOrderRemito[]> {
+    try {
+      const collection: IOrderRemito[] = await (await axios.post(SERVER+"/data/collection/remito", {orders}, authReturner())).data
+      return collection
+    } catch (error) {
+      console.log(error);
+      alert("Error al generar remito.");
+      return []
+    }
+  }
   
   const innitialState: IGlobalContext = {
     user: {
@@ -882,6 +894,7 @@ export default function GlobalState(props: IPropsChildren) {
     pedidosFn,
     insumosFn,
     ccosFn,
+    collectionRemito,
     sysUsersFn,
     orderAproveFn,
     orderRejectFn,
@@ -1008,5 +1021,5 @@ interface IGlobalContext {
   editCantProdCompra: (detailID: number, cantidad: number) => void;
   deleteProdCompra: (detailID: number) => void;
   getUniqCompraNro: (nro: string) => void;
-  
+  collectionRemito: (orders:string []) => Promise<IOrderRemito[]>
 }

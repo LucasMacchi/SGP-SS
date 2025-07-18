@@ -86,7 +86,7 @@ export default function CompraDetail () {
         if(global && global.compraDetail) {
             const blob: Blob = 
             await pdf(<ComprasDocument c={global?.compraDetail}/>).toBlob()
-            saveAs(blob, 'TEST.pdf')
+            saveAs(blob, 'Compra_'+global.compraDetail.nro)
         }
 
     }

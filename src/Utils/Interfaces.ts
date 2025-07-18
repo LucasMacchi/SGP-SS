@@ -273,3 +273,12 @@ export interface ICompraDto {
     proveedor: string,
     compras: IinsumoCompra[],
 }
+
+export interface IOrderRemito {
+    order_id: number,
+    numero: number,
+    client_des: string,
+    service_des: string,
+    localidad: string,
+    insumos: IInsumo[]
+}

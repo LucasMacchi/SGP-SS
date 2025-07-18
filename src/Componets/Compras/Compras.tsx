@@ -85,7 +85,8 @@ export default function Compras () {
 
     const registrarCompra = () => {
         if(compra.area.length>0 && compra.tipo.length>0 && compra.lugar.length>0 && 
-            compra.compras.length >0 && compra.proveedor.length>0 && global){
+            compra.compras.length >0 && global){
+            if(compra.proveedor.length>0) setCompra({...compra, proveedor: "A Eleccion"})
             compra.fullname = global.user.last_name+" "+global.user.first_name
             global.registerCompra(compra)
 
@@ -155,7 +156,7 @@ export default function Compras () {
                 <div>
                     <hr color='#3399ff' className='hr-line'/>
                     <div className='data-div-add'>
-                        <h5 style={{margin: "2px"}}>Area: </h5>
+                        <h5 style={{margin: "2px"}}>Area*: </h5>
                         <select name="area" className='filter-sub' value={compra.area}
                         onChange={(e) => setCompra({...compra, area: e.target.value})}>
                             <option value={""}>---</option>
@@ -165,7 +166,7 @@ export default function Compras () {
                         </select>
                     </div>
                     <div className='data-div-add'>
-                        <h5 style={{margin: "2px"}}>Tipo: </h5>
+                        <h5 style={{margin: "2px"}}>Tipo*: </h5>
                         <select name="area" className='filter-sub' value={compra.tipo}
                         onChange={(e) => setCompra({...compra, tipo: e.target.value})}>
                             <option value={""}>---</option>
@@ -176,17 +177,17 @@ export default function Compras () {
                         </select>
                     </div>
                     <div className='data-div-add'>
-                        <h5 style={{margin: "2px"}}>Lugar: </h5>
+                        <h5 style={{margin: "2px"}}>Lugar*: </h5>
                         <input type='text' className='textfield-search'
                         value={compra.lugar} onChange={e => setCompra({...compra, lugar: e.target.value})}/>
                     </div>
                     <div className='data-div-add'>
-                        <h5 style={{margin: "2px"}}>Proveedor: </h5>
+                        <h5 style={{margin: "2px"}}>Proveedor sugerido: </h5>
                         <input type='text' className='textfield-search'
                         value={compra.proveedor} onChange={e => setCompra({...compra, proveedor: e.target.value})}/>
                     </div>
                     <div className='data-div-add'>
-                        <h5>Descripcion / Motivo: </h5>
+                        <h5>Descripcion / Motivo*: </h5>
                         <textarea value={compra.descripcion} className='texarea-details'
                         onChange={(e) => setCompra({...compra, descripcion: e.target.value})}/>
                     </div>

@@ -10,6 +10,7 @@ import Header from '../Header/Header'
 import CollectionDocument from '../pdfs/collection'
 import RemitoDocument, { divisionTable} from '../pdfs/remito'
 import infoMsg from '../../Utils/infoMsg'
+import RemitoDocumentCol from '../pdfs/remitoColeccion'
 
 
 export default function InformesPage () {
@@ -104,6 +105,16 @@ export default function InformesPage () {
         else saveAs(blob, 'REMITO_'+collection)
     }
 
+    const createRemitoColeccion = async () => {
+        console.log("Pedidos: ",orders)
+        const dataF = await global?.collectionRemito(orders)
+        if(dataF && dataF.length > 0) {
+            const blob: Blob = await pdf(<RemitoDocumentCol c={dataF} />).toBlob()
+            saveAs(blob, 'REMITO_'+collection)
+        }
+
+    }
+
     const createClientePdf = async (insumos: IInsumo[]) => {
         let reqName = ''
         if(userReq) {
@@ -148,24 +159,7 @@ export default function InformesPage () {
             const res = await global?.collectionOrders(orders)
             if(res) {
                 if(remit) {
-                    let insumos: IInsumo[] = []
-                    insumos = res.insumos.map((i) => {
-                        const format = i.insumo_des.split('-')
-                        const cod = parseInt(format[0])
-                        const cod1 = parseInt(format[1])
-                        const cod2 = parseInt(format[2])
-                        const cod3 = parseInt(format[3])
-                        const data: IInsumo = {
-                            insumo_id: Number.isNaN(cod) ? 0 : cod,
-                            ins_cod1: Number.isNaN(cod1) ? 0 : cod1,
-                            ins_cod2: Number.isNaN(cod2) ? 0 : cod2,
-                            ins_cod3: Number.isNaN(cod3) ? 0 : cod3,
-                            insumo_des: format[4],
-                            amount: Math.round(i.sum * 100) / 100
-                        }
-                        return data
-                    })
-                    await createRemito(insumos, false)
+                    await createRemitoColeccion()
                 }
                 else{
                     await printCollection(res)

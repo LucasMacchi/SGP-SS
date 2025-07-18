@@ -13,7 +13,8 @@ import tokenExpireChecker from '../../Utils/tokenExpireChecker'
 import dateParser from '../../Utils/dateParser'
 //import sectoresPersonal from "./sectores.json"
 import infoMsg from '../../Utils/infoMsg'
-import RemitoDocument, { divisionTable } from '../pdfs/remito'
+import RemitoDocument from '../pdfs/remito'
+import { divisionTable } from '../pdfs/remito'
 
 
 export default function DetailsPage () {
