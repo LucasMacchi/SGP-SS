@@ -14,6 +14,7 @@ import {
   ICompraDto,
   IEmailSender,
   IFilter,
+  IInsumoComp,
   IOrderRemito,
   IPedido,
   IPersonal,
@@ -832,6 +833,16 @@ export default function GlobalState(props: IPropsChildren) {
       return []
     }
   }
+
+  async function  getInsumosComplete(): Promise<IInsumoComp[]> {
+    try {
+      const insumos: IInsumoComp[] = (await axios.get(SERVER+"/data/insumos/complete",authReturner())).data
+      return insumos
+    } catch (error) {
+      alert("Error al traer insumos.");
+      return []
+    }
+  }
   
   const innitialState: IGlobalContext = {
     user: {
@@ -892,6 +903,7 @@ export default function GlobalState(props: IPropsChildren) {
     logoutFn,
     sessionFn,
     pedidosFn,
+    getInsumosComplete,
     insumosFn,
     ccosFn,
     collectionRemito,
@@ -1021,5 +1033,6 @@ interface IGlobalContext {
   editCantProdCompra: (detailID: number, cantidad: number) => void;
   deleteProdCompra: (detailID: number) => void;
   getUniqCompraNro: (nro: string) => void;
-  collectionRemito: (orders:string []) => Promise<IOrderRemito[]>
+  collectionRemito: (orders:string []) => Promise<IOrderRemito[]>;
+  getInsumosComplete: () => Promise<IInsumoComp[]>
 }

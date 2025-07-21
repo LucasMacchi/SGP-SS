@@ -18,7 +18,7 @@ const stylePedido = StyleSheet.create({
     },
     view: {
         marginLeft: "30px",
-        marginTop: "90px"    
+        marginTop: "75px"    
     },
     viewFecha: {
         marginLeft: "450px",
@@ -49,8 +49,8 @@ const stylePedido = StyleSheet.create({
         width: '12%',
     },
     tableCell: {
-        marginBottom: 4,
-        fontSize: 8,
+        marginBottom: 6,
+        fontSize: 10,
         textAlign: 'left',
         fontWeight: "900"
     },
@@ -100,7 +100,7 @@ const divisionByPageCollection = (data:IOrderRemito[]):JSX.Element[] => {
                     <Text style={stylePedido.dateText}>{date.getFullYear()}</Text>
                 </View>
                 <View style={stylePedido.viewTitulo}>
-                    <Text style={stylePedido.dateText}>{arr.client_des+" - "+arr.service_des}</Text>
+                    <Text style={stylePedido.dateText}>{arr.client_des+" - "+arr.service_des+ " - "+arr.numero}</Text>
                 </View>
                 <View style={stylePedido.viewLocal}>
                     <Text style={stylePedido.dateText}>{arr.localidad}</Text>

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react"
 import Header from "../Header/Header"
 import { GlobalContext } from "../../Context/GlobalContext"
-import { ICompra, ICompraDto, IinsumoCompra, rolesNum } from "../../Utils/Interfaces"
+import { ICompra, ICompraDto, IInsumoComp, IinsumoCompra, rolesNum } from "../../Utils/Interfaces"
 
 export default function Compras () {
     
@@ -9,6 +9,9 @@ export default function Compras () {
     const [display, setDisplay] = useState(0)
     const [custom, setCustom] = useState(false)
     const [areas, setAreas] = useState<string[]>([])
+    const [insumosComp, setInsumosComp] = useState<IInsumoComp[]>([])
+    const [filteredIns, setFilteredIns] = useState<IInsumoComp[]>([])
+    const [search, setSearch] = useState("")
     const [nro, setNro] = useState("")
     const [compra, setCompra] = useState<ICompraDto>({
         area: '',
@@ -27,9 +30,8 @@ export default function Compras () {
     useEffect(() => {
         if(global) {
             if(global.login === false) global?.sessionFn()
-            if(global.insumos.length === 0) global.insumosFn(false)
+            global.getInsumosComplete().then(ins => setInsumosComp(ins))
             global.getAreasFn().then(ars => setAreas(ars))
-            
         }
 
     },[])
@@ -59,8 +61,34 @@ export default function Compras () {
     },[display])
 
     useEffect(() => {
+        if(global) {
+            let arr: IInsumoComp[] = insumosComp
+            if(search.length>3) {
+                arr = arr.filter(ins => ins.descripcion.toLowerCase().includes(search.toLowerCase()))
+            }
+            if(compra.area === "Limpieza"){
+                arr = arr.filter(ins => ins.categoria === "Limpieza")
+            }
+            if(compra.area === "Seguridad"){
+                arr = arr.filter(ins => ins.categoria === "Seguridad")
+            }
+            if(compra.area === "Racionamiento"){
+                arr = arr.filter(ins => ins.categoria === "Racionamiento")
+            }
+            if(compra.area === "Mantenimiento"){
+                arr = arr.filter(ins => ins.categoria === "Mantenimiento")
+            }
+            if(compra.tipo === "Indumentaria"){
+                arr = arr.filter(ins => ins.rubro === "Indumentar")
+            }
+            setFilteredIns(arr)
+        }
+
+    },[insumosComp,search,compra.area, compra.tipo])
+
+    useEffect(() => {
         setCustom(true)
-        if(compra.tipo === "Insumo") {
+        if(compra.tipo === "Insumo" || compra.tipo === "Indumentaria") {
             setCustom(false)
         }
     },[compra.tipo])
@@ -109,13 +137,18 @@ export default function Compras () {
                         <label htmlFor="">Insumo Personalizado</label>
                         <input type="checkbox" onChange={(e) => setCustom(e.target.checked )} checked={custom}/>
                     </div>
+                    <div>
+                        <label htmlFor="">Buscar: </label>
+                        <input type='text' className='textfield-search' style={{width: "100px"}}
+                        value={search} onChange={e => setSearch(e.target.value)}/>
+                    </div> 
                     <select defaultValue={''} value={insumo.descripcion} className="data-div-select"
                     style={{width: "280px"}}
                     onChange={e => setInsumo({...insumo, descripcion: e.target.value})}>
                     <option value={''}>---</option>
                     {
-                        global?.insumos.map((i, index) => (
-                            <option key={index} value={i.split("-")[4]}>{i.split("-")[4]}</option>
+                        filteredIns.map((i, index) => (
+                            <option key={index} value={i.descripcion}>{i.descripcion}</option>
                         ))
                     }
                     </select>
@@ -174,6 +207,7 @@ export default function Compras () {
                             <option value={"Insumo"}>Insumo</option>
                             <option value={"Maquinaria"}>Maquinaria</option>
                             <option value={"Equipamiento"}>Equipamiento</option>
+                            <option value={"Indumentaria"}>Indumentaria</option>
                         </select>
                     </div>
                     <div className='data-div-add'>

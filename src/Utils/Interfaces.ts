@@ -79,6 +79,16 @@ export interface IInsumo {
     categoria?: string
 }
 
+export interface IInsumoComp {
+    insumo_id: number,
+    ins_cod1: number,
+    ins_cod2: number,
+    ins_cod3: number,
+    descripcion: string,
+    categoria: string,
+    rubro: string
+}
+
 export interface IResponseInsumo {
     insumo: string
 }
