@@ -20,7 +20,8 @@ export default function Compras () {
         lugar: '',
         fullname: '',
         compras: [],
-        proveedor: ''
+        proveedor: '',
+        date: ""
     })
     const [insumo, setInsumo] = useState<IinsumoCompra>({
         descripcion: '',
@@ -114,12 +115,12 @@ export default function Compras () {
     const registrarCompra = () => {
         if(compra.area.length>0 && compra.tipo.length>0 && compra.lugar.length>0 && 
             compra.compras.length >0 && global){
-            if(compra.proveedor.length>0) setCompra({...compra, proveedor: "A Eleccion"})
+            if(compra.proveedor.length>0) compra.proveedor = "A eleccion"
             compra.fullname = global.user.last_name+" "+global.user.first_name
             global.registerCompra(compra)
 
             setCompra({area: '',tipo: '',descripcion: '',lugar: '',fullname: '',
-            compras: [],proveedor: ''})
+            compras: [],proveedor: '', date: ""})
             setInsumo({descripcion: '', cantidad: 0})
         }
         else {
@@ -197,6 +198,11 @@ export default function Compras () {
                                 <option value={ar} key={ar}>{ar}</option>
                             ))}
                         </select>
+                    </div>
+                    <div className='data-div-add'>
+                        <h5 style={{margin: "2px"}}>Fecha: </h5>
+                        <input type='date' id='date_start' className='date-input'
+                        value={compra.date} onChange={e => setCompra({...compra, date: e.target.value})}/>
                     </div>
                     <div className='data-div-add'>
                         <h5 style={{margin: "2px"}}>Tipo*: </h5>
