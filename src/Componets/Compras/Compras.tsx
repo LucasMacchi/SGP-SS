@@ -115,7 +115,7 @@ export default function Compras () {
     const registrarCompra = () => {
         if(compra.area.length>0 && compra.tipo.length>0 && compra.lugar.length>0 && 
             compra.compras.length >0 && global){
-            if(compra.proveedor.length>0) compra.proveedor = "A eleccion"
+            if(compra.proveedor.length === 0) compra.proveedor = "A eleccion"
             compra.fullname = global.user.last_name+" "+global.user.first_name
             global.registerCompra(compra)
 

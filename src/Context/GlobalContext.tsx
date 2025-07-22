@@ -699,7 +699,6 @@ export default function GlobalState(props: IPropsChildren) {
   //Register Compra
   async function registerCompra(data: ICompraDto) {
     try {
-      data.proveedor = "A eleccion"
       await axios.post(SERVER+"/compras/registrar",data,authReturner())
       alert("Compra creada")
     } catch (error) {
