@@ -11,8 +11,14 @@ export default function Compras () {
     const [areas, setAreas] = useState<string[]>([])
     const [insumosComp, setInsumosComp] = useState<IInsumoComp[]>([])
     const [filteredIns, setFilteredIns] = useState<IInsumoComp[]>([])
+    const [filteredCompra, setFilteredCompra] = useState<ICompra[]>([])
     const [search, setSearch] = useState("")
     const [nro, setNro] = useState("")
+    const [proveedor, setProveedor] = useState("")
+    const [filterDate, setFilterDate] = useState({
+        start: "",
+        end: ""
+    })
     const [compra, setCompra] = useState<ICompraDto>({
         area: '',
         tipo: '',
@@ -94,6 +100,28 @@ export default function Compras () {
         }
     },[compra.tipo])
 
+    useEffect(() => {
+        if(global) {
+            let filtered = global?.compras
+            if(proveedor.length > 0) filtered = filtered.filter(c => c.proveedor === proveedor)
+            if(filterDate.start) {
+                const startDate = new Date(filterDate.start)
+                filtered = filtered.filter(c => {
+                    const fecha = new Date(c.fecha)
+                    if(fecha >= startDate) return c
+                })
+            }
+            if(filterDate.end) {
+                const startEnd = new Date(filterDate.end)
+                filtered = filtered.filter(c => {
+                    const fecha = new Date(c.fecha)
+                    if(fecha <= startEnd) return c
+                })
+            }
+            setFilteredCompra(filtered)
+        }
+    },[proveedor, filterDate, global?.compras])
+
     const addInsumo = () => {
         if(insumo.cantidad && insumo.descripcion.length > 3){
             compra.compras.push(insumo)
@@ -127,6 +155,16 @@ export default function Compras () {
             console.log(compra, global?.user)
             alert("Faltan datos para registrar la compra.")
         }
+    }
+
+    const proveedorSetReturner = (): string[] => {
+        if(global) {
+            const proveedores = global.compras.map(c => c.proveedor)
+            const newSet = new Set(proveedores)
+            const newArr = Array.from(newSet)
+            return newArr
+        }
+        else return []
     }
 
     const descripcionChange = () => {
@@ -267,22 +305,41 @@ export default function Compras () {
         }
         else if(display === 2 || display === 3) {
             return(
-                <div style={{width: "380px", margin: "3px"}}>
+                <div style={{width: "400px", margin: "3px"}}>
+                    <div>
+                        <h4 className='title-Homepage'>Proveedor</h4>
+                        <select value={proveedor} onChange={(e) => setProveedor(e.target.value)}>
+                            <option value={''}>---</option>
+                            {proveedorSetReturner().map((p) => (
+                                <option>{p}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <h4 className='title-Homepage'>Fecha Inicio</h4>
+                        <input type='date' id='date_start' className='date-input'
+                        value={filterDate.start} onChange={e => setFilterDate({...filterDate, start: e.target.value})}/>
+                    </div>
+                    <div>
+                        <h4 className='title-Homepage'>Fecha Final</h4>
+                        <input type='date' id='date_start' className='date-input'
+                        value={filterDate.end} onChange={e => setFilterDate({...filterDate, end: e.target.value})}/>
+                    </div>
                     <table style={{fontSize: "small"}}>
                         <tbody>
                             <tr>
                                 <th style={{border: "1px solid", width: "10%"}}>ID</th>
                                 <th style={{border: "1px solid", width: "22%"}}>Area</th>
-                                <th style={{border: "1px solid", width: "22%"}}>Lugar</th>
                                 <th style={{border: "1px solid", width: "22%"}}>Fecha</th>
+                                <th style={{border: "1px solid", width: "22%"}}>Proveedor</th>
                             </tr>
-                            {global?.compras.map((c) => (
+                            {filteredCompra.map((c) => (
                             <tr style={{backgroundColor: colorCheck(c)}} key={c.compra_id}
                             onClick={() => window.location.href = "/compras/"+c.compra_id}>
                                 <th style={{border: "1px solid", width: "10%"}}>{c.nro}</th>
                                 <th style={{border: "1px solid", width: "22%"}}>{c.area}</th>
-                                <th style={{border: "1px solid", width: "22%"}}>{c.lugar}</th>
                                 <th style={{border: "1px solid", width: "22%"}}>{c.fecha.split("T")[0]}</th>
+                                <th style={{border: "1px solid", width: "22%"}}>{c.proveedor}</th>
                             </tr>
                             ))}
                         </tbody>
