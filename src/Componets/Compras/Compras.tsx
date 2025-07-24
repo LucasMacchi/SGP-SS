@@ -103,7 +103,7 @@ export default function Compras () {
     useEffect(() => {
         if(global) {
             let filtered = global?.compras
-            if(proveedor.length > 0) filtered = filtered.filter(c => c.proveedor === proveedor)
+            if(proveedor.length > 0) filtered = filtered.filter(c => c.proveedor.includes(proveedor))
             if(filterDate.start) {
                 const startDate = new Date(filterDate.start)
                 filtered = filtered.filter(c => {
@@ -159,7 +159,7 @@ export default function Compras () {
 
     const proveedorSetReturner = (): string[] => {
         if(global) {
-            const proveedores = global.compras.map(c => c.proveedor)
+            const proveedores = global.compras.map(c => c.proveedor.trimEnd())
             const newSet = new Set(proveedores)
             const newArr = Array.from(newSet)
             return newArr
