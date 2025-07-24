@@ -15,6 +15,8 @@ export default function Compras () {
     const [search, setSearch] = useState("")
     const [nro, setNro] = useState("")
     const [proveedor, setProveedor] = useState("")
+    const [fullnameF, setFullnameF] = useState("")
+    const [areaF, setAreaF] = useState("")
     const [filterDate, setFilterDate] = useState({
         start: "",
         end: ""
@@ -45,9 +47,13 @@ export default function Compras () {
 
     useEffect(() => {
         setCompra({area: '',tipo: '',descripcion: '',lugar: '',fullname: '',
-            compras: [],proveedor: ''})
+        compras: [],proveedor: ''})
         setInsumo({descripcion: '', cantidad: 0})
         setNro("")
+        setAreaF("")
+        setFullnameF("")
+        setProveedor("")
+        setFilterDate({start: "",end: ""})
         if(display === 2) {
             if(global?.user.rol !== rolesNum.admin && global?.user.rol !== rolesNum.administrativo) {
                 global?.getAllCompras(true, global.user.last_name+" "+global.user.first_name) 
@@ -104,6 +110,8 @@ export default function Compras () {
         if(global) {
             let filtered = global?.compras
             if(proveedor.length > 0) filtered = filtered.filter(c => c.proveedor.includes(proveedor))
+            if(fullnameF) filtered = filtered.filter(c => c.fullname.includes(fullnameF))
+            if(areaF) filtered = filtered.filter(c => c.area.includes(areaF))
             if(filterDate.start) {
                 const startDate = new Date(filterDate.start)
                 filtered = filtered.filter(c => {
@@ -120,7 +128,7 @@ export default function Compras () {
             }
             setFilteredCompra(filtered)
         }
-    },[proveedor, filterDate, global?.compras])
+    },[proveedor, fullnameF, areaF, filterDate, global?.compras])
 
     const addInsumo = () => {
         if(insumo.cantidad && insumo.descripcion.length > 3){
@@ -161,6 +169,15 @@ export default function Compras () {
         if(global) {
             const proveedores = global.compras.map(c => c.proveedor.trimEnd())
             const newSet = new Set(proveedores)
+            const newArr = Array.from(newSet)
+            return newArr
+        }
+        else return []
+    }
+    const solicitanteSetReturner = (): string[] => {
+        if(global) {
+            const nombres = global.compras.map(c => c.fullname)
+            const newSet = new Set(nombres)
             const newArr = Array.from(newSet)
             return newArr
         }
@@ -308,9 +325,27 @@ export default function Compras () {
                 <div style={{width: "400px", margin: "3px"}}>
                     <div>
                         <h4 className='title-Homepage'>Proveedor</h4>
-                        <select value={proveedor} onChange={(e) => setProveedor(e.target.value)}>
+                        <select value={proveedor} onChange={(e) => setProveedor(e.target.value)} style={{width: 200}}>
                             <option value={''}>---</option>
                             {proveedorSetReturner().map((p) => (
+                                <option>{p}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <h4 className='title-Homepage'>Solicitante</h4>
+                        <select value={fullnameF} onChange={(e) => setFullnameF(e.target.value)} style={{width: 200}}>
+                            <option value={''}>---</option>
+                            {solicitanteSetReturner().map((p) => (
+                                <option>{p}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <h4 className='title-Homepage'>Area</h4>
+                        <select value={areaF} onChange={(e) => setAreaF(e.target.value)} style={{width: 200}}>
+                            <option value={''}>---</option>
+                            {areas.map((p) => (
                                 <option>{p}</option>
                             ))}
                         </select>
