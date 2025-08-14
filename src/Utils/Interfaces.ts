@@ -270,7 +270,8 @@ export interface ICompra {
     compra_id: number,
     fecha: string,
     comentario: string,
-    nro: string
+    nro: string,
+    preaprobado: boolean
 
 }
 

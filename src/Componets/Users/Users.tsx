@@ -86,7 +86,7 @@ export default function UsersPagina () {
 
     return(
         <div>
-            <div className='div-header-pedidos'>
+            <div>
                 <Header />
             </div>
             <h1 className='title-Homepage' >

@@ -37,6 +37,14 @@ export default function CompraDetail () {
 
     }
 
+    const preaproveCompra = async () => {
+        if(comentarios.length > 24) {
+            if(confirm("¿Quieres preaprobar esta compra?")){
+                global?.preaproveCompraFn(global.compraDetail.compra_id, comentarios)
+            }
+        } else alert("Comentario con un minimo de 25 caracteres es necesario.")
+    }
+
     const actionEditDes = (id: number) => {
         if((global?.user.rol === rolesNum.admin || global?.user.rol === rolesNum.administrativo) && !global.compraDetail.anulado
             && !global.compraDetail.aprobado) {
@@ -92,7 +100,6 @@ export default function CompraDetail () {
     }
     const displayStatus = () => {
         if(global?.compraDetail.aprobado || global?.compraDetail.anulado){
-
             if(global?.compraDetail.aprobado){
             return(
                 <div className='data-div-info' style={{backgroundColor: "#32CD32",color: "white"}}>
@@ -126,6 +133,35 @@ export default function CompraDetail () {
             )
             }
 
+        }
+        else if (global && global?.user.rol !== rolesNum.admin && global?.user.rol !== rolesNum.administrativo && global.compraDetail.preaprobado) {
+            return(
+                <div className='data-div-info' style={{backgroundColor: "#c4c42a", color: "white"}}>
+                    <div className='data-div-info'>
+                        <h4>Comentarios:</h4>
+                        <textarea value={global?.compraDetail.comentario} className='texarea-details'
+                        disabled/>
+                    </div>
+                    <h4>Estado: PREAPROBADO</h4>
+                </div>
+            )
+        }
+        else if((global?.user.rol === rolesNum.admin || global?.user.rol === rolesNum.administrativo) && global.compraDetail.area === "Racionamiento" && !global.compraDetail.preaprobado) {
+            return(
+                <div>
+                    <div className='data-div-info'>
+                        <h4>Comentarios:</h4>
+                        <h6>Comentario con un minimo de 25 caracteres es necesario</h6>
+                        <h6>Actuales {comentarios.length}</h6>
+                        <textarea value={comentarios} className='texarea-details'
+                        onChange={(e) => setComentarios(e.target.value)}/>
+                    </div>
+                    <div className='div-btns'>
+                        <button className='btn-preacept' onClick={() => preaproveCompra()}>PREAPROBAR</button>
+                        <button className='btn-negative' onClick={() => changeEstado(false)}>RECHAZAR</button>
+                    </div>
+                </div>
+            )
         }
         else if(global?.user.rol === rolesNum.admin || global?.user.rol === rolesNum.administrativo) {
             return(

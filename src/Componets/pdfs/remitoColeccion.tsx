@@ -100,7 +100,7 @@ const divisionByPageCollection = (data:IOrderRemito[]):JSX.Element[] => {
                     <Text style={stylePedido.dateText}>{date.getFullYear()}</Text>
                 </View>
                 <View style={stylePedido.viewTitulo}>
-                    <Text style={stylePedido.dateText}>{arr.client_des+" - "+arr.service_des+ " - "+arr.numero}</Text>
+                    <Text style={stylePedido.dateText}>{arr.client_des+" - "+arr.service_des+ " - "+(arr.numero ? arr.numero : "")}</Text>
                 </View>
                 <View style={stylePedido.viewLocal}>
                     <Text style={stylePedido.dateText}>{arr.localidad}</Text>

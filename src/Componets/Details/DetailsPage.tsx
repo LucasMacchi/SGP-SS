@@ -634,7 +634,7 @@ export default function DetailsPage () {
 
     return(
         <div className='detaail-all-div'>
-            <div className='div-header-pedidos'>
+            <div >
                 <Header />
             </div>
             <h1 className='title-Homepage' >

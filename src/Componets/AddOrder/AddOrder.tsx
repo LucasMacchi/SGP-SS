@@ -376,7 +376,7 @@ export default function AddOrder () {
             <button className='btn-export-pdf' onClick={() => loadOrder()}>Cargar Pedido</button>
             <button className="info-popup" onClick={() => infoMsg(3)}>?</button>
             <hr color='#666666' className='hr-line'/>
-            {displayForms()}
+            {global?.user.rol !== 5 ? displayForms() : <h3 className='title-Homepage'>No tiene permiso para crear pedidos.</h3>}
         </div>
     )
 }

@@ -38,7 +38,7 @@ export default function ServicesPage () {
 
     return(
         <div className="service-div">
-            <div className='div-header-pedidos'>
+            <div >
                 <Header />
             </div>
             <h2 className='title-Homepage' >

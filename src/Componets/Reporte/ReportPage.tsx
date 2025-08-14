@@ -77,7 +77,7 @@ export default function ReportPage () {
     }
     return(
         <div>
-            <div className='div-header-pedidos'>
+            <div>
                 <Header />
             </div>
             <h1 className='title-Homepage' >

@@ -69,7 +69,9 @@ const globalReducer = (
     case ac.GET_COMPRAS:
       return {...state, compras: payload}
     case ac.SET_COMPRA_DETAIL:
-      return {...state, compraDetail: payload}
+      return {...state, compraDetail: payload};
+    case ac.SET_MENU:
+      return {...state, menu: payload}
     default:
       return state;
   }
@@ -843,6 +845,24 @@ export default function GlobalState(props: IPropsChildren) {
       return []
     }
   }
+
+  async function preaproveCompraFn (id: number, comentario: string) {
+    try {
+      await axios.patch(SERVER+"/compras/preaprove/"+id,{comentario},authReturner())
+      alert("Compra preaprobada")
+      window.location.reload()
+    } catch (error) {
+      console.log(error);
+      alert("Error al cambiar la compra.");
+    }
+  }
+
+  function changeMenu (v: number) {
+    dispatch({
+      payload: v,
+      type: ac.SET_MENU,
+    });
+  }
   
   const innitialState: IGlobalContext = {
     user: {
@@ -852,6 +872,7 @@ export default function GlobalState(props: IPropsChildren) {
       rol: 3,
       activated: false,
     },
+    menu: 1,
     pedidoDetail: {
       order_id: 0,
       requester: "",
@@ -878,6 +899,7 @@ export default function GlobalState(props: IPropsChildren) {
         activado: true,
         aprobado: false,
         anulado: false,
+        preaprobado: false,
         fullname: "",
         proveedor: "",
         compra_id: 0,
@@ -908,7 +930,9 @@ export default function GlobalState(props: IPropsChildren) {
     ccosFn,
     collectionRemito,
     sysUsersFn,
+    changeMenu,
     orderAproveFn,
+    preaproveCompraFn,
     orderRejectFn,
     orderCancelFn,
     orderDeliveredFn,
@@ -962,6 +986,7 @@ export default function GlobalState(props: IPropsChildren) {
 
 interface IGlobalContext {
   user: IUser;
+  menu: number;
   createPersonal: (personal: IPersonal) => void;
   personal: IPersonal[];
   categories: string[];
@@ -1027,6 +1052,7 @@ interface IGlobalContext {
   collectionOrders: (orders:string []) => Promise<ICollectionoRes>;
   registerCompra: (data: ICompraDto) => void;
   changeStateCompra: (aprobar:boolean, id: number,comentario: string) => void;
+  preaproveCompraFn: (id: number, comentario: string) => void;
   getAllCompras: (revised:boolean, fullname?: string) => void;
   getUniqCompra: (id:number) => void;
   editDesProdCompra: (detailID: number, descripcion: string) => void;
@@ -1034,5 +1060,6 @@ interface IGlobalContext {
   deleteProdCompra: (detailID: number) => void;
   getUniqCompraNro: (nro: string) => void;
   collectionRemito: (orders:string []) => Promise<IOrderRemito[]>;
-  getInsumosComplete: () => Promise<IInsumoComp[]>
+  getInsumosComplete: () => Promise<IInsumoComp[]>;
+  changeMenu: (v: number) => void;
 }

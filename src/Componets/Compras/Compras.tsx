@@ -232,6 +232,9 @@ export default function Compras () {
         if(compra.aprobado) {
             return "#32CD32"
         }
+        else if (compra.preaprobado) {
+            return "#c4c42a"
+        }
         else if(compra.anulado) {
             return "#FF0000"
         }
@@ -255,7 +258,7 @@ export default function Compras () {
                         </select>
                     </div>
                     <div className='data-div-add'>
-                        <h5 style={{margin: "2px"}}>Fecha: </h5>
+                        <h5 style={{margin: "2px"}}>Fecha a entregar*: </h5>
                         <input type='date' id='date_start' className='date-input'
                         value={compra.date} onChange={e => setCompra({...compra, date: e.target.value})}/>
                     </div>
@@ -269,6 +272,7 @@ export default function Compras () {
                             <option value={"Maquinaria"}>Maquinaria</option>
                             <option value={"Equipamiento"}>Equipamiento</option>
                             <option value={"Indumentaria"}>Indumentaria</option>
+                            <option value={"Racionamiento"}>Racionamiento</option>
                         </select>
                     </div>
                     <div className='data-div-add'>

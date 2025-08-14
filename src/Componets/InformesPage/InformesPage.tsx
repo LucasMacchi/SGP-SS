@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
 import './informes.css'
 import lastMonth from '../../Utils/lastMonth'
-import { IClientIns, ICollectionoRes, ICollectionPDF, IInsumo, IpedidoClientDataPDF } from '../../Utils/Interfaces'
+import { IClientIns, ICollectionoRes, ICollectionPDF, IInsumo, IOrderRemito, IpedidoClientDataPDF } from '../../Utils/Interfaces'
 import {pdf} from '@react-pdf/renderer';
 import { saveAs } from 'file-saver'
 import ClientDocument from '../pdfs/client'
@@ -22,6 +22,19 @@ export default function InformesPage () {
     const [collection, setCollection] = useState('')
     const [orders, setOrders] = useState<string[]>([])
     const [remit, setRemit] = useState(false)
+    const [remito, setRemito] = useState<IOrderRemito>({
+        order_id: 0,
+        numero: 0,
+        client_des: "-",
+        service_des: "",
+        localidad: "-",
+        insumos: []
+    })
+    const [insRemito, setInsRemito] = useState<IInsumo>({
+        amount: 1,
+        insumo_des: ""
+    })
+
 
     useEffect(() => {
         setStartDate(lastMonth())
@@ -144,6 +157,13 @@ export default function InformesPage () {
         }
     }
 
+    const deleteInsumoRowRemito = (index: number, ins: string) => {
+        if(confirm('¿Quiere eliminar el insumo '+ins+ "?")){
+            remito.insumos.splice(index, 1)
+            setRemito(remito)
+        }
+    }
+
     const deleteCollection = () => {
         if(collection && confirm('Quieres eliminar los pedidos de la coleccion?')) {
             localStorage.removeItem(collection)
@@ -199,6 +219,21 @@ export default function InformesPage () {
         saveAs(blob, 'SGP_'+collection)
     }
 
+    const addIns = () => {
+        remito.insumos.push(insRemito)
+        setRemito({...remito})
+        setInsRemito({amount: 0, insumo_des: ""})
+    }
+
+    const generateCustomRemito = async () => {
+
+        const blob: Blob = await pdf(<RemitoDocumentCol c={[remito]} />).toBlob()
+        saveAs(blob, 'REMITO_'+remito.service_des)
+        setRemito({order_id: 0,numero: 0,client_des: "-",
+        service_des: "",localidad: "-",insumos: []})
+
+    }
+
     const displaySelection = () => {
         return (
             <div className='table-div'>
@@ -237,12 +272,15 @@ export default function InformesPage () {
     return(
         <div>
             <div>
-                <div className='div-informes-header'>
+                <div >
                     <Header />
                 </div>
                 <h1 className='title-Homepage' >
                         Informes
                 </h1>
+                {
+                    global?.user.rol !== 5 && 
+                    <div>
                 <h5 className='filter-sub'>Los informes generados son sobre los pedidos </h5>
                 <h5 className='filter-sub'>que ya estan Aprobados, Listos o Entregados.</h5>
                 <h5 className='filter-sub'>Generar Remitos: <input type="checkbox" checked={remit} onChange={(e) => setRemit(e.target.checked)}/></h5>
@@ -289,6 +327,58 @@ export default function InformesPage () {
                         Conjunto de Pedidos
                     </h2>
                     {displaySelection()}
+                </div>
+                    </div>
+                }
+
+                <hr color='#3399ff' className='hr-line'/>
+                <div>
+                    <h2 className='title-Homepage' >
+                        Generador de Remitos
+                    </h2>
+                    <div >
+                        <h4 className='title-Homepage'>Servicio: </h4>
+                        <input type="text" id='otherins' className="data-div-select" value={remito.service_des}
+                        style={{width: "90%"}} onChange={(e) => setRemito({...remito, service_des: e.target.value})}/>
+                    </div>
+                    <div >
+                        <h4 className='title-Homepage'>Localidad (Opcional): </h4>
+                        <input type="text" id='otherins' className="data-div-select" value={remito.localidad}
+                        style={{width: "90%"}} onChange={(e) => setRemito({...remito, localidad: e.target.value})}/>
+                    </div>
+                    <div >
+                        <h4 className='title-Homepage'>Cliente (Opcional): </h4>
+                        <input type="text" id='otherins' className="data-div-select" value={remito.client_des}
+                        style={{width: "90%"}} onChange={(e) => setRemito({...remito, client_des: e.target.value})}/>
+                    </div>
+                    <div style={{flexDirection: "row"}}>
+                        <h4 className='title-Homepage'>Insumo: </h4>
+                        <input type="text" id='otherins' className="data-div-select" value={insRemito.insumo_des}
+                        style={{width: "68%"}} onChange={(e) => setInsRemito({...insRemito, insumo_des: e.target.value})}/>
+                        <input type="number" id='otherins' className="data-div-select" value={insRemito.amount} min={1}
+                        style={{width: "10%"}} onChange={(e) => setInsRemito({...insRemito, amount: parseInt(e.target.value) ? parseInt(e.target.value) : 0})}/>
+                        <button className="info-popup" style={{ margin: 5}} onClick={() => addIns()}>+</button>
+                    </div>
+                    <div>
+                        <h5 className='filter-sub'>Presione en un insumo para eliminarlo.</h5>
+                        <table style={{width: 400, alignItems: "center"}}>
+                            <tbody>
+                                <tr >
+                                    <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 320}}>Insumo</th>
+                                    <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 80}}>Cantidad</th>
+                                </tr>
+                                {remito.insumos.map((ins,i) => (
+                                    <tr onClick={() => deleteInsumoRowRemito(i, ins.insumo_des)}>
+                                        <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 320}}>{ins.insumo_des}</th>
+                                        <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 80}} >{ins.amount}</th>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        <button className='btn-big' onClick={() => generateCustomRemito()}>
+                            Generar
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

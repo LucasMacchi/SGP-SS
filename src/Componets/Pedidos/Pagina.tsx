@@ -67,8 +67,12 @@ export default function PaginaPedidos () {
         global?.pedidosFn( global.user.rol, filterData)
     }
 
-    const displayLoading = () => {
-        return (<h3 className='title-Homepage'>Cargando...</h3>)
+    const displayLoading = (compras: boolean) => {
+        if(compras) {
+            window.location.href = "/compras"
+        }
+        else return (<h3 className='title-Homepage'>Cargando...</h3>)
+        
     }
 
     const displayDate = (date: string): string => {
@@ -194,10 +198,9 @@ export default function PaginaPedidos () {
 
     return(
         <div >
-            <div className='div-pedidos'>
-                <Header />
-            </div>
+            <Header />
             <hr color='#3399ff' className='hr-line'/>
+            {global?.user.rol !== 5 && 
             <div className='div-filter'>
                 <div>
                     <h5 className='filter-sub'>Nro Pedido</h5>
@@ -281,9 +284,11 @@ export default function PaginaPedidos () {
                     Filtrar
                 </button>
             </div>
+            }
+
             <div className='div-list'>
                 {
-                global?.pedidos.length && global?.pedidos.length >= 0 ? displayPedidos() : displayLoading()
+                global?.pedidos.length && global?.pedidos.length >= 0 ? displayPedidos() : displayLoading(global?.user.rol === 5 ? true : false)
                 }
             </div>
         </div>
