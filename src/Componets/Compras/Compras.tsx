@@ -47,7 +47,7 @@ export default function Compras () {
 
     useEffect(() => {
         setCompra({area: '',tipo: '',descripcion: '',lugar: '',fullname: '',
-        compras: [],proveedor: ''})
+        compras: [],proveedor: '', date: ""})
         setInsumo({descripcion: '', cantidad: 0})
         setNro("")
         setAreaF("")
@@ -150,7 +150,7 @@ export default function Compras () {
 
     const registrarCompra = () => {
         if(compra.area.length>0 && compra.tipo.length>0 && compra.lugar.length>0 && 
-            compra.compras.length >0 && global){
+            compra.compras.length >0 && global && compra.date.length > 0){
             if(compra.proveedor.length === 0) compra.proveedor = "A eleccion"
             compra.fullname = global.user.last_name+" "+global.user.first_name
             global.registerCompra(compra)

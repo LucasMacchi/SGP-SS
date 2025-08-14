@@ -283,7 +283,7 @@ export interface ICompraDto {
     fullname: string,
     proveedor: string,
     compras: IinsumoCompra[],
-    date?: string
+    date: string
 }
 
 export interface IOrderRemito {
