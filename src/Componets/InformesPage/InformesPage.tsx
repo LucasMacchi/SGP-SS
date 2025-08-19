@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
 import './informes.css'
 import lastMonth from '../../Utils/lastMonth'
-import { IClientIns, ICollectionoRes, ICollectionPDF, IInsumo, IOrderRemito, IpedidoClientDataPDF } from '../../Utils/Interfaces'
+import { IClientIns, ICollectionoRes, ICollectionPDF, IInsumo, IInsumoRac, IOrderRemito, IpedidoClientDataPDF, IpedidoRacDataPDF, IPedidoRacPDF, IServicio } from '../../Utils/Interfaces'
 import {pdf} from '@react-pdf/renderer';
 import { saveAs } from 'file-saver'
 import ClientDocument from '../pdfs/client'
@@ -11,6 +11,8 @@ import CollectionDocument from '../pdfs/collection'
 import RemitoDocument, { divisionTable} from '../pdfs/remito'
 import infoMsg from '../../Utils/infoMsg'
 import RemitoDocumentCol from '../pdfs/remitoColeccion'
+import PedidoRacPdf from '../pdfs/pedidoRac'
+import serviceDescription from '../../Utils/serviceDescription'
 
 
 export default function InformesPage () {
@@ -20,6 +22,8 @@ export default function InformesPage () {
     const [client, setClient] = useState(0)
     const [userReq, setUser] = useState(0)
     const [collection, setCollection] = useState('')
+    const [serviceS, setServiceS] = useState('')
+    const [serviceF, setServiceF] = useState<IServicio[]>([])
     const [orders, setOrders] = useState<string[]>([])
     const [remit, setRemit] = useState(false)
     const [remito, setRemito] = useState<IOrderRemito>({
@@ -34,13 +38,40 @@ export default function InformesPage () {
         amount: 1,
         insumo_des: ""
     })
+    const [insRac, setInsRac] = useState<IInsumoRac>({
+        des: "",
+        kg: 0,
+        cajas: 0,
+        bolsas: 0,
+        rac: 0
+    })
+    const [remitoRac, setReRac] = useState<IpedidoRacDataPDF>({
+        solicitante_usuario: "",
+        pedido_req: "",
+        pedido_service: "",
+        pedido_client_id: 0,
+        pedido_service_id: 0,
+        pedido_insumos: []
+    })
 
 
     useEffect(() => {
         setStartDate(lastMonth())
-        if(global?.ccos.length === 0) global.ccosFn()
+        if(global?.ccos.length === 0) {
+            global.ccosFn()
+        }
         if(global?.sysUsers.length === 0) global.sysUsersFn()
     },[])
+
+    useEffect(() => {
+        if(global){
+            let arr = global?.ccos
+            const search = serviceS.toLowerCase()
+            arr = arr?.filter(s => s.client_id === 1)
+            if(serviceS.length > 2) arr = arr?.filter(s => s.service_des.toLowerCase().includes(search))
+            setServiceF(arr)
+        }
+    },[serviceS, global?.ccos])
 
     const setClientsSelect = () => {
         let aux: number = 0
@@ -164,6 +195,13 @@ export default function InformesPage () {
         }
     }
 
+    const deleteInsumoRowRemitoRac = (index: number, ins: string) => {
+        if(confirm('¿Quiere eliminar el insumo '+ins+ "?")){
+            remitoRac.pedido_insumos.splice(index, 1)
+            setReRac(remitoRac)
+        }
+    }
+
     const deleteCollection = () => {
         if(collection && confirm('Quieres eliminar los pedidos de la coleccion?')) {
             localStorage.removeItem(collection)
@@ -224,9 +262,15 @@ export default function InformesPage () {
         setRemito({...remito})
         setInsRemito({amount: 0, insumo_des: ""})
     }
+    const addInsRac = () => {
+        if(insRac.des.length > 0) {
+            remitoRac.pedido_insumos.push(insRac)
+            setReRac({...remitoRac})
+            setInsRac({des: "", rac: 0, kg: 0, cajas: 0, bolsas: 0})
+        } else alert("Ingrese un insumo valido.")
+    }
 
     const generateCustomRemito = async () => {
-
         const blob: Blob = await pdf(<RemitoDocumentCol c={[remito]} />).toBlob()
         saveAs(blob, 'REMITO_'+remito.service_des)
         setRemito({order_id: 0,numero: 0,client_des: "-",
@@ -234,37 +278,142 @@ export default function InformesPage () {
 
     }
 
+    const generateRacEnvioPdf = async () => {
+        if(global && remitoRac.pedido_insumos.length > 0 && remitoRac.pedido_service_id) {
+            remitoRac.pedido_client_id = 1
+            remitoRac.solicitante_usuario = global.user.username
+            remitoRac.pedido_req = new Date().toISOString()
+            remitoRac.pedido_service = serviceDescription(global.ccos, remitoRac.pedido_service_id)
+            const data: IPedidoRacPDF = {pedido:remitoRac}
+            const blob: Blob = await pdf(<PedidoRacPdf pedido={data.pedido}/>).toBlob()
+            saveAs(blob, 'SGP_REMITORAC')
+            
+        } else alert("Ingrese un servicio e insumos.")
+    }
+
     const displaySelection = () => {
         return (
-            <div className='table-div'>
-                <div>
-                <h5 className='filter-sub'>Selecciona la Coleccion</h5>
-                <select value={collection} onChange={(e) => setCollection(e.target.value)} className='select-small'>
-                  <option value={''}>---</option>
-                  <option value={'Coleccion1'}>Coleccion 1</option>
-                  <option value={'Coleccion2'}>Coleccion 2</option>
-                  <option value={'Coleccion3'}>Coleccion 3</option>
-                  <option value={'Coleccion4'}>Coleccion 4</option>
-                  <option value={'Coleccion5'}>Coleccion 5</option>
-                </select>
-                {orders.length > 0 && <button className='btn-export-pdf' onClick={() => requestCollection()}>Crear</button>}
-                {orders.length > 0 && <button className='btn-export-pdf' onClick={() => deleteCollection()}>Eliminar</button>}
-                <button className="info-popup" onClick={() => infoMsg(9)}>?</button>
-            </div>
             <div>
-                <table>
-                    <tbody>
-                        <tr>
-                            <th className='data-div-insumo-name-row'>Pedidos Seleccionados</th>
-                        </tr>
-                        {orders.map((o, i) => (
-                            <tr key={o+i}>
-                                <th key={o} onClick={() => deleteInsumoRow(i,o, orders)} className='data-div-insumo-name-row'>{o}</th>
+                <h2 className='title-Homepage' >
+                    Conjunto de Pedidos
+                </h2>
+                <div className='table-div'>
+                    <div>
+                    <h5 className='filter-sub'>Selecciona la Coleccion</h5>
+                    <select value={collection} onChange={(e) => setCollection(e.target.value)} className='select-small'>
+                    <option value={''}>---</option>
+                    <option value={'Coleccion1'}>Coleccion 1</option>
+                    <option value={'Coleccion2'}>Coleccion 2</option>
+                    <option value={'Coleccion3'}>Coleccion 3</option>
+                    <option value={'Coleccion4'}>Coleccion 4</option>
+                    <option value={'Coleccion5'}>Coleccion 5</option>
+                    </select>
+                    {orders.length > 0 && <button className='btn-export-pdf' onClick={() => requestCollection()}>Crear</button>}
+                    {orders.length > 0 && <button className='btn-export-pdf' onClick={() => deleteCollection()}>Eliminar</button>}
+                    <button className="info-popup" onClick={() => infoMsg(9)}>?</button>
+                </div>
+                <div>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th className='data-div-insumo-name-row'>Pedidos Seleccionados</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                            {orders.map((o, i) => (
+                                <tr key={o+i}>
+                                    <th key={o} onClick={() => deleteInsumoRow(i,o, orders)} className='data-div-insumo-name-row'>{o}</th>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                </div>
             </div>
+
+        )
+    }
+    
+    const displayRemitoAnexRac = (show: boolean) => {
+
+        if(show)return(
+            <div>
+                <hr color='#3399ff' className='hr-line'/>
+                <div>
+                    <h2 className='title-Homepage' >
+                        Remito detalle 
+                    </h2>
+                    <div >
+                        <h4 className='title-Homepage'>Servicio: Encontrados - {serviceF.length}</h4>
+                        <div style={{ display: "flex",flexDirection: "row"}}>
+                            <h4 className='title-Homepage'>Buscar: </h4>
+                            <input type="text" id='otherins' className="data-div-select" value={serviceS}
+                            style={{width: "58%"}} onChange={(e) => setServiceS(e.target.value)}/>
+                        </div>
+                        <select defaultValue={0}
+                        value={remitoRac.pedido_service_id} onChange={(e) => setReRac({...remitoRac, pedido_service_id: parseInt(e.target.value)})} className='select-small-cco'>
+                            <option value={0}>---</option>
+                            {
+                                serviceF.map((cco) => (<option key={cco.service_id} value={cco.service_id}>{cco.service_des}</option>))
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <div style={{ display: "flex",flexDirection: "row"}}>
+                            <h4 className='title-Homepage'>Insumo: </h4>
+                            <input type="text" id='otherins' className="data-div-select" value={insRac.des}
+                            style={{width: "58%"}} onChange={(e) => setInsRac({...insRac, des: e.target.value})}/>
+                        </div>
+                        <div style={{display: "flex", flexDirection: "row", width: 400}}>
+                            <div>
+                                <h4 className='title-Homepage'>Kilos: </h4>
+                                <input type="number" id='otherins' className="data-div-select" value={insRac.kg} min={1}
+                                style={{width: "35%"}} onChange={(e) => setInsRac({...insRac, kg: parseInt(e.target.value) ? parseInt(e.target.value) : 0})}/>
+                            </div>
+                            <div >
+                                <h4 className='title-Homepage'>Cajas: </h4>
+                                <input type="number" id='otherins' className="data-div-select" value={insRac.cajas} min={1}
+                                style={{width: "35%"}} onChange={(e) => setInsRac({...insRac, cajas: parseInt(e.target.value) ? parseInt(e.target.value) : 0})}/>
+                            </div>
+                            <div >
+                                <h4 className='title-Homepage'>Bolsas: </h4>
+                                <input type="number" id='otherins' className="data-div-select" value={insRac.bolsas} min={1}
+                                style={{width: "35%"}} onChange={(e) => setInsRac({...insRac, bolsas: parseInt(e.target.value) ? parseInt(e.target.value) : 0})}/>
+                            </div>
+                            <div >
+                                <h4 className='title-Homepage'>Raciones: </h4>
+                                <input type="number" id='otherins' className="data-div-select" value={insRac.rac} min={1}
+                                style={{width: "35%"}} onChange={(e) => setInsRac({...insRac, rac: parseInt(e.target.value) ? parseInt(e.target.value) : 0})}/>
+                            </div>
+                        </div>
+
+                        <button className="info-popup" style={{ margin: 5}} onClick={() => addInsRac()}>Agregar</button>
+                    </div>
+                    <div>
+                        <h5 className='filter-sub'>Presione en un insumo para eliminarlo.</h5>
+                        <table style={{width: 420, alignItems: "center"}}>
+                            <tbody>
+                                <tr >
+                                    <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 320}}>Insumo</th>
+                                    <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 20}}>Kilos</th>
+                                    <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 20}}>Cajas</th>
+                                    <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 20}}>Bolsas</th>
+                                    <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 20}}>Rac</th>
+                                </tr>
+                                {remitoRac.pedido_insumos.map((ins,i) => (
+                                    <tr onClick={() => deleteInsumoRowRemitoRac(i, ins.des)}>
+                                        <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 320}}>{ins.des}</th>
+                                        <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 20}}>{ins.kg}</th>
+                                        <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 20}}>{ins.cajas}</th>
+                                        <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 20}}>{ins.bolsas}</th>
+                                        <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 20}}>{ins.rac}</th>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        <button className='btn-big' onClick={() => generateRacEnvioPdf()}>
+                            Generar
+                        </button>
+                    </div>
+                </div>
             </div>
         )
     }
@@ -322,13 +471,11 @@ export default function InformesPage () {
                     </button>
                 </div>
                 <hr color='#3399ff' className='hr-line'/>
-                <div>
-                    <h2 className='title-Homepage' >
-                        Conjunto de Pedidos
-                    </h2>
                     {displaySelection()}
+                <div>
+                    {displayRemitoAnexRac(false)}
                 </div>
-                    </div>
+                </div>
                 }
 
                 <hr color='#3399ff' className='hr-line'/>
@@ -380,6 +527,7 @@ export default function InformesPage () {
                         </button>
                     </div>
                 </div>
+
             </div>
         </div>
     )

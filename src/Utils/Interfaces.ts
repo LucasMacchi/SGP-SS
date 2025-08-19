@@ -134,11 +134,32 @@ export interface IpedidoDataPDF {
     pedido_state: string,
     pedido_insumos: IInsumo[]
 }
+
+export interface IpedidoRacDataPDF {
+    solicitante_usuario: string,
+    pedido_req: string,
+    pedido_service: string,
+    pedido_client_id: number,
+    pedido_service_id: number,
+    pedido_insumos: IInsumoRac[]
+}
+
+export interface IInsumoRac {
+    des: string,
+    kg: number,
+    cajas: number,
+    bolsas: number,
+    rac: number
+}
+
 export interface IPedidosPDF {
     pedidos: IpedidoDataPDF[]
 }
 export interface IPedidoPDF {
     pedido: IpedidoDataPDF
+}
+export interface IPedidoRacPDF {
+    pedido: IpedidoRacDataPDF
 }
 export interface IpedidoClientDataPDF {
     pedido_start: string,

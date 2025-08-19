@@ -240,27 +240,28 @@ export default function DetailsPage () {
                 case 'Pendiente':
                     return(
                         <div className='div-btns'>
-                            <button className='btn-negative' onClick={() => rejectFn(order? order.order_id : 0)}>RECHAZAR</button>
+                            <button className='btn-negative' onClick={() => cancelFn(order.order_id)}>CANCELAR</button>
                         </div>
                     )
                 case 'Aprobado':
                     return(
                         <div className='div-btns'>
-                            <button className='btn-negative' onClick={() => rejectFn(order? order.order_id : 0)}>RECHAZAR</button>
+                            <h3 className='title-Homepage'>Esperando a que el pedido este listo.</h3>
                         </div>
                     )
                 case 'Listo':
                     return (
                         <div className='div-btns'>
-                            <button className='btn-negative' onClick={() => rejectFn(order? order.order_id : 0)}>RECHAZAR</button>
+                            <button className='btn-problem' onClick={() => problemFn(order.order_id)}>PROBLEMA</button>
+                            <button className='btn-neutral' onClick={() => deliverFn(order.order_id)}>ENTREGADO</button>
                         </div>
                     )
                 default:
-                    return(
+                    return (
                         <div className='div-btns'>
-                            <button className='btn-neutral' onClick={() => archiveFn(order? order.order_id : 0)}>ARCHIVAR</button>
+                            <button className='btn-neutral' onClick={() => navigator('/add/'+id)}>REPETIR</button>
                         </div>
-                    ) 
+                    )
 
             }
         }
@@ -333,7 +334,7 @@ export default function DetailsPage () {
                 default:
                     return(
                         <div className='div-btns'>
-                            <h3 className='title-Homepage'>Pedido entregado</h3>
+                            <button className='btn-neutral' onClick={() => navigator('/add/'+id)}>REPETIR</button>
                         </div>
                     ) 
 
