@@ -78,15 +78,17 @@ export default function Header () {
                 <img src="/logo_big.webp" alt="" className='logo-big-home'/>
             </div>
             <div >
-                <select className='dropdown' value={global?.menu} onChange={(e) => {
+                <select className='dropdown' value={99} onChange={(e) => {
                     global?.changeMenu(parseInt(e.target.value))
                     navigatorFn(parseInt(e.target.value))
+                    console.log(e.target.value)
                 }}>
+                    <option className='dropdown-txt-none' value={99}>MENU</option>
                     <option className='dropdown-txt' value={0}>CERRAR SESION</option>
                     <option className='dropdown-txt' style={hidderHeader([5])} value={1}>PEDIDOS</option>
                     <option className='dropdown-txt' style={hidderHeader([5])} value={2}>NUEVO PEDIDO</option>
                     <option className='dropdown-txt' value={3}>GENERAR INFORME</option>
-                    <option className='dropdown-txt' style={hidderHeader([5])} value={4}>SERVICIOS</option>
+                    <option className='dropdown-txt' style={hidderHeader([5])} value={4}>SERVICIOS / INSUMOS</option>
                     <option className='dropdown-txt' value={5}>CORREO</option>
                     <option className='dropdown-txt' style={hidderHeader([5])} value={6}>BUSCAR REPORTES</option>
                     <option className='dropdown-txt' value={7}>SOPORTE TECNICO</option>

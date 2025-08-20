@@ -263,19 +263,6 @@ export default function Compras () {
                         value={compra.date} onChange={e => setCompra({...compra, date: e.target.value})}/>
                     </div>
                     <div className='data-div-add'>
-                        <h5 style={{margin: "2px"}}>Tipo*: </h5>
-                        <select name="area" className='filter-sub' value={compra.tipo}
-                        onChange={(e) => setCompra({...compra, tipo: e.target.value})}>
-                            <option value={""}>---</option>
-                            <option value={"Servicio"}>Servicio</option>
-                            <option value={"Insumo"}>Insumo</option>
-                            <option value={"Maquinaria"}>Maquinaria</option>
-                            <option value={"Equipamiento"}>Equipamiento</option>
-                            <option value={"Indumentaria"}>Indumentaria</option>
-                            <option value={"Racionamiento"}>Racionamiento</option>
-                        </select>
-                    </div>
-                    <div className='data-div-add'>
                         <h5 style={{margin: "2px"}}>Lugar*: </h5>
                         <input type='text' className='textfield-search'
                         value={compra.lugar} onChange={e => setCompra({...compra, lugar: e.target.value})}/>
@@ -292,6 +279,19 @@ export default function Compras () {
                     </div>
                     <hr color='#3399ff' className='hr-line'/>
                     <h4 className='title-Homepage'>Agregue los insumos/servicios</h4>
+                    <div className='data-div-add'>
+                        <h5 style={{margin: "2px"}}>Tipo*: </h5>
+                        <select name="area" className='filter-sub' value={compra.tipo}
+                        onChange={(e) => setCompra({...compra, tipo: e.target.value})}>
+                            <option value={""}>---</option>
+                            <option value={"Servicio"}>Servicio</option>
+                            <option value={"Insumo"}>Insumo</option>
+                            <option value={"Maquinaria"}>Maquinaria</option>
+                            <option value={"Equipamiento"}>Equipamiento</option>
+                            <option value={"Indumentaria"}>Indumentaria</option>
+                            <option value={"Racionamiento"}>Racionamiento/Cocina</option>
+                        </select>
+                    </div>
                     <div className='data-div-add'>
                         {descripcionChange()}
                         <h5 style={{margin: "2px"}}>Cantidad: </h5>
@@ -364,25 +364,28 @@ export default function Compras () {
                         <input type='date' id='date_start' className='date-input'
                         value={filterDate.end} onChange={e => setFilterDate({...filterDate, end: e.target.value})}/>
                     </div>
-                    <table style={{fontSize: "small"}}>
-                        <tbody>
-                            <tr>
-                                <th style={{border: "1px solid", width: "10%"}}>ID</th>
-                                <th style={{border: "1px solid", width: "22%"}}>Area</th>
-                                <th style={{border: "1px solid", width: "22%"}}>Fecha</th>
-                                <th style={{border: "1px solid", width: "22%"}}>Proveedor</th>
-                            </tr>
-                            {filteredCompra.map((c) => (
-                            <tr style={{backgroundColor: colorCheck(c)}} key={c.compra_id}
-                            onClick={() => window.location.href = "/compras/"+c.compra_id}>
-                                <th style={{border: "1px solid", width: "10%"}}>{c.nro}</th>
-                                <th style={{border: "1px solid", width: "22%"}}>{c.area}</th>
-                                <th style={{border: "1px solid", width: "22%"}}>{c.fecha.split("T")[0]}</th>
-                                <th style={{border: "1px solid", width: "22%"}}>{c.proveedor}</th>
-                            </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    <div style={{display: "flex", justifyContent: "center"}}>
+                        <table style={{fontSize: "small", width: 380}}>
+                            <tbody>
+                                <tr>
+                                    <th style={{border: "1px solid", width: "10%"}}>ID</th>
+                                    <th style={{border: "1px solid", width: "22%"}}>Area</th>
+                                    <th style={{border: "1px solid", width: "22%"}}>Fecha</th>
+                                    <th style={{border: "1px solid", width: "22%"}}>Proveedor</th>
+                                </tr>
+                                {filteredCompra.map((c) => (
+                                <tr style={{backgroundColor: colorCheck(c)}} key={c.compra_id}
+                                onClick={() => window.location.href = "/compras/"+c.compra_id}>
+                                    <th style={{border: "1px solid", width: "10%"}}>{c.nro}</th>
+                                    <th style={{border: "1px solid", width: "22%"}}>{c.area}</th>
+                                    <th style={{border: "1px solid", width: "22%"}}>{c.fecha.split("T")[0]}</th>
+                                    <th style={{border: "1px solid", width: "22%"}}>{c.proveedor}</th>
+                                </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
             )
         }

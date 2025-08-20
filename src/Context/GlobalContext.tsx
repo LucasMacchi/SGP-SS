@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   IAction,
   IAddPedido,
+  IAddProd,
   ICategoriesRes,
   ICatRub,
   IChangeData,
@@ -813,7 +814,16 @@ export default function GlobalState(props: IPropsChildren) {
       alert("Error al editar la compra.");
     }
   }
-
+  async function addProdCompra (data: IAddProd): Promise<boolean> {
+    try {
+      await axios.post(SERVER+"/compra/add",data, authReturner())
+      return true
+    } catch (error) {
+      console.log(error);
+      alert("Error al editar la compra.");
+      return false
+    }
+  }
   async function deleteProdCompra(detailID: number) {
     try {
       await axios.delete(SERVER+"/compras/delete/"+detailID, authReturner())
@@ -973,7 +983,8 @@ export default function GlobalState(props: IPropsChildren) {
     editDesProdCompra,
     editCantProdCompra,
     deleteProdCompra,
-    getUniqCompraNro
+    getUniqCompraNro,
+    addProdCompra
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1062,4 +1073,5 @@ interface IGlobalContext {
   collectionRemito: (orders:string []) => Promise<IOrderRemito[]>;
   getInsumosComplete: () => Promise<IInsumoComp[]>;
   changeMenu: (v: number) => void;
+  addProdCompra: (data: IAddProd) => Promise<boolean>;
 }

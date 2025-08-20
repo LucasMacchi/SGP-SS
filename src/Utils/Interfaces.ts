@@ -144,6 +144,18 @@ export interface IpedidoRacDataPDF {
     pedido_insumos: IInsumoRac[]
 }
 
+export interface IDataPdf {
+    solicitado: string,
+    datos: string[],
+    descripcion: string
+}
+
+export interface IAddProd {
+    descripcion: string,
+    compraID: number,
+    cantidad: number
+}
+
 export interface IInsumoRac {
     des: string,
     kg: number,

@@ -17,6 +17,12 @@
     font-weight: 700;
 }
 
+.dropdown-txt-none {
+    text-align: center;
+    font-weight: 700;
+    visibility: hidden;
+}
+
 .dropdown-ul {
     position: absolute;
     display: block;

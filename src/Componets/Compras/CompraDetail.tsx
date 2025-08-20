@@ -3,7 +3,7 @@ import Header from "../Header/Header";
 import {useEffect, useContext, useState } from "react";
 import { GlobalContext } from "../../Context/GlobalContext";
 import "./Compras.css"
-import { rolesNum } from "../../Utils/Interfaces";
+import { IAddProd, rolesNum } from "../../Utils/Interfaces";
 import ComprasDocument from "../pdfs/compras";
 import { pdf } from "@react-pdf/renderer";
 import saveAs from "file-saver";
@@ -62,6 +62,28 @@ export default function CompraDetail () {
             if(newDes && parseInt(newDes)) {
                 global.editCantProdCompra(id,parseInt(newDes))
             }
+        }
+    }
+
+   const addPorducto = async () => {
+        const des = prompt("Ingrese el nombre del producto:")
+        if(des){
+            const cant = prompt("Ingrese la cantidad:")
+            const formCant: number |  null = cant ? parseInt(cant) : null
+            if(formCant){
+                if(global && confirm("Quieres agregar el producto:\nDescripcion: "+des+"\nCantidad: "+cant)){
+                    const data: IAddProd = {
+                        descripcion: des,
+                        cantidad: formCant,
+                        compraID: global.compraDetail.compra_id
+
+
+                    }
+                    console.log(data)
+                    //const res = await global?.addProdCompra(data)
+                }
+            } else alert("Cantidad invalida, ingrese un numero.")
+
         }
     }
 
@@ -166,7 +188,8 @@ export default function CompraDetail () {
         else if(global?.user.rol === rolesNum.admin || global?.user.rol === rolesNum.administrativo) {
             return(
                 <div>
-                    <div className='data-div-info'>
+                    <div className='data-div-info' >
+                        <button className="info-popup" style={{marginTop: 15, marginBottom: 15}} onClick={() => addPorducto()}>Agregar Producto</button>
                         <h4>Comentarios:</h4>
                         <h6>Comentario con un minimo de 25 caracteres es necesario</h6>
                         <h6>Actuales {comentarios.length}</h6>

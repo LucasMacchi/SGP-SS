@@ -22,12 +22,12 @@ const stylePedido = StyleSheet.create({
     },
     viewFecha: {
         marginLeft: "450px",
-        marginTop: "120px",
+        marginTop: "85px",
         flexDirection: "row"
     },
     viewTitulo: {
         marginTop: "48px",
-        marginLeft: "60px",
+        marginLeft: "52px",
     },
     viewLocal: {
         marginTop: "28px",
