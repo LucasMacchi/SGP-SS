@@ -433,8 +433,8 @@ export default function InformesPage () {
                         <div style={{display: "flex", flexDirection: "row", width: 410}}>
                             <div>
                                 <h4 className='title-Homepage'>Kilos: </h4>
-                                <input type="number" id='otherins' className="data-div-select" value={insRac.kg} min={1}
-                                style={{width: "35%"}} onChange={(e) => setInsRac({...insRac, kg: parseInt(e.target.value) ? parseInt(e.target.value) : 0})}/>
+                                <input type="number" id='otherins' className="data-div-select" value={insRac.kg}
+                                style={{width: "45%"}} onChange={(e) => setInsRac({...insRac, kg: parseFloat(e.target.value) ? parseFloat(e.target.value) : 0})}/>
                             </div>
                             <div >
                                 <h4 className='title-Homepage'>Cajas: </h4>
