@@ -19,5 +19,6 @@ export default {
     GET_COMPRAS: 'get_compras',
     SET_COMPRA_DETAIL: "set_compra_detail",
     SET_MENU: "set_menu",
-    SET_LENTREGAS: "set_lentregas"
+    SET_LENTREGAS: "set_lentregas",
+    SET_DESGLOSES: "set_desgloses"
 }

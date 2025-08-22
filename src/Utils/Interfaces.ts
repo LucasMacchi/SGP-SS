@@ -93,6 +93,7 @@ export interface IResponseInsumo {
     insumo: string
 }
 
+
 // 1 admin / 2 administrativo / 3 encargado
 
 export interface IUser {

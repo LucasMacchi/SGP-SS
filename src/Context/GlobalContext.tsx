@@ -76,6 +76,8 @@ const globalReducer = (
       return {...state, menu: payload}
     case ac.SET_LENTREGAS:
       return {...state, lentregas: payload}
+    case ac.SET_DESGLOSES:
+      return {...state, desgloses: payload}
     default:
       return state;
   }
@@ -873,10 +875,21 @@ export default function GlobalState(props: IPropsChildren) {
   async function getLugaresEntreFn() {
     try {
       const entregas: ILgarEntrega[] = (await axios.get(SERVER+"/envios/entregas",authReturner())).data
-      console.log(entregas)
       dispatch({
         payload: entregas,
         type: ac.SET_LENTREGAS,
+      });
+    } catch (error) {
+      console.log(error);
+      alert("Error al traer lugares de entrega.");
+    }
+  }
+  async function getDesglosesFn() {
+    try {
+      const desgloses: string[] = (await axios.get(SERVER+"/envios/desgloses",authReturner())).data
+      dispatch({
+        payload: desgloses,
+        type: ac.SET_DESGLOSES,
       });
     } catch (error) {
       console.log(error);
@@ -949,6 +962,7 @@ export default function GlobalState(props: IPropsChildren) {
     reports: [],
     insCategroies: {rubros: [], categorias: []},
     errorCat: [],
+    desgloses: [],
     loginFn,
     logoutFn,
     sessionFn,
@@ -1003,7 +1017,8 @@ export default function GlobalState(props: IPropsChildren) {
     deleteProdCompra,
     getUniqCompraNro,
     addProdCompra,
-    getLugaresEntreFn
+    getLugaresEntreFn,
+    getDesglosesFn
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1021,6 +1036,7 @@ interface IGlobalContext {
   createPersonal: (personal: IPersonal) => void;
   personal: IPersonal[];
   categories: string[];
+  desgloses: string[];
   insCategroies: ICatRub,
   errorCat: string[];
   pedidoDetail: IPedido;
@@ -1094,5 +1110,6 @@ interface IGlobalContext {
   collectionRemito: (orders:string []) => Promise<IOrderRemito[]>;
   getInsumosComplete: () => Promise<IInsumoComp[]>;
   changeMenu: (v: number) => void;
+  getDesglosesFn: () => void;
   addProdCompra: (data: IAddProd) => Promise<boolean>;
 }

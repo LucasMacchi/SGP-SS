@@ -25,6 +25,8 @@ export default function InformesPage () {
     const [serviceS, setServiceS] = useState('')
     const [serviceF, setServiceF] = useState<IServicio[]>([])
     const [lgaresF, setLgaresF] = useState<ILgarEntrega[]>([])
+    const [desglosesF, setDesglosesF] = useState<string[]>([])
+    const [desglosesS, setDesglosesS] = useState("")
     const [lgaresS, setLgaresS] = useState("")
     const [orders, setOrders] = useState<string[]>([])
     const [remit, setRemit] = useState(false)
@@ -64,6 +66,7 @@ export default function InformesPage () {
         if(global?.ccos.length === 0) global.ccosFn()
         if(global?.sysUsers.length === 0) global.sysUsersFn()
         if(global?.lentregas.length === 0) global.getLugaresEntreFn()
+        if(global?.desgloses.length === 0) global.getDesglosesFn()
         setServiceS("")
         console.log(serviceF)
     },[])
@@ -86,6 +89,15 @@ export default function InformesPage () {
             setLgaresF(arr)
         }
     },[lgaresS, global?.lentregas])
+
+    useEffect(() => {
+        if(global){
+            let arr = global?.desgloses
+            const search = desglosesS.toLowerCase()
+            if(desglosesS.length > 2) arr = arr?.filter(s => s.toLowerCase().includes(search))
+            setDesglosesF(arr)
+        }
+    },[desglosesS, global?.desgloses])
 
     const setClientsSelect = () => {
         let aux: number = 0
@@ -376,11 +388,22 @@ export default function InformesPage () {
                             }
                         </select>
                     </div>
-                    <div style={{ display: "flex",flexDirection: "row"}}>
-                        <h4 className='title-Homepage'>Desglose: </h4>
-                        <input type="text" id='otherins' className="data-div-select" value={remitoRac.pedido_desglose}
-                        style={{width: "58%"}} onChange={(e) => setReRac({...remitoRac, pedido_desglose: e.target.value})}/>
+                    <div>
+                        <h4 className='title-Homepage'>Desgloses encontrados - {desglosesF.length}</h4>
+                        <div style={{ display: "flex",flexDirection: "row"}}>
+                            <h4 className='title-Homepage'>Buscar: </h4>
+                            <input type="text" id='otherins' className="data-div-select" value={desglosesS}
+                            style={{width: "58%"}} onChange={(e) => setDesglosesS(e.target.value)}/>
+                        </div>
+                        <select defaultValue={""}
+                        value={remitoRac.pedido_desglose} onChange={(e) => setReRac({...remitoRac, pedido_desglose: e.target.value})} className='select-small-cco'>
+                            <option value={""}>---</option>
+                            {
+                                desglosesF.map((lg,i) => (<option key={i} value={lg}>{lg}</option>))
+                            }
+                        </select>
                     </div>
+
                     <div style={{ display: "flex",flexDirection: "row"}}>
                         <h4 className='title-Homepage'>Nro Remito: </h4>
                         <input type="text" id='otherins' className="data-div-select" value={remitoRac.remito_nro}

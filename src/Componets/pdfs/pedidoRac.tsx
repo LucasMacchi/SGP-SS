@@ -108,7 +108,7 @@ const PedidoRacPdf: React.FC<IPedidoRacPDF> = ({pedido}) => (
                 <View >
                     <Text style={stylePedido.title}>Desglose de Entrega</Text>
                     <Text style={stylePedido.body}>Cabecera: {pedido.pedido_service_id+'-'+pedido.pedido_service}</Text>
-                    <Text style={stylePedido.body}>Desglose: {pedido.pedido_desglose}</Text>
+                    <Text style={stylePedido.body}>Dependencia: {pedido.pedido_desglose}</Text>
                     <Text style={stylePedido.body}>Fecha: {dateParser(pedido.pedido_req)}</Text>
                     <Text style={stylePedido.body}>Remito: {pedido.remito_nro}</Text>
                 </View>
