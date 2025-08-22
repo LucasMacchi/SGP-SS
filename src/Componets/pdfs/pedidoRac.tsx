@@ -10,13 +10,13 @@ const stylePedido = StyleSheet.create({
         fontFamily: 'Helvetica',
     },
     title: {
-        fontSize: 13,
+        fontSize: 16,
     },
     subtitle: {
         fontSize: 10,
     },
     body: {
-        fontSize: 8
+        fontSize: 12
     },
     view: {
         padding: 2,
@@ -65,7 +65,7 @@ const stylePedido = StyleSheet.create({
       },
       tableCell: {
         margin: 5,
-        fontSize: 8,
+        fontSize: 10,
         textAlign: 'left',
       },
       viewdata: {
@@ -87,6 +87,11 @@ const stylePedido = StyleSheet.create({
       }
 })
 
+const dateParser = (fecha: string) => {
+    const dateFr = new Date(fecha)
+    return dateFr.getDate() + "/" + (dateFr.getMonth()+1) + "/" + dateFr.getFullYear()
+}
+
 const PedidoRacPdf: React.FC<IPedidoRacPDF> = ({pedido}) => (
     <Document>
         <Page size={'A4'} style={stylePedido.page}>
@@ -101,12 +106,16 @@ const PedidoRacPdf: React.FC<IPedidoRacPDF> = ({pedido}) => (
             </View>
             <View style={stylePedido.viewdata}>
                 <View >
-                    <Text style={stylePedido.title}>Datos del Pedido</Text>
-                    <Text style={stylePedido.body}>Servicio: {pedido.pedido_service_id+'-'+pedido.pedido_service}</Text>
-                    <Text style={stylePedido.body}>Solicitado en el dia: {pedido.pedido_req}</Text>
-                    <Text style={stylePedido.body}>Solicitado por: {pedido.solicitante_usuario}</Text>
+                    <Text style={stylePedido.title}>Desglose de Entrega</Text>
+                    <Text style={stylePedido.body}>Cabecera: {pedido.pedido_service_id+'-'+pedido.pedido_service}</Text>
+                    <Text style={stylePedido.body}>Desglose: {pedido.pedido_desglose}</Text>
+                    <Text style={stylePedido.body}>Fecha: {dateParser(pedido.pedido_req)}</Text>
+                    <Text style={stylePedido.body}>Remito: {pedido.remito_nro}</Text>
                 </View>
                 <View style={stylePedido.viewdataReq}>
+                    <Text style={stylePedido.title}>Datos de Contacto</Text>
+                    <Text style={stylePedido.body}>Telefono: 3794-586633</Text>
+                    <Text style={stylePedido.body}>Correo: info@solucionesyservicios.com.ar</Text>
                 </View>
             </View>
             <View style={stylePedido.view}>

@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
 import './informes.css'
 import lastMonth from '../../Utils/lastMonth'
-import { IClientIns, ICollectionoRes, ICollectionPDF, IInsumo, IInsumoRac, IOrderRemito, IpedidoClientDataPDF, IpedidoRacDataPDF, IPedidoRacPDF, IServicio } from '../../Utils/Interfaces'
+import { IClientIns, ICollectionoRes, ICollectionPDF, IInsumo, IInsumoRac, ILgarEntrega, IOrderRemito, IpedidoClientDataPDF, IpedidoRacDataPDF, IPedidoRacPDF, IServicio } from '../../Utils/Interfaces'
 import {pdf} from '@react-pdf/renderer';
 import { saveAs } from 'file-saver'
 import ClientDocument from '../pdfs/client'
@@ -12,7 +12,7 @@ import RemitoDocument, { divisionTable} from '../pdfs/remito'
 import infoMsg from '../../Utils/infoMsg'
 import RemitoDocumentCol from '../pdfs/remitoColeccion'
 import PedidoRacPdf from '../pdfs/pedidoRac'
-import serviceDescription from '../../Utils/serviceDescription'
+import lentregaService from '../../Utils/lentregaService'
 
 
 export default function InformesPage () {
@@ -24,6 +24,8 @@ export default function InformesPage () {
     const [collection, setCollection] = useState('')
     const [serviceS, setServiceS] = useState('')
     const [serviceF, setServiceF] = useState<IServicio[]>([])
+    const [lgaresF, setLgaresF] = useState<ILgarEntrega[]>([])
+    const [lgaresS, setLgaresS] = useState("")
     const [orders, setOrders] = useState<string[]>([])
     const [remit, setRemit] = useState(false)
     const [remito, setRemito] = useState<IOrderRemito>({
@@ -51,16 +53,19 @@ export default function InformesPage () {
         pedido_service: "",
         pedido_client_id: 0,
         pedido_service_id: 0,
-        pedido_insumos: []
+        pedido_insumos: [],
+        pedido_desglose: "",
+        remito_nro: ""
     })
 
 
     useEffect(() => {
         setStartDate(lastMonth())
-        if(global?.ccos.length === 0) {
-            global.ccosFn()
-        }
+        if(global?.ccos.length === 0) global.ccosFn()
         if(global?.sysUsers.length === 0) global.sysUsersFn()
+        if(global?.lentregas.length === 0) global.getLugaresEntreFn()
+        setServiceS("")
+        console.log(serviceF)
     },[])
 
     useEffect(() => {
@@ -72,6 +77,15 @@ export default function InformesPage () {
             setServiceF(arr)
         }
     },[serviceS, global?.ccos])
+
+    useEffect(() => {
+        if(global){
+            let arr = global?.lentregas
+            const search = lgaresS.toLowerCase()
+            if(lgaresS.length > 2) arr = arr?.filter(s => s.descripcion.toLowerCase().includes(search))
+            setLgaresF(arr)
+        }
+    },[lgaresS, global?.lentregas])
 
     const setClientsSelect = () => {
         let aux: number = 0
@@ -279,16 +293,22 @@ export default function InformesPage () {
     }
 
     const generateRacEnvioPdf = async () => {
-        if(global && remitoRac.pedido_insumos.length > 0 && remitoRac.pedido_service_id) {
+        if(global && remitoRac.pedido_insumos.length > 0 && remitoRac.pedido_service_id && remitoRac.remito_nro.length > 0 && remitoRac.pedido_desglose.length > 0) {
             remitoRac.pedido_client_id = 1
             remitoRac.solicitante_usuario = global.user.username
             remitoRac.pedido_req = new Date().toISOString()
-            remitoRac.pedido_service = serviceDescription(global.ccos, remitoRac.pedido_service_id)
+            remitoRac.pedido_service = lentregaService(global.lentregas, remitoRac.pedido_service_id)
             const data: IPedidoRacPDF = {pedido:remitoRac}
             const blob: Blob = await pdf(<PedidoRacPdf pedido={data.pedido}/>).toBlob()
-            saveAs(blob, 'SGP_REMITORAC')
+            saveAs(blob, 'SGP_REMITODES_'+remitoRac.remito_nro)
+            setReRac({
+            ...remitoRac,
+            solicitante_usuario: "",pedido_req: "",
+            pedido_insumos: [],pedido_desglose: ""})
+
             
-        } else alert("Ingrese un servicio e insumos.")
+            
+        } else alert("Faltan datos.")
     }
 
     const displaySelection = () => {
@@ -342,25 +362,45 @@ export default function InformesPage () {
                         Remito detalle 
                     </h2>
                     <div >
-                        <h4 className='title-Homepage'>Servicio: Encontrados - {serviceF.length}</h4>
+                        <h4 className='title-Homepage'>Servicio: Encontrados - {lgaresF.length}</h4>
                         <div style={{ display: "flex",flexDirection: "row"}}>
                             <h4 className='title-Homepage'>Buscar: </h4>
-                            <input type="text" id='otherins' className="data-div-select" value={serviceS}
-                            style={{width: "58%"}} onChange={(e) => setServiceS(e.target.value)}/>
+                            <input type="text" id='otherins' className="data-div-select" value={lgaresS}
+                            style={{width: "58%"}} onChange={(e) => setLgaresS(e.target.value)}/>
                         </div>
                         <select defaultValue={0}
                         value={remitoRac.pedido_service_id} onChange={(e) => setReRac({...remitoRac, pedido_service_id: parseInt(e.target.value)})} className='select-small-cco'>
                             <option value={0}>---</option>
                             {
-                                serviceF.map((cco) => (<option key={cco.service_id} value={cco.service_id}>{cco.service_des}</option>))
+                                lgaresF.map((lg,i) => (<option key={i} value={lg.lentrega_id}>{lg.lentrega_id+"-"+lg.descripcion}</option>))
                             }
                         </select>
+                    </div>
+                    <div style={{ display: "flex",flexDirection: "row"}}>
+                        <h4 className='title-Homepage'>Desglose: </h4>
+                        <input type="text" id='otherins' className="data-div-select" value={remitoRac.pedido_desglose}
+                        style={{width: "58%"}} onChange={(e) => setReRac({...remitoRac, pedido_desglose: e.target.value})}/>
+                    </div>
+                    <div style={{ display: "flex",flexDirection: "row"}}>
+                        <h4 className='title-Homepage'>Nro Remito: </h4>
+                        <input type="text" id='otherins' className="data-div-select" value={remitoRac.remito_nro}
+                        style={{width: "25%"}} onChange={(e) => setReRac({...remitoRac, remito_nro: e.target.value})}/>
                     </div>
                     <div>
                         <div style={{ display: "flex",flexDirection: "row"}}>
                             <h4 className='title-Homepage'>Insumo: </h4>
-                            <input type="text" id='otherins' className="data-div-select" value={insRac.des}
-                            style={{width: "58%"}} onChange={(e) => setInsRac({...insRac, des: e.target.value})}/>
+                            <select name="remitodes" onChange={(e) => setInsRac({...insRac, des: e.target.value})}>
+                                <option value="">---</option>
+                                <option value="Leche entera en polvo 800 gr">Leche entera en polvo 800 gr</option>
+                                <option value="Azucar 1 Kg">Azucar 1 Kg</option>
+                                <option value="Yerba 1 Kg">Yerba 1 Kg</option>
+                                <option value="Alfajores 28gr">Alfajores 28gr</option>
+                                <option value="Galletita 15x180g">Galletita 15x180g</option>
+                                <option value="Leche Chocolatada en Polvo 1kg">Leche Chocolatada en Polvo 1kg</option>
+                                <option value="Budin 20x170g">Budin 20x170g</option>
+                                <option value="Galletita 10x380g">Galletita 10x380g</option>
+
+                            </select>
                         </div>
                         <div style={{display: "flex", flexDirection: "row", width: 400}}>
                             <div>
@@ -473,7 +513,7 @@ export default function InformesPage () {
                 <hr color='#3399ff' className='hr-line'/>
                     {displaySelection()}
                 <div>
-                    {displayRemitoAnexRac(false)}
+                    {displayRemitoAnexRac(true)}
                 </div>
                 </div>
                 }

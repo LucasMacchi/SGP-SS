@@ -16,6 +16,7 @@ import {
   IEmailSender,
   IFilter,
   IInsumoComp,
+  ILgarEntrega,
   IOrderRemito,
   IPedido,
   IPersonal,
@@ -73,6 +74,8 @@ const globalReducer = (
       return {...state, compraDetail: payload};
     case ac.SET_MENU:
       return {...state, menu: payload}
+    case ac.SET_LENTREGAS:
+      return {...state, lentregas: payload}
     default:
       return state;
   }
@@ -867,6 +870,20 @@ export default function GlobalState(props: IPropsChildren) {
     }
   }
 
+  async function getLugaresEntreFn() {
+    try {
+      const entregas: ILgarEntrega[] = (await axios.get(SERVER+"/envios/entregas",authReturner())).data
+      console.log(entregas)
+      dispatch({
+        payload: entregas,
+        type: ac.SET_LENTREGAS,
+      });
+    } catch (error) {
+      console.log(error);
+      alert("Error al traer lugares de entrega.");
+    }
+  }
+
   function changeMenu (v: number) {
     dispatch({
       payload: v,
@@ -925,6 +942,7 @@ export default function GlobalState(props: IPropsChildren) {
     login: false,
     pedidos: [],
     ccos: [],
+    lentregas: [],
     compras: [],
     insumos: [],
     categories: [],
@@ -984,7 +1002,8 @@ export default function GlobalState(props: IPropsChildren) {
     editCantProdCompra,
     deleteProdCompra,
     getUniqCompraNro,
-    addProdCompra
+    addProdCompra,
+    getLugaresEntreFn
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -998,6 +1017,7 @@ export default function GlobalState(props: IPropsChildren) {
 interface IGlobalContext {
   user: IUser;
   menu: number;
+  lentregas: ILgarEntrega[];
   createPersonal: (personal: IPersonal) => void;
   personal: IPersonal[];
   categories: string[];
@@ -1066,6 +1086,7 @@ interface IGlobalContext {
   preaproveCompraFn: (id: number, comentario: string) => void;
   getAllCompras: (revised:boolean, fullname?: string) => void;
   getUniqCompra: (id:number) => void;
+  getLugaresEntreFn: () => void;
   editDesProdCompra: (detailID: number, descripcion: string) => void;
   editCantProdCompra: (detailID: number, cantidad: number) => void;
   deleteProdCompra: (detailID: number) => void;

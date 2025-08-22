@@ -141,7 +141,9 @@ export interface IpedidoRacDataPDF {
     pedido_service: string,
     pedido_client_id: number,
     pedido_service_id: number,
-    pedido_insumos: IInsumoRac[]
+    pedido_insumos: IInsumoRac[],
+    pedido_desglose: string,
+    remito_nro: string
 }
 
 export interface IDataPdf {
@@ -326,4 +328,15 @@ export interface IOrderRemito {
     service_des: string,
     localidad: string,
     insumos: IInsumo[]
+}
+
+export interface ILgarEntrega {
+    lentrega_id: number,
+    service_id?: number,
+    client_id?: number,
+    localidad: string,
+    direccion: string,
+    lat?: number,
+    long?: number,
+    descripcion: string
 }
