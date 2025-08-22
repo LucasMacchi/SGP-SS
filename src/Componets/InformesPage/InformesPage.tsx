@@ -398,6 +398,11 @@ export default function InformesPage () {
                         <select defaultValue={""}
                         value={remitoRac.pedido_desglose} onChange={(e) => setReRac({...remitoRac, pedido_desglose: e.target.value})} className='select-small-cco'>
                             <option value={""}>---</option>
+                            {(global && remitoRac.pedido_service_id) && 
+                            <option value={lentregaService(global.lentregas, remitoRac.pedido_service_id)}>
+                                {lentregaService(global.lentregas, remitoRac.pedido_service_id)}
+                            </option>}
+                            
                             {
                                 desglosesF.map((lg,i) => (<option key={i} value={lg}>{lg}</option>))
                             }
