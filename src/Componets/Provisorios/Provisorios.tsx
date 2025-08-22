@@ -33,7 +33,7 @@ export default function Provisorio () {
 
     return(
         <div>
-            <div className='div-header-pedidos'>
+            <div>
                 <Header />
             </div>
             <h2 className='title-Homepage' >

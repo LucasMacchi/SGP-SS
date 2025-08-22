@@ -4,12 +4,20 @@ import { useNavigate } from "react-router-dom";
 import {
   IAction,
   IAddPedido,
+  IAddProd,
   ICategoriesRes,
   ICatRub,
   IChangeData,
   IClientIns,
+  ICollection,
+  ICollectionoRes,
+  ICompra,
+  ICompraDto,
   IEmailSender,
   IFilter,
+  IInsumoComp,
+  ILgarEntrega,
+  IOrderRemito,
   IPedido,
   IPersonal,
   IPropsChildren,
@@ -60,6 +68,16 @@ const globalReducer = (
       return { ...state, reports: payload };
     case ac.GET_INS_CATEGROIES:
       return { ...state, insCategroies: payload };
+    case ac.GET_COMPRAS:
+      return {...state, compras: payload}
+    case ac.SET_COMPRA_DETAIL:
+      return {...state, compraDetail: payload};
+    case ac.SET_MENU:
+      return {...state, menu: payload}
+    case ac.SET_LENTREGAS:
+      return {...state, lentregas: payload}
+    case ac.SET_DESGLOSES:
+      return {...state, desgloses: payload}
     default:
       return state;
   }
@@ -143,19 +161,16 @@ export default function GlobalState(props: IPropsChildren) {
     if (LOGS === "1") console.log("ROL ", rol);
     const token = localStorage.getItem("jwToken");
     const dataUser: IToken = jwtDecode(token ?? "");
-    if (rol === rolesNum.encargado) {
-      filter.requester = dataUser.user;
+    if (rol === rolesNum.encargado || rol === rolesNum.cocina) {
+      filter.user_id = dataUser.usuario_id;
       const pedidos: AxiosResponse<IPedido[]> = await axios.post(
         SERVER + "/pedido/all",
         filter,
         authReturner(),
       );
-      const pedidosFiltered = pedidos.data.filter(
-        (p) => p.requester === dataUser.user,
-      );
       dispatch({
         type: ac.GET_PEDIDOS,
-        payload: pedidosFiltered,
+        payload: pedidos.data,
       });
     } else if (
       rol === rolesNum.admin ||
@@ -174,10 +189,10 @@ export default function GlobalState(props: IPropsChildren) {
     } else alert("No valid rol");
   }
   //Trae todos los insumos para la creacion de nuevos pedidos
-  async function insumosFn(rubro: string, empty: boolean) {
+  async function insumosFn(empty: boolean) {
     if(!empty) {
     const insumos: AxiosResponse<IResponseInsumo[]> = await axios.get(
-      SERVER + "/data/insumos/"+rubro,
+      SERVER + "/data/insumos",
       authReturner(),
     );
     console.log(insumos)
@@ -231,7 +246,6 @@ export default function GlobalState(props: IPropsChildren) {
       detailsToDelete,
       authReturner(),
     );
-    navigation("/");
     window.location.reload();
     return true;
   }
@@ -283,7 +297,6 @@ export default function GlobalState(props: IPropsChildren) {
       data,
       authReturner(),
     );
-    navigation("/");
     window.location.reload();
     return true;
   }
@@ -456,6 +469,13 @@ export default function GlobalState(props: IPropsChildren) {
     );
     if (pingRes.data) return pingRes.data + " / " + SERVER;
     else return "Cannot ping the server " + SERVER;
+  }
+
+  async function collectionOrders(orders:string []): Promise<ICollectionoRes> {
+    
+    const collectionInsumos: ICollectionoRes = (await axios.post(SERVER+'/data/collection',{orders},authReturner())).data
+    return collectionInsumos
+
   }
 
   async function generateClientPDF(
@@ -646,10 +666,10 @@ export default function GlobalState(props: IPropsChildren) {
   async function getCategoriasInsumos() {
     try {
         const res: string[] = await (await axios.get(SERVER + "/data/categories/insumos", authReturner())).data;
-      dispatch({
-        payload: res,
-        type: ac.GET_INS_CATEGROIES
-      })
+        dispatch({
+          payload: res,
+          type: ac.GET_INS_CATEGROIES
+        })
     } catch (error) {
       console.log(error);
       alert("Error al traer las categorias de los insumos.");
@@ -668,6 +688,221 @@ export default function GlobalState(props: IPropsChildren) {
       alert("Error al eliminar pedido.");
     }   
   }
+
+  //Check if order exists
+  async function checkExistsPedido(nro:string): Promise<boolean> {
+    const resAx: boolean = (await axios.get(SERVER+'/pedido/uniq/'+nro, authReturner())).data
+    console.log(resAx)
+    if(resAx) return resAx
+    else resAx 
+    return false
+  }
+
+  //Get areas for compras
+  async function getAreasFn(): Promise<string[]> {
+    const areas: string[] = (await axios.get(SERVER+"/compras/areas", authReturner())).data
+    return areas
+  }
+
+  //Register Compra
+  async function registerCompra(data: ICompraDto) {
+    try {
+      await axios.post(SERVER+"/compras/registrar",data,authReturner())
+      alert("Compra creada")
+    } catch (error) {
+      console.log(error);
+      alert("Error al crear una compra.");
+    }
+  }
+
+  //Cambiar estado compra
+  async function changeStateCompra(aprobar:boolean, id: number, comentario: string) {
+    try {
+      if(aprobar) {
+        await axios.patch(SERVER+"/compras/aprove/"+id,{comentario},authReturner())
+        alert("Compra aprobada")
+        window.location.reload()
+      }
+      else {
+        await axios.patch(SERVER+"/compras/null/"+id,{comentario},authReturner())
+        alert("Compra anulada")
+        window.location.reload()
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Error al cambiar la compra.");
+    }
+  }
+
+  //Traer todos las compras
+  async function getAllCompras(revised:boolean,fullname?: string) {
+    try {
+      const compras: ICompra[] = await (await axios.get(SERVER+"/compras/all", authReturner())).data
+      if(revised) {
+        let newArr = compras.filter((c) => c.anulado === false && c.aprobado === false)
+        if(fullname) {
+          newArr = newArr.filter((c) => c.fullname === fullname)
+          console.log("Compras de "+fullname)
+        }
+        dispatch({
+          payload: newArr,
+          type: ac.GET_COMPRAS
+        })
+        console.log(newArr)
+      }
+      else {
+        let newArr = compras.filter((c) => c.anulado === true || c.aprobado === true)
+        if(fullname) {
+          newArr = newArr.filter((c) => c.fullname === fullname)
+          console.log("Compras de "+fullname)
+        }
+        dispatch({
+          payload: newArr,
+          type: ac.GET_COMPRAS
+        })
+        console.log(newArr)
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Error al traer las compras.");
+    }
+  }
+
+  async function getUniqCompra(id:number) {
+    try {
+      const compra: ICompra = await (await axios.get(SERVER+"/compras/uniq/"+id, authReturner())).data
+        dispatch({
+          payload: compra,
+          type: ac.SET_COMPRA_DETAIL
+        })
+        console.log(compra)
+    } catch (error) {
+      console.log(error);
+      alert("Error al traer la compra.");
+    }
+  }
+
+  async function getUniqCompraNro(nro: string) {
+    try {
+      const compraID: number = await (await axios.get(SERVER+"/compras/uniqbynro/"+nro, authReturner())).data
+      if(compraID) {
+        window.location.href = "/compras/"+compraID
+      }
+      else {
+        alert("Error al encontrar la compra.");
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Error al encontrar la compra.");
+    }
+    return 0
+  }
+
+  async function editDesProdCompra(detailID: number, descripcion: string) {
+    try {
+      await axios.patch(SERVER+"/compras/edit/des",{detailID,descripcion}, authReturner())
+      alert("Compra modificada")
+      window.location.reload()
+    } catch (error) {
+      console.log(error);
+      alert("Error al editar la compra.");
+    }
+  }
+
+  async function editCantProdCompra(detailID: number, cantidad: number) {
+    try {
+      await axios.patch(SERVER+"/compras/edit/cant",{detailID,cantidad}, authReturner())
+      alert("Compra modificada")
+      window.location.reload()
+    } catch (error) {
+      console.log(error);
+      alert("Error al editar la compra.");
+    }
+  }
+  async function addProdCompra (data: IAddProd): Promise<boolean> {
+    try {
+      await axios.post(SERVER+"/compra/add",data, authReturner())
+      return true
+    } catch (error) {
+      console.log(error);
+      alert("Error al editar la compra.");
+      return false
+    }
+  }
+  async function deleteProdCompra(detailID: number) {
+    try {
+      await axios.delete(SERVER+"/compras/delete/"+detailID, authReturner())
+      alert("Compra modificada")
+      window.location.reload()
+    } catch (error) {
+      console.log(error);
+      alert("Error al editar la compra.");
+    }
+  }
+
+  async function collectionRemito(orders:string []): Promise<IOrderRemito[]> {
+    try {
+      const collection: IOrderRemito[] = await (await axios.post(SERVER+"/data/collection/remito", {orders}, authReturner())).data
+      return collection
+    } catch (error) {
+      console.log(error);
+      alert("Error al generar remito.");
+      return []
+    }
+  }
+
+  async function  getInsumosComplete(): Promise<IInsumoComp[]> {
+    try {
+      const insumos: IInsumoComp[] = (await axios.get(SERVER+"/data/insumos/complete",authReturner())).data
+      return insumos
+    } catch (error) {
+      alert("Error al traer insumos.");
+      return []
+    }
+  }
+
+  async function preaproveCompraFn (id: number, comentario: string) {
+    try {
+      await axios.patch(SERVER+"/compras/preaprove/"+id,{comentario},authReturner())
+      alert("Compra preaprobada")
+      window.location.reload()
+    } catch (error) {
+      console.log(error);
+      alert("Error al cambiar la compra.");
+    }
+  }
+
+  async function getLugaresEntreFn() {
+    try {
+      const entregas: ILgarEntrega[] = (await axios.get(SERVER+"/envios/entregas",authReturner())).data
+      dispatch({
+        payload: entregas,
+        type: ac.SET_LENTREGAS,
+      });
+    } catch (error) {
+      console.log(error);
+      alert("Error al traer lugares de entrega.");
+    }
+  }
+  async function getDesglosesFn() {
+    try {
+      const desgloses: string[] = (await axios.get(SERVER+"/envios/desgloses",authReturner())).data
+      dispatch({
+        payload: desgloses,
+        type: ac.SET_DESGLOSES,
+      });
+    } catch (error) {
+      console.log(error);
+      alert("Error al traer lugares de entrega.");
+    }
+  }
+
+  function changeMenu (v: number) {
+    dispatch({
+      payload: v,
+      type: ac.SET_MENU,
+    });
+  }
   
   const innitialState: IGlobalContext = {
     user: {
@@ -677,6 +912,7 @@ export default function GlobalState(props: IPropsChildren) {
       rol: 3,
       activated: false,
     },
+    menu: 1,
     pedidoDetail: {
       order_id: 0,
       requester: "",
@@ -693,24 +929,52 @@ export default function GlobalState(props: IPropsChildren) {
       email: "",
       service_des: ``
     },
+    compraDetail: {
+        area: "",
+        tipo: "",
+        compras: [],
+        descripcion: "",
+        lugar: "",
+        fecha_aprobado: "",
+        activado: true,
+        aprobado: false,
+        anulado: false,
+        preaprobado: false,
+        fullname: "",
+        proveedor: "",
+        compra_id: 0,
+        fecha: "",
+        comentario: "",
+        nro: ""
+    },
     personal: [],
     sysUsers: [],
+    coleccion: {collection1: [],collection2: [],
+      collection3: [],collection5: [],collection4: [],
+    },
     login: false,
     pedidos: [],
     ccos: [],
+    lentregas: [],
+    compras: [],
     insumos: [],
     categories: [],
     reports: [],
     insCategroies: {rubros: [], categorias: []},
     errorCat: [],
+    desgloses: [],
     loginFn,
     logoutFn,
     sessionFn,
     pedidosFn,
+    getInsumosComplete,
     insumosFn,
     ccosFn,
+    collectionRemito,
     sysUsersFn,
+    changeMenu,
     orderAproveFn,
+    preaproveCompraFn,
     orderRejectFn,
     orderCancelFn,
     orderDeliveredFn,
@@ -740,7 +1004,21 @@ export default function GlobalState(props: IPropsChildren) {
     createPersonal,
     deletePersonal,
     getCategoriasInsumos,
-    eliminarPedido
+    eliminarPedido,
+    checkExistsPedido,
+    collectionOrders,
+    getAreasFn,
+    registerCompra,
+    changeStateCompra,
+    getAllCompras,
+    getUniqCompra,
+    editDesProdCompra,
+    editCantProdCompra,
+    deleteProdCompra,
+    getUniqCompraNro,
+    addProdCompra,
+    getLugaresEntreFn,
+    getDesglosesFn
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -753,23 +1031,29 @@ export default function GlobalState(props: IPropsChildren) {
 
 interface IGlobalContext {
   user: IUser;
+  menu: number;
+  lentregas: ILgarEntrega[];
   createPersonal: (personal: IPersonal) => void;
   personal: IPersonal[];
   categories: string[];
+  desgloses: string[];
   insCategroies: ICatRub,
   errorCat: string[];
   pedidoDetail: IPedido;
   login: boolean;
+  compras: ICompra[];
   pedidos: IPedido[];
   insumos: string[];
   sysUsers: IUser[];
+  coleccion: ICollection;
   ccos: IServicio[];
   reports: IReport[];
+  compraDetail: ICompra,
   loginFn: (username: string) => void;
   logoutFn: () => void;
   sessionFn: () => void;
   pedidosFn: (rol: number, filter: IFilter) => void;
-  insumosFn: (rubro: string, empty: boolean) => void;
+  insumosFn: ( empty: boolean) => void;
   ccosFn: () => void;
   sysUsersFn: () => void;
   orderAproveFn: (
@@ -809,5 +1093,23 @@ interface IGlobalContext {
   orderLegajo: (id: number, legajo: number) => void;
   deletePersonal: (legajo: number) => void;
   getCategoriasInsumos: () => void;
+  getAreasFn: () => Promise<string[]>;
   eliminarPedido: (id: number) => void;
+  checkExistsPedido: (nro: string) => Promise<boolean>;
+  collectionOrders: (orders:string []) => Promise<ICollectionoRes>;
+  registerCompra: (data: ICompraDto) => void;
+  changeStateCompra: (aprobar:boolean, id: number,comentario: string) => void;
+  preaproveCompraFn: (id: number, comentario: string) => void;
+  getAllCompras: (revised:boolean, fullname?: string) => void;
+  getUniqCompra: (id:number) => void;
+  getLugaresEntreFn: () => void;
+  editDesProdCompra: (detailID: number, descripcion: string) => void;
+  editCantProdCompra: (detailID: number, cantidad: number) => void;
+  deleteProdCompra: (detailID: number) => void;
+  getUniqCompraNro: (nro: string) => void;
+  collectionRemito: (orders:string []) => Promise<IOrderRemito[]>;
+  getInsumosComplete: () => Promise<IInsumoComp[]>;
+  changeMenu: (v: number) => void;
+  getDesglosesFn: () => void;
+  addProdCompra: (data: IAddProd) => Promise<boolean>;
 }

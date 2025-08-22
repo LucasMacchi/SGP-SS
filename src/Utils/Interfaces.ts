@@ -4,7 +4,8 @@ export const rolesNum = {
     admin: 1,
     administrativo: 2,
     encargado: 3,
-    en_deposito: 4
+    en_deposito: 4,
+    cocina: 5,
 }
 
 export type TEstado = 'Pendiente' | 'Aprobado' | 'Cancelado' | 'Rechazado' | 'Entregado';
@@ -78,9 +79,20 @@ export interface IInsumo {
     categoria?: string
 }
 
+export interface IInsumoComp {
+    insumo_id: number,
+    ins_cod1: number,
+    ins_cod2: number,
+    ins_cod3: number,
+    descripcion: string,
+    categoria: string,
+    rubro: string
+}
+
 export interface IResponseInsumo {
     insumo: string
 }
+
 
 // 1 admin / 2 administrativo / 3 encargado
 
@@ -123,11 +135,46 @@ export interface IpedidoDataPDF {
     pedido_state: string,
     pedido_insumos: IInsumo[]
 }
+
+export interface IpedidoRacDataPDF {
+    solicitante_usuario: string,
+    pedido_req: string,
+    pedido_service: string,
+    pedido_client_id: number,
+    pedido_service_id: number,
+    pedido_insumos: IInsumoRac[],
+    pedido_desglose: string,
+    remito_nro: string
+}
+
+export interface IDataPdf {
+    solicitado: string,
+    datos: string[],
+    descripcion: string
+}
+
+export interface IAddProd {
+    descripcion: string,
+    compraID: number,
+    cantidad: number
+}
+
+export interface IInsumoRac {
+    des: string,
+    kg: number,
+    cajas: number,
+    bolsas: number,
+    rac: number
+}
+
 export interface IPedidosPDF {
     pedidos: IpedidoDataPDF[]
 }
 export interface IPedidoPDF {
     pedido: IpedidoDataPDF
+}
+export interface IPedidoRacPDF {
+    pedido: IpedidoRacDataPDF
 }
 export interface IpedidoClientDataPDF {
     pedido_start: string,
@@ -148,11 +195,30 @@ export interface IClientIns {
     ins_cod2?: number,
     ins_cod3?: number,
 }
+export interface ICollectionInsumo {
+    insumo_des: string,
+    sum: number
+}
+export interface ICollectionsServ {
+    numero: string,
+    service_des: string,
+    requester: string
+}
+export interface ICollectionoRes {
+    insumos: ICollectionInsumo[],
+    servicios: ICollectionsServ []
+}
 export interface IClientResponse {
     insumos: IClientIns[]
 }
 export interface ICategoriesRes {
     categorias: string[]
+}
+export interface ICollectionPDF {
+    collection: {
+        insumos: IClientIns[],
+        orders: ICollectionsServ []
+    }
 }
 export interface IEmailSender {
     to_send:string,
@@ -179,11 +245,11 @@ export interface IFilter {
     limit: number,
     client: number,
     service: number,
-    requester: string,
     numero: string
     state: string
     dateStart: string
-    dateEnd: string
+    dateEnd: string,
+    user_id: number
 }
 export interface IEntrega {
   entrega: {
@@ -193,6 +259,10 @@ export interface IEntrega {
     fecha_entrega: string,
     insumos: IInsumo[]
   }
+}
+
+export interface ICompraDocu {
+    c: ICompra  
 }
 
 export interface IPersonal {
@@ -205,4 +275,69 @@ export interface IPersonal {
 export interface ICatRub {
     categorias: string[],
     rubros: string[]
+}
+
+export interface ICollection {
+    collection1: string[],
+    collection2: string[],
+    collection3: string[],
+    collection4: string[],
+    collection5: string[],
+}
+
+export interface IinsumoCompra {
+    descripcion: string,
+    cantidad: number,
+    detail_id?: number
+}
+
+export interface ICompra {
+    area: string,
+    tipo: string,
+    compras: IinsumoCompra[],
+    descripcion: string,
+    lugar: string
+    fecha_aprobado?: string,
+    activado: boolean,
+    aprobado: boolean,
+    anulado: boolean,
+    fullname: string,
+    proveedor: string,
+    compra_id: number,
+    fecha: string,
+    comentario: string,
+    nro: string,
+    preaprobado: boolean
+
+}
+
+export interface ICompraDto {
+    area: string,
+    tipo: string,
+    descripcion: string,
+    lugar: string
+    fullname: string,
+    proveedor: string,
+    compras: IinsumoCompra[],
+    date: string
+}
+
+export interface IOrderRemito {
+    order_id: number,
+    numero: number,
+    client_des: string,
+    service_des: string,
+    localidad: string,
+    insumos: IInsumo[]
+}
+
+export interface ILgarEntrega {
+    lentrega_id: number,
+    service_id?: number,
+    client_id?: number,
+    localidad: string,
+    direccion: string,
+    lat?: number,
+    long?: number,
+    descripcion: string
 }

@@ -5,9 +5,24 @@
     z-index: 2;
 }
 .dropdown {
-    max-width: 100%;
-    
+    width: 350px;
+    color: white;
+    font-weight: 700;
+    background-color:#3399ff;
+    height: 35px;
 }
+
+.dropdown-txt {
+    text-align: center;
+    font-weight: 700;
+}
+
+.dropdown-txt-none {
+    text-align: center;
+    font-weight: 700;
+    visibility: hidden;
+}
+
 .dropdown-ul {
     position: absolute;
     display: block;
@@ -23,10 +38,6 @@
     height: 30px;
     margin: 0;
 }
-.dropdown, li:hover {
-    background-color: #8fc2f4;
-}
-
 
 .btn-menu-header {
     color: white;

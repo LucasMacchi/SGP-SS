@@ -11,7 +11,10 @@ import { saveAs } from 'file-saver'
 import Header from '../Header/Header'
 import tokenExpireChecker from '../../Utils/tokenExpireChecker'
 import dateParser from '../../Utils/dateParser'
-import sectoresPersonal from "./sectores.json"
+//import sectoresPersonal from "./sectores.json"
+import infoMsg from '../../Utils/infoMsg'
+import RemitoDocument from '../pdfs/remito'
+import { divisionTable } from '../pdfs/remito'
 
 
 export default function DetailsPage () {
@@ -28,50 +31,36 @@ export default function DetailsPage () {
     const [commnet, setComment] = useState<string>('')
     const [action, setAction] = useState(0)
     const [dateEntrega, setDateEntrega] = useState('')
-    const [legajo, setLegajo] = useState(0)
-    const [sector, setSector] = useState('')
-    const [showLegajo, setShowLegajo] = useState(false)
-    const [search, setSearch] = useState('')
-    const [filteredArr, setFiltered] = useState<IPersonal[]>([])
-    const [dni, setDni] = useState(0)
-    const [fullname, setFullname] = useState('')
-    const [rubro, setRubro] = useState('')
+    const [collection, setCollectionArr] = useState('')
+    const [searchIns, setSearchIns] = useState('')
+    const [filteredIns, setFilteredIns] = useState<string[]>([])
 
-    useEffect(() => {
-      if(sector) global?.getPersonalBySector(sector, false)
-      else global?.getPersonalBySector(sector, true)
-    },[sector])
-    
     useEffect(() => {
       if(global && id && !tokenExpireChecker()){
           global.uniqPedido(parseInt(id), false)
           if(global.insCategroies.rubros.length === 0) global.getCategoriasInsumos()
           if(global.ccos.length === 0) global.ccosFn()
+          if(global.insumos.length === 0) global.insumosFn(false)  
       }else{
           navigator('/')
       }
     },[])
-
-    useEffect(() => {
-        if( rubro) global?.insumosFn(rubro, false)
-    },[, rubro])
     
-    useEffect(() => {
-      let array = global?.personal
-      if(array){
-        if(search.length > 0 && array) {
-          array = array.filter(p => p.fullname.toLowerCase().includes(search.toLowerCase()))
-        }
-        setFiltered(array)
-      }
-    },[global?.personal, search])
-
     useEffect(() => {
       if(global) {
         setOrder(global?.pedidoDetail)
         getPersonal()
       }
     },[global?.pedidoDetail])
+    useEffect(() => {
+        if(global && global.insumos.length > 0) {
+            let arr = global?.insumos
+            if(searchIns.length > 2) {
+                arr = arr.filter(c => c.toUpperCase().includes(searchIns.toUpperCase()))
+            }
+            setFilteredIns(arr)
+        }
+    },[global?.insumos, searchIns])
     
     const getPersonal = async (): Promise<IPersonal> => {
       if(global && order && order.legajo) {
@@ -80,18 +69,29 @@ export default function DetailsPage () {
       }
       else return {legajo:0,fullname:'',cuil:0,sector:``}
     }
-    
-    const setPersonal = async (legajo: number) => {
-      if(legajo){
-        if(confirm('Quieres asignar el pedido a '+legajo) && global && order){
-          const oldLegajo = order.legajo ? order.legajo : 0
-          await global.orderLegajo(order.order_id, legajo)
-          if(oldLegajo && oldLegajo > 1000000) await global.deletePersonal(oldLegajo)
+
+    const createRemito = async () => {
+        if(order){
+            const insumosFormat: IInsumo[] = order.insumos.map((i) => {
+                const format = i.insumo_des.split('-')
+                const cod = parseInt(format[0])
+                const cod1 = parseInt(format[1])
+                const cod2 = parseInt(format[2])
+                const cod3 = parseInt(format[3])
+                const data: IInsumo = {
+                    insumo_id: Number.isNaN(cod) ? 0 : cod,
+                    ins_cod1: Number.isNaN(cod1) ? 0 : cod1,
+                    ins_cod2: Number.isNaN(cod2) ? 0 : cod2,
+                    ins_cod3: Number.isNaN(cod3) ? 0 : cod3,
+                    insumo_des: format[4],
+                    amount: Math.round(i.amount * 100) / 100
+                }
+                return data
+            })
+            const dataF = divisionTable(insumosFormat)
+            const blob: Blob = await pdf(<RemitoDocument c={dataF} />).toBlob()
+            saveAs(blob, 'REMITO_'+order?.numero)
         }
-      }
-      else {
-        alert('Ingrese pesonal valido.')
-      }
     }
 
     const rejectFn = (order_id: number) => {
@@ -205,7 +205,7 @@ export default function DetailsPage () {
                 <h3 className='title-Homepage'>Cargando...</h3>
             )
         }
-        else if(global?.user.rol === rolesNum.encargado) {
+        else if(global?.user.rol === rolesNum.encargado || global?.user.rol === rolesNum.cocina) {
             switch(order?.state){
                 case 'Pendiente':
                     return(
@@ -240,27 +240,28 @@ export default function DetailsPage () {
                 case 'Pendiente':
                     return(
                         <div className='div-btns'>
-                            <button className='btn-negative' onClick={() => rejectFn(order? order.order_id : 0)}>RECHAZAR</button>
+                            <button className='btn-negative' onClick={() => cancelFn(order.order_id)}>CANCELAR</button>
                         </div>
                     )
                 case 'Aprobado':
                     return(
                         <div className='div-btns'>
-                            <button className='btn-negative' onClick={() => rejectFn(order? order.order_id : 0)}>RECHAZAR</button>
+                            <h3 className='title-Homepage'>Esperando a que el pedido este listo.</h3>
                         </div>
                     )
                 case 'Listo':
                     return (
                         <div className='div-btns'>
-                            <button className='btn-negative' onClick={() => rejectFn(order? order.order_id : 0)}>RECHAZAR</button>
+                            <button className='btn-problem' onClick={() => problemFn(order.order_id)}>PROBLEMA</button>
+                            <button className='btn-neutral' onClick={() => deliverFn(order.order_id)}>ENTREGADO</button>
                         </div>
                     )
                 default:
-                    return(
+                    return (
                         <div className='div-btns'>
-                            <button className='btn-neutral' onClick={() => archiveFn(order? order.order_id : 0)}>ARCHIVAR</button>
+                            <button className='btn-neutral' onClick={() => navigator('/add/'+id)}>REPETIR</button>
                         </div>
-                    ) 
+                    )
 
             }
         }
@@ -327,13 +328,13 @@ export default function DetailsPage () {
                 case 'Listo':
                     return (
                         <div className='div-btns'>
-                            <h3 className='title-Homepage'>Pedido listo, esperando entrega</h3>
+                            <button className='btn-neutral' onClick={() => deliverFn(order.order_id)}>ENTREGADO</button>
                         </div>
                     )
                 default:
                     return(
                         <div className='div-btns'>
-                            <h3 className='title-Homepage'>Pedido entregado</h3>
+                            <button className='btn-neutral' onClick={() => navigator('/add/'+id)}>REPETIR</button>
                         </div>
                     ) 
 
@@ -399,7 +400,7 @@ export default function DetailsPage () {
         }
     }
     const changeAmount = async (nm: number, detail_id: number | undefined) => {
-        if(order && detail_id && order.state === 'Pendiente' && global?.user.rol !== 3) {
+        if(order && detail_id && order.state === 'Pendiente' && global?.user.rol !== rolesNum.encargado && global?.user.rol !== rolesNum.cocina) {
           const newA = prompt('Ingrese la nueva cantidad (utilize . en vez de ,) ', nm.toString()) ?? 0;
             if(newA === 0) return 0
             else if(newA && parseFloat(newA)) {
@@ -429,6 +430,26 @@ export default function DetailsPage () {
                 else alert('Pedido no eliminado')
             }
             else alert('Pedido no eliminado')
+        }
+    }
+
+    const setColeccion = () => {
+        if(global && order && collection) {
+            const col: string | null = localStorage.getItem(collection)
+            if(localStorage.getItem(collection) && col) {
+                const orders: string [] = JSON.parse(col)
+                if(!orders.includes(order.numero)){
+                    orders.push(order.numero)
+                    localStorage.setItem(collection, JSON.stringify(orders))
+                    alert(`Pedido ${order.numero} agregado a la coleccion ${collection}`)
+                }
+                else alert('Pedido ya esta en la coleccion.')
+            }
+            else {
+                const orders: string[] = [order.numero]
+                localStorage.setItem(collection, JSON.stringify(orders))
+                alert(`Pedido ${order.numero} agregado a la coleccion ${collection}`)
+            }
         }
     }
 
@@ -470,173 +491,110 @@ export default function DetailsPage () {
           <button className='btn-export-pdf' onClick={() => deletePedido()}>Eliminar Pedido</button>
         )
       }
+      else if(action === 7) {
+        return (
+            <div>
+                <h5 className='filter-sub'>Selecciona la Coleccion</h5>
+                <select value={collection} onChange={(e) => setCollectionArr(e.target.value)} className='select-actions'>
+                  <option value={''}>---</option>
+                  <option value={'Coleccion1'}>Coleccion 1</option>
+                  <option value={'Coleccion2'}>Coleccion 2</option>
+                  <option value={'Coleccion3'}>Coleccion 3</option>
+                  <option value={'Coleccion4'}>Coleccion 4</option>
+                  <option value={'Coleccion5'}>Coleccion 5</option>
+                </select>
+                <button className='btn-export-pdf' onClick={() => setColeccion()}>Agregar</button>
+            </div>
+        )
+      }
+      else if(action === 8) {
+        return(
+          <button className='btn-export-pdf' onClick={() => createRemito()}>Crear Remito</button>
+        )
+      }
       else {
         return(
           <></>
         )
       }
     }
-    
-    const createPersonalLink = async () => {
-      const personal: IPersonal = {
-        cuil: dni,
-        fullname: fullname,
-        sector: sector,
-        legajo: dni
-      }
-      if(dni && fullname && order) {
-        await global?.createPersonal(personal)
-        await setTimeout(() => {global?.orderLegajo(order.order_id, dni)},(1000))
-      }
-      else alert('Compruebe que los datos son correctos')
-
-    }
-    
-    const displayLegajo = () => {
-      if(showLegajo) {
-        return(
-          <div className='data-div-add'>
-            <div>
-            <h6>Sector</h6>
-            <select value={sector} className="data-div-select"
-            onChange={e => {
-              setSearch('')
-              setSector(e.target.value)}}>
-            <option value={''}>---</option>
-            {
-                sectoresPersonal.sectores.map((s) => {
-                    return(<option key={s} value={s}>{s}</option>)
-                })
-            }
-            </select>
-            </div>  
-            <div className='data-div-add' >
-                <h6 className={sector === 'PROVISORIO' ? "data-div-non"  : ''}>Busqueda por nombre de personal</h6>
-                <input type="text" id='otherins' 
-                className={sector === 'PROVISORIO' ? "data-div-non"  : 'data-div-select'}
-                onChange={(e) => setSearch(e.target.value)} disabled={sector.length===0}
-                value={search}/>
-            </div>
-              {sector === 'PROVISORIO' ?
-                <div>
-                  <div>
-                    <h6>Apellido y Nombre</h6>
-                    <input type="text" id='otherins' className="data-div-select" 
-                    onChange={(e) => setFullname(e.target.value)} value={fullname}/>
-                  </div>
-                  <div>
-                    <h6>CUIL</h6>
-                    <input type="number" id='otherins' className="data-div-select" 
-                    onChange={(e) => setDni(parseInt(e.target.value))} value={dni}/>
-                  </div>
-                  <button className='btn-export-pdf' onClick={() => createPersonalLink()}>Registrar</button>
-                </div>
-                :
-                <div>
-                  <h6>Personal -  {global?.personal.length && global?.personal.length + " Encontrados"}</h6>
-                  <select value={legajo} className="data-div-select" disabled={sector.length===0}
-                  onChange={e => {
-                    setLegajo(parseInt(e.target.value))
-                    setPersonal(parseInt(e.target.value))}}>
-                  <option value={0}>---</option>
-                  {
-                      filteredArr.map((p) => {
-                          return(<option key={p.legajo} value={p.legajo}>{p.legajo+'-'+p.fullname}</option>)
-                      })
-                  }
-                  </select>
-                </div>
-              }
-
-          </div>
-        )
-      }
-    }
-    
     const dataDisplay = () => {
         if(order) {
             return(
                 <div className='data-div'>
-                  <div>
+                  <div className='data-div-info'>
                     <div>
                         <h5 className='filter-sub'>Otras Acciones</h5>
                         <select value={action} onChange={(e) => setAction(parseInt(e.target.value))} className='select-actions'>
                           <option value={0}>---</option>
                           {(order.legajo && global?.user.rol === rolesNum.en_deposito) && <option value={1}>Exportar plantilla de entrega</option>}
                           <option value={2}>Exportar a pdf</option>
+                          <option value={8}>Crear remito</option>
                           <option value={3}>Reportar</option>
                           {global?.user.rol === rolesNum.admin && <option value={4}>Exportar a TXT</option>}
                           {order.prov && <option value={5}>Provisional</option>}
                           {global?.user.rol === rolesNum.admin && <option value={6}>Eliminar Pedido</option>}
+                            {global?.user.rol === rolesNum.en_deposito && <option value={7}>Agregar a Coleccion</option>}
                         </select>
-                        
+                        <button className="info-popup" onClick={() => infoMsg(6)}>?</button>
                     </div>
                     <div>
                       {displayActions()}
                     </div>
                   </div>
-
-                    <hr color='#666666' className='hr-details'/>
-                    <h3>CCO: </h3>
-                    <h4>{serviceDisplayer(order.service_id)}</h4>
-                    {order.prov && <h4>{order.prov_des}</h4>}
-                    <hr color='#666666' className='hr-details'/>
-                    <h3>Solicitante: </h3>
-                    <h4>{order.requester}</h4>
-                    <h4>{order.email}</h4>
-                    <hr color='#666666' className='hr-details'/>
-                    <h3>Estado del Pedido: </h3>
-                    <h4>{order.state}</h4>
-                    <hr color='#666666' className='hr-details'/>
+                    <div className='data-div-info'>
+                        <h3>CCO: </h3>
+                        <h4>{serviceDisplayer(order.service_id)}</h4>
+                        {order.prov && <h4>{order.prov_des}</h4>}
+                    </div>
+                    <div className='data-div-info'>
+                        <h3>Solicitante: </h3>
+                        <h4>{order.requester}</h4>
+                        <h4>{order.email}</h4>
+                    </div>
+                    <div className='data-div-info'>
+                        <h3>Estado del Pedido: </h3>
+                        <h4>{order.state}</h4>
+                    </div>
                     {order.legajo ?
-                      <div>
+                      <div className='data-div-info'> 
                         <h3>Entregar a legajo: {order.legajo}</h3>
                         <hr color='#666666' className='hr-details'/>
                       </div>
                       :
                       ''
                     }
-                    <h3>Fecha:</h3>
-                    <h4>{'Ordenado: '+dbDateParser(order.date_requested, false)}</h4>
-                    <h4>{order.date_aproved ? 'Aprobado: '+dbDateParser(order.date_aproved, false) : 'Aprobacion: pendiente'}</h4>
-                    <h4>{order.date_delivered ? "Recibido: "+dbDateParser(order.date_delivered,false) : 'Entrega: pendiente'}</h4>
-                    <hr color='#666666' className='hr-details'/>
+                    <div className='data-div-info'>
+                        <h3>Fecha:</h3>
+                        <h4>{'Ordenado: '+dbDateParser(order.date_requested, false)}</h4>
+                        <h4>{order.date_aproved ? 'Aprobado: '+dbDateParser(order.date_aproved, false) : 'Aprobacion: pendiente'}</h4>
+                        <h4>{order.date_delivered ? "Recibido: "+dbDateParser(order.date_delivered,false) : 'Entrega: pendiente'}</h4>
+                    </div>
                     {checkToAdd() &&
                         <div className='data-div-add-special'>
                             <h4>Agregar insumo: </h4>
-                            <input type="checkbox" checked={addIns} onChange={(e) => setAddIns(e.target.checked)}/>
+                            <div>
+                                <input type="checkbox" checked={addIns} onChange={(e) => setAddIns(e.target.checked)}/>
+                            </div>
+                            
                         </div>
                     }
-                    {global?.user.rol === 4 &&
-                      <div className='data-div-add-special'>
-                          <h4>{order.legajo ?"Modificar entrega a Personal":"Entrega a Personal:"} </h4>
-                          <input type="checkbox" checked={showLegajo} onChange={(e) => setShowLegajo(e.target.checked)}/>
-                      </div>}
-                    {displayLegajo()}
 
                     {addIns &&
                         <div>
                             <div>
-                                <h6>Rubro</h6>
-                                <select value={rubro} className="data-div-select"
-                                onChange={e => {
-                                  setRubro(e.target.value)}}>
-                                <option value={''}>---</option>
-                                {
-                                    global?.insCategroies.rubros.map((c) => {
-                                        return(<option key={c} value={c}>{c}</option>)
-                                    })
-                                }
-                                </select>
-                            </div>
-                            <div>
-                                <h6>Insumo - {global?.insumos && global?.insumos.length > 0 ? global?.insumos.length + " Encontrados" : 0 + " Encontrados"}</h6>
+                                <div>
+                                    <h6>Busqueda</h6>
+                                    <input type="text" id='otherins' className="data-div-select" 
+                                    onChange={(e) => setSearchIns(e.target.value)} value={searchIns}/>
+                                    <button className="info-popup" onClick={() => infoMsg(5)}>?</button>
+                                </div>
+                                <h6>Insumo - {filteredIns && filteredIns.length > 0 ? filteredIns.length + " Encontrados" : 0 + " Encontrados"}</h6>
                                 <select defaultValue={''} value={newIns} className="data-div-select"
-                                disabled={!rubro}
                                 onChange={e => setNewAdd(e.target.value)}>
                                 <option value={''}>---</option>
                                 {
-                                    global?.insumos.map((i, index) => (
+                                    filteredIns.map((i, index) => (
                                         <option key={index} value={i}>{i}</option>
                                     ))
                                 }
@@ -649,6 +607,9 @@ export default function DetailsPage () {
 
                         </div>
                     }
+                    <hr color='#666666' className='hr-details'/>
+
+                    {global?.user.rol === rolesNum.en_deposito && <button className="info-popup" onClick={() => infoMsg(7)}>?</button>}
                     <table >
                         <tbody>
                             <tr>
@@ -674,7 +635,7 @@ export default function DetailsPage () {
 
     return(
         <div className='detaail-all-div'>
-            <div className='div-header-pedidos'>
+            <div >
                 <Header />
             </div>
             <h1 className='title-Homepage' >

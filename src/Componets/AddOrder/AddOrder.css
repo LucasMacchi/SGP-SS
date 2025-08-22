@@ -1,6 +1,12 @@
 .data-div-add {
     color: #666666;
     text-align: left;
+
+}
+.data-div-add-border {
+    color: #666666;
+    text-align: left;
+    border: 2px solid;
 }
 .data-div-add, h4, h6 {
     margin: 5px;
@@ -119,5 +125,12 @@
     font-weight: normal;
     color: #3399ff;
     margin: 3px;
+}
+.info-popup {
+    color: white;
+    background-color: #3399ff;
+    border-color: #3399ff;
+    font-size: small;
+    border-radius: 5px;
 }
 

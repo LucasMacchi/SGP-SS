@@ -1,5 +1,5 @@
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
-import { IPedidoPDF } from '../../Utils/Interfaces';
+import { IPedidoRacPDF } from '../../Utils/Interfaces';
 
 const stylePedido = StyleSheet.create({
     logo: {
@@ -10,13 +10,13 @@ const stylePedido = StyleSheet.create({
         fontFamily: 'Helvetica',
     },
     title: {
-        fontSize: 13,
+        fontSize: 16,
     },
     subtitle: {
         fontSize: 10,
     },
     body: {
-        fontSize: 8
+        fontSize: 12
     },
     view: {
         padding: 2,
@@ -49,7 +49,7 @@ const stylePedido = StyleSheet.create({
         borderTopWidth: 0,
       },
       tableColcod: {
-        width: '8%',
+        width: '18%',
         borderStyle: 'solid',
         borderWidth: 1,
         borderColor: '#bfbfbf',
@@ -65,7 +65,7 @@ const stylePedido = StyleSheet.create({
       },
       tableCell: {
         margin: 5,
-        fontSize: 8,
+        fontSize: 10,
         textAlign: 'left',
       },
       viewdata: {
@@ -87,7 +87,12 @@ const stylePedido = StyleSheet.create({
       }
 })
 
-const PedidoDocument: React.FC<IPedidoPDF> = ({pedido}) => (
+const dateParser = (fecha: string) => {
+    const dateFr = new Date(fecha)
+    return dateFr.getDate() + "/" + (dateFr.getMonth()+1) + "/" + dateFr.getFullYear()
+}
+
+const PedidoRacPdf: React.FC<IPedidoRacPDF> = ({pedido}) => (
     <Document>
         <Page size={'A4'} style={stylePedido.page}>
             <View style={stylePedido.viewdataHeader}>
@@ -101,63 +106,54 @@ const PedidoDocument: React.FC<IPedidoPDF> = ({pedido}) => (
             </View>
             <View style={stylePedido.viewdata}>
                 <View >
-                    <Text style={stylePedido.title}>Datos del Pedido - {pedido.pedido_numero}</Text>
-                    <Text style={stylePedido.body}>Cliente: {pedido.pedido_client_id+'-'+pedido.pedido_client}</Text>
-                    <Text style={stylePedido.body}>Servicio: {pedido.pedido_service_id+'-'+pedido.pedido_service}</Text>
-                    <Text style={stylePedido.body}>Solicitado en el dia: {pedido.pedido_req}</Text>
-                    <Text style={stylePedido.body}>Aprobado en el dia: {pedido.pedido_apr ?? 'Pendiente' }</Text>
-                    <Text style={stylePedido.body}>Entregado en el dia: {pedido.pedido_deli ?? 'Pendiente'}</Text>
-                    <Text style={stylePedido.body}>Estado Actual del Pedido: {pedido.pedido_state}</Text>
+                    <Text style={stylePedido.title}>Desglose de Entrega</Text>
+                    <Text style={stylePedido.body}>Cabecera: {pedido.pedido_service_id+'-'+pedido.pedido_service}</Text>
+                    <Text style={stylePedido.body}>Dependencia: {pedido.pedido_desglose}</Text>
+                    <Text style={stylePedido.body}>Fecha: {dateParser(pedido.pedido_req)}</Text>
+                    <Text style={stylePedido.body}>Remito: {pedido.remito_nro}</Text>
                 </View>
                 <View style={stylePedido.viewdataReq}>
-                    <Text style={stylePedido.title}>Datos del Solicitante</Text>
-                    <Text style={stylePedido.body}>Apellido y Nombre: {pedido.solicitante_apellido+' '+pedido.solicitante_nombre}</Text>
-                    <Text style={stylePedido.body}>Email: {pedido.solicitante_email}</Text>
+                    <Text style={stylePedido.title}>Datos de Contacto</Text>
+                    <Text style={stylePedido.body}>Telefono: 3794-586633</Text>
+                    <Text style={stylePedido.body}>Correo: info@solucionesyservicios.com.ar</Text>
                 </View>
             </View>
-
             <View style={stylePedido.view}>
                 <View style={stylePedido.table}>
                 <View style={stylePedido.tableRow_header}>
-                    <View style={stylePedido.tableColcod}>
-                        <Text style={stylePedido.tableCell}>cod</Text>
-                    </View>
-                    <View style={stylePedido.tableColcod}>
-                        <Text style={stylePedido.tableCell}>cod 1</Text>
-                    </View>
-                    <View style={stylePedido.tableColcod}>
-                        <Text style={stylePedido.tableCell}>cod 2</Text>
-                    </View>
-                    <View style={stylePedido.tableColcod}>
-                        <Text style={stylePedido.tableCell}>cod 3</Text>
-                    </View>
                     <View style={stylePedido.tableColIns}>
                         <Text style={stylePedido.tableCell}>Insumo</Text>
                     </View>
-                    <View style={stylePedido.tableColCant}>
-                        <Text style={stylePedido.tableCell}>Cant</Text>
+                    <View style={stylePedido.tableColcod}>
+                        <Text style={stylePedido.tableCell}>Kilos</Text>
+                    </View>
+                    <View style={stylePedido.tableColcod}>
+                        <Text style={stylePedido.tableCell}>Caja</Text>
+                    </View>
+                    <View style={stylePedido.tableColcod}>
+                        <Text style={stylePedido.tableCell}>Bolsas</Text>
+                    </View>
+                    <View style={stylePedido.tableColcod}>
+                        <Text style={stylePedido.tableCell}>Raciones</Text>
                     </View>
                 </View>
                 </View>
                 {pedido.pedido_insumos.map((i) => (
                     <View style={stylePedido.tableRow}>
-                        <View style={stylePedido.tableColcod}>
-                            <Text style={stylePedido.tableCell}>{i.insumo_id}</Text>
-                        </View>
-                        <View style={stylePedido.tableColcod}>
-                            <Text style={stylePedido.tableCell}>{i.ins_cod1 === 0 ? ' ' : i.ins_cod1}</Text>
-                        </View>
-                        <View style={stylePedido.tableColcod}>
-                            <Text style={stylePedido.tableCell}>{i.ins_cod2 === 0 ? ' ' : i.ins_cod2}</Text>
-                        </View>
-                        <View style={stylePedido.tableColcod}>
-                            <Text style={stylePedido.tableCell}>{i.ins_cod3 === 0 ? ' ' : i.ins_cod3}</Text>
-                        </View>
                         <View style={stylePedido.tableColIns}>
-                            <Text style={stylePedido.tableCell}>{i.insumo_des}</Text>
+                            <Text style={stylePedido.tableCell}>{i.des}</Text>
                         </View>
-                        <View style={stylePedido.tableColCant}>
-                            <Text style={stylePedido.tableCell}>{i.amount}</Text>
+                        <View style={stylePedido.tableColcod}>
+                            <Text style={stylePedido.tableCell}>{i.kg}</Text>
+                        </View>
+                        <View style={stylePedido.tableColcod}>
+                            <Text style={stylePedido.tableCell}>{i.cajas}</Text>
+                        </View>
+                        <View style={stylePedido.tableColcod}>
+                            <Text style={stylePedido.tableCell}>{i.bolsas}</Text>
+                        </View>
+                        <View style={stylePedido.tableColcod}>
+                            <Text style={stylePedido.tableCell}>{i.rac}</Text>
                         </View>
                     </View>
                 ))}
@@ -167,4 +163,4 @@ const PedidoDocument: React.FC<IPedidoPDF> = ({pedido}) => (
     </Document>
 )
 
-export default PedidoDocument
+export default PedidoRacPdf

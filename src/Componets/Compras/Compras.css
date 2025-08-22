@@ -1,0 +1,13 @@
+
+.table-interaction:hover{
+    background-color: darkgrey;
+}
+
+.btn-preacept {
+    color: white;
+    background-color: #c4c42a;
+    border-color: #c4c42a;
+    font-size: medium;
+    height: 50px;
+    width: 140px;
+}

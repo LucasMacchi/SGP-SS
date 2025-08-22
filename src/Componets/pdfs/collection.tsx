@@ -1,5 +1,5 @@
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
-import { IPedidoPDF } from '../../Utils/Interfaces';
+import { ICollectionPDF } from '../../Utils/Interfaces';
 
 const stylePedido = StyleSheet.create({
     logo: {
@@ -73,21 +73,19 @@ const stylePedido = StyleSheet.create({
         borderBottomWidth: 1,
         padding: 4,
         justifyContent: 'flex-start',
-        paddingLeft: 40
       },
       viewdataHeader: {
         flexDirection: 'row',
         borderBottomWidth: 1,
         padding: 4,
         justifyContent: 'space-between',
-        
       },
       viewdataReq: {
         marginLeft: 20
       }
 })
 
-const PedidoDocument: React.FC<IPedidoPDF> = ({pedido}) => (
+const CollectionDocument: React.FC<ICollectionPDF> = ({collection}) => (
     <Document>
         <Page size={'A4'} style={stylePedido.page}>
             <View style={stylePedido.viewdataHeader}>
@@ -99,21 +97,34 @@ const PedidoDocument: React.FC<IPedidoPDF> = ({pedido}) => (
                     <Text style={stylePedido.subtitle}>Corrientes, Corrientes, Argentina</Text>
                 </View>
             </View>
-            <View style={stylePedido.viewdata}>
-                <View >
-                    <Text style={stylePedido.title}>Datos del Pedido - {pedido.pedido_numero}</Text>
-                    <Text style={stylePedido.body}>Cliente: {pedido.pedido_client_id+'-'+pedido.pedido_client}</Text>
-                    <Text style={stylePedido.body}>Servicio: {pedido.pedido_service_id+'-'+pedido.pedido_service}</Text>
-                    <Text style={stylePedido.body}>Solicitado en el dia: {pedido.pedido_req}</Text>
-                    <Text style={stylePedido.body}>Aprobado en el dia: {pedido.pedido_apr ?? 'Pendiente' }</Text>
-                    <Text style={stylePedido.body}>Entregado en el dia: {pedido.pedido_deli ?? 'Pendiente'}</Text>
-                    <Text style={stylePedido.body}>Estado Actual del Pedido: {pedido.pedido_state}</Text>
+            <View style={stylePedido.view}>
+                <View style={stylePedido.table}>
+                <View style={stylePedido.tableRow_header}>
+                    <View style={stylePedido.tableColIns}>
+                        <Text style={stylePedido.tableCell}>Pedido</Text>
+                    </View>
+                    <View style={stylePedido.tableColIns}>
+                        <Text style={stylePedido.tableCell}>Servicio</Text>
+                    </View>
+                    <View style={stylePedido.tableColIns}>
+                        <Text style={stylePedido.tableCell}>Solicitante</Text>
+                    </View>
                 </View>
-                <View style={stylePedido.viewdataReq}>
-                    <Text style={stylePedido.title}>Datos del Solicitante</Text>
-                    <Text style={stylePedido.body}>Apellido y Nombre: {pedido.solicitante_apellido+' '+pedido.solicitante_nombre}</Text>
-                    <Text style={stylePedido.body}>Email: {pedido.solicitante_email}</Text>
                 </View>
+                {collection.orders.map((i) => (
+                    <View style={stylePedido.tableRow}>
+                        <View style={stylePedido.tableColIns}>
+                            <Text style={stylePedido.tableCell}>{i.numero}</Text>
+                        </View>
+                        <View style={stylePedido.tableColIns}>
+                            <Text style={stylePedido.tableCell}>{i.service_des}</Text>
+                        </View>
+                        <View style={stylePedido.tableColIns}>
+                            <Text style={stylePedido.tableCell}>{i.requester}</Text>
+                        </View>
+                    </View>
+                ))}
+                
             </View>
 
             <View style={stylePedido.view}>
@@ -139,7 +150,7 @@ const PedidoDocument: React.FC<IPedidoPDF> = ({pedido}) => (
                     </View>
                 </View>
                 </View>
-                {pedido.pedido_insumos.map((i) => (
+                {collection.insumos.map((i) => (
                     <View style={stylePedido.tableRow}>
                         <View style={stylePedido.tableColcod}>
                             <Text style={stylePedido.tableCell}>{i.insumo_id}</Text>
@@ -157,7 +168,7 @@ const PedidoDocument: React.FC<IPedidoPDF> = ({pedido}) => (
                             <Text style={stylePedido.tableCell}>{i.insumo_des}</Text>
                         </View>
                         <View style={stylePedido.tableColCant}>
-                            <Text style={stylePedido.tableCell}>{i.amount}</Text>
+                            <Text style={stylePedido.tableCell}>{i.sum}</Text>
                         </View>
                     </View>
                 ))}
@@ -167,4 +178,4 @@ const PedidoDocument: React.FC<IPedidoPDF> = ({pedido}) => (
     </Document>
 )
 
-export default PedidoDocument
+export default CollectionDocument

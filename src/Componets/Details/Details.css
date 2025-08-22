@@ -1,9 +1,12 @@
 .detail-all-div {
-    max-width: 300px;
+    max-width: 350px;
 }
 .data-div {
     color: #666666;
     text-align: left;
+}
+.data-div-info {
+    border: 1px solid;
 }
 .data-div-non {
     display: none;
@@ -71,6 +74,7 @@
     border-color: #3399ff;
     font-size: small;
     height: 25px;
+    margin: 8px;
 }
 .export-div {
     display: block;

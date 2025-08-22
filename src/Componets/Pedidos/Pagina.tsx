@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from 'react'
 import { GlobalContext } from '../../Context/GlobalContext'
-import { IFilter, IInsumo, IpedidoDataPDF, rolesNum } from '../../Utils/Interfaces'
+import { IFilter, IInsumo, IpedidoDataPDF, IServicio, rolesNum } from '../../Utils/Interfaces'
 import "./Pagina.css"
 import dateParser from '../../Utils/dateParser'
 import { useNavigate } from 'react-router-dom'
@@ -22,10 +22,11 @@ export default function PaginaPedidos () {
     const [cco, setCco] = useState(0)
     const [client, setClient] = useState(0)
     const [nro, setNro] = useState('')
-    const [req, setReq] = useState('')
+    const [req, setReq] = useState(0)
     const [state, setState] = useState('')
     const [dateStart, setDateStart] = useState('')
     const [dateEnd, setDateEnd] = useState('')
+    const [ccoArr, setCcoArr] = useState<IServicio[]>([])
     
     useEffect(() => {
         setDateStart(lastMonth())
@@ -38,14 +39,15 @@ export default function PaginaPedidos () {
                     limit,
                     client,
                     service: cco,
-                    requester: req,
+                    user_id: req,
                     numero: nro,
                     state: state,
                     dateStart,
-                    dateEnd
+                    dateEnd,
                 }
                 if(global.pedidos.length === 0) global?.pedidosFn( global.user.rol, filtro)
                 if(global.ccos.length === 0 ) global.ccosFn()
+                if(global.sysUsers.length === 0 && (global.user.rol === rolesNum.en_deposito || global.user.rol === rolesNum.admin)) global.sysUsersFn()
             }
         }, waitTime);
     },[global?.user])
@@ -56,7 +58,7 @@ export default function PaginaPedidos () {
             limit: limit,
             client: client ? client : 0,
             service: cco,
-            requester: req,
+            user_id: req,
             numero: nro,
             state: state,
             dateStart,
@@ -65,14 +67,38 @@ export default function PaginaPedidos () {
         global?.pedidosFn( global.user.rol, filterData)
     }
 
-    const displayLoading = () => {
-        return (<h3 className='title-Homepage'>Cargando...</h3>)
+    const displayLoading = (compras: boolean) => {
+        if(compras) {
+            window.location.href = "/compras"
+        }
+        else return (<h3 className='title-Homepage'>Cargando...</h3>)
+        
     }
 
     const displayDate = (date: string): string => {
         const d = dateParser(date)
         return d.day + '/'+d.month+'/'+d.year
     }
+
+    useEffect(() => {
+        if(global && global.ccos) {
+            let arr = global.ccos
+            if(client) {
+                arr = arr.filter((s) => s.client_id === client)
+            }
+            setCcoArr(arr)
+        }
+
+    },[client, cco])
+
+    useEffect(() => {
+        setDateEnd("")
+        setDateStart("")
+        setReq(0)
+        setCco(0)
+        setClient(0)
+        setState("")
+    },[nro])
 
     const colorChange = (state: string): string => {
         switch(state) {
@@ -107,11 +133,6 @@ export default function PaginaPedidos () {
             )
         })
     )
-    const requesterSearch = (): Array<string> => {
-        const reqSet = new Set<string>(global?.pedidos.map(p => p.requester))
-        const arr = Array.from(reqSet)
-        return arr
-    }
     const stateSearch = () => {
         return filterJSON.states
     }
@@ -126,7 +147,8 @@ export default function PaginaPedidos () {
             if(id === s.service_id) {
                 data.clientdes = s.client_des
                 data.clientid = s.client_id
-
+                data.serdes = s.service_des
+                data.serid = s.service_id
             }
         });
         return data
@@ -176,10 +198,9 @@ export default function PaginaPedidos () {
 
     return(
         <div >
-            <div className='div-pedidos'>
-                <Header />
-            </div>
+            <Header />
             <hr color='#3399ff' className='hr-line'/>
+            {global?.user.rol !== 5 && 
             <div className='div-filter'>
                 <div>
                     <h5 className='filter-sub'>Nro Pedido</h5>
@@ -187,22 +208,10 @@ export default function PaginaPedidos () {
                     value={nro} onChange={e => setNro(e.target.value)}/>
                 </div>
                 <div>
-                    <h5 className='filter-sub'>CCO</h5>
-                    <select defaultValue={''} disabled={parseInt(nro) ? true : false}
-                    value={cco} onChange={(e) => setCco(parseInt(e.target.value))} className='select-small-cco'>
-                        <option value={''}>---</option>
-                        {
-                            global?.ccos.map((cco) => (
-                                <option key={cco.service_id} value={cco.service_id}>{cco.service_id+'-'+cco.service_des}</option>
-                            ))
-                        }
-                    </select>
-                </div>
-                <div>
                     <h5 className='filter-sub'>Cliente</h5>
-                    <select defaultValue={''} disabled={parseInt(nro) ? true : false}
+                    <select disabled={nro.length > 0 ? true : false}
                     value={client} onChange={(e) => setClient(parseInt(e.target.value))} className='select-small-cco'>
-                        <option value={''}>---</option>
+                        <option value={0}>---</option>
                         {global?.ccos &&
                             clientesReturner(global.ccos)?.map((cco) => (
                                 <option key={cco.client_id} value={cco.client_id}>{cco.client_id+'-'+cco.client_des}</option>
@@ -210,15 +219,27 @@ export default function PaginaPedidos () {
                         }
                     </select>
                 </div>
+                <div>
+                    <h5 className='filter-sub'>CCO</h5>
+                    <select disabled={nro.length > 0 ? true : false}
+                    value={cco} onChange={(e) => setCco(parseInt(e.target.value))} className='select-small-cco'>
+                        <option value={0}>---</option>
+                        {
+                            ccoArr.map((cco) => (
+                                <option key={cco.service_id} value={cco.service_id}>{cco.service_id+'-'+cco.service_des}</option>
+                            ))
+                        }
+                    </select>
+                </div>
                 <div className='div-filter-other'>
                   <div>
                       <h5 className='filter-sub'>Solicitante</h5>
-                      <select defaultValue={''} disabled={parseInt(nro) ||  global?.user.rol === rolesNum.encargado ? true : false}
-                      value={req} onChange={(e) => setReq(e.target.value)} className='select-small'>
-                          <option value={''}>---</option>
+                      <select defaultValue={''} disabled={nro.length > 0 ||  global?.user.rol === rolesNum.encargado ? true : false}
+                      value={req} onChange={(e) => setReq(parseInt(e.target.value))} className='select-small'>
+                          <option value={0}>---</option>
                           {
-                              requesterSearch().map((r) => (
-                                  <option key={r} value={r}>{r}</option>
+                              global?.sysUsers.map((r) => (
+                                  <option key={r.usuario_id} value={r.usuario_id}>{r.username}</option>
                               ))
                           }
                       </select>
@@ -235,19 +256,24 @@ export default function PaginaPedidos () {
                       </select>
                   </div>
                   <div>
-                      <h5 className='filter-sub'>Cantidad</h5>
-                      <input type='number' id='limit' className='textfield-limit' min={10}
-                      value={limit} onChange={e => setLimit(parseInt(e.target.value))}/>
+                    <h5 className='filter-sub'>Cantidad</h5>
+                    <select className='select-small' value={limit}
+                    onChange={e => setLimit(parseInt(e.target.value))}>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                        <option value={150}>150</option>
+                        <option value={200}>200</option>
+                    </select>
                   </div>
                 </div>
 
                 <div>
                     <h5 className='filter-sub'>Fecha de inicio y Final</h5>
-                    <input disabled={parseInt(nro) ? true : false} 
+                    <input disabled={nro.length > 0 ? true : false} 
                     type='date' id='date_start' className='date-input'
                     value={dateStart} onChange={e => setDateStart(e.target.value)}/>
                     <a> - </a>
-                    <input disabled={parseInt(nro) ? true : false} 
+                    <input disabled={nro.length > 0 ? true : false} 
                     type='date' id='date_end' className='date-input'
                     value={dateEnd} onChange={e => setDateEnd(e.target.value)}/>
                 </div>
@@ -258,9 +284,11 @@ export default function PaginaPedidos () {
                     Filtrar
                 </button>
             </div>
+            }
+
             <div className='div-list'>
                 {
-                global?.pedidos.length && global?.pedidos.length >= 0 ? displayPedidos() : displayLoading()
+                global?.pedidos.length && global?.pedidos.length >= 0 ? displayPedidos() : displayLoading(global?.user.rol === 5 ? true : false)
                 }
             </div>
         </div>
