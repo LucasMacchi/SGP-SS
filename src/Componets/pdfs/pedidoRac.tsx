@@ -111,6 +111,7 @@ const PedidoRacPdf: React.FC<IPedidoRacPDF> = ({pedido}) => (
                     <Text style={stylePedido.body}>Dependencia: {pedido.pedido_desglose}</Text>
                     <Text style={stylePedido.body}>Fecha: {dateParser(pedido.pedido_req)}</Text>
                     <Text style={stylePedido.body}>Remito: {pedido.remito_nro}</Text>
+                    <Text style={stylePedido.body}>Localidad: {pedido.pedido_local}</Text>
                 </View>
                 <View style={stylePedido.viewdataReq}>
                     <Text style={stylePedido.title}>Datos de Contacto</Text>

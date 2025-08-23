@@ -142,6 +142,7 @@ export interface IpedidoRacDataPDF {
     pedido_service: string,
     pedido_client_id: number,
     pedido_service_id: number,
+    pedido_local: string,
     pedido_insumos: IInsumoRac[],
     pedido_desglose: string,
     remito_nro: string
