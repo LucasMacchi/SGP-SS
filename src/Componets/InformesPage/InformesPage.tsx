@@ -57,7 +57,8 @@ export default function InformesPage () {
         pedido_service_id: 0,
         pedido_insumos: [],
         pedido_desglose: "",
-        remito_nro: ""
+        remito_nro: "",
+        pedido_local: ""
     })
 
 
@@ -309,7 +310,8 @@ export default function InformesPage () {
             remitoRac.pedido_client_id = 1
             remitoRac.solicitante_usuario = global.user.username
             remitoRac.pedido_req = new Date().toISOString()
-            remitoRac.pedido_service = lentregaService(global.lentregas, remitoRac.pedido_service_id)
+            remitoRac.pedido_service = lentregaService(global.lentregas, remitoRac.pedido_service_id).descripcion
+            remitoRac.pedido_local = lentregaService(global.lentregas, remitoRac.pedido_service_id).localidad
             const data: IPedidoRacPDF = {pedido:remitoRac}
             const blob: Blob = await pdf(<PedidoRacPdf pedido={data.pedido}/>).toBlob()
             saveAs(blob, 'SGP_REMITODES_'+remitoRac.remito_nro)
@@ -399,8 +401,8 @@ export default function InformesPage () {
                         value={remitoRac.pedido_desglose} onChange={(e) => setReRac({...remitoRac, pedido_desglose: e.target.value})} className='select-small-cco'>
                             <option value={""}>---</option>
                             {(global && remitoRac.pedido_service_id) && 
-                            <option value={lentregaService(global.lentregas, remitoRac.pedido_service_id)}>
-                                {lentregaService(global.lentregas, remitoRac.pedido_service_id)}
+                            <option value={lentregaService(global.lentregas, remitoRac.pedido_service_id).descripcion}>
+                                {lentregaService(global.lentregas, remitoRac.pedido_service_id).descripcion}
                             </option>}
                             
                             {
