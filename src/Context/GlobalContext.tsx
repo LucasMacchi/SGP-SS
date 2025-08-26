@@ -13,6 +13,7 @@ import {
   ICollectionoRes,
   ICompra,
   ICompraDto,
+  IDesglose,
   IEmailSender,
   IFilter,
   IInsumoComp,
@@ -886,7 +887,7 @@ export default function GlobalState(props: IPropsChildren) {
   }
   async function getDesglosesFn() {
     try {
-      const desgloses: string[] = (await axios.get(SERVER+"/envios/desgloses",authReturner())).data
+      const desgloses: IDesglose[] = (await axios.get(SERVER+"/envios/desgloses",authReturner())).data
       dispatch({
         payload: desgloses,
         type: ac.SET_DESGLOSES,
@@ -1036,7 +1037,7 @@ interface IGlobalContext {
   createPersonal: (personal: IPersonal) => void;
   personal: IPersonal[];
   categories: string[];
-  desgloses: string[];
+  desgloses: IDesglose[];
   insCategroies: ICatRub,
   errorCat: string[];
   pedidoDetail: IPedido;

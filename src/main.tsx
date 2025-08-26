@@ -18,6 +18,7 @@ import ServicesPage from './Componets/Servicios/ServicesPage.tsx'
 import Soporte from './Componets/Soporte/Soporte.tsx'
 import Compras from './Componets/Compras/Compras.tsx'
 import CompraDetail from './Componets/Compras/CompraDetail.tsx'
+import Envios from './Componets/Envios/Envios.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -40,6 +41,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path='/compras/:id' element={<CompraDetail/>}/>
           <Route path='/add' element={<AddOrder/>}/>
           <Route path='/add/:orderId' element={<AddOrder/>}/>
+          <Route path='/envio' element={<Envios/>}/>
         </Routes>
       </StrictMode>
     </GlobalState>

@@ -165,7 +165,8 @@ export interface IInsumoRac {
     kg: number,
     cajas: number,
     bolsas: number,
-    rac: number
+    rac: number,
+    sel?: number
 }
 
 export interface IPedidosPDF {
@@ -341,4 +342,10 @@ export interface ILgarEntrega {
     lat?: number,
     long?: number,
     descripcion: string
+}
+
+export interface IDesglose {
+    descripcion: string,
+    localidad: string,
+    desglose_id: number
 }
