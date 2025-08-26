@@ -92,7 +92,7 @@ export default function Header () {
                     <option className='dropdown-txt' style={hidderHeader([5])} value={2}>NUEVO PEDIDO</option>
                     <option className='dropdown-txt' value={3}>GENERAR INFORME</option>
                     <option className='dropdown-txt' style={hidderHeader([5])} value={4}>SERVICIOS / INSUMOS</option>
-                    <option className='dropdown-txt' style={hidderHeader([5,4,3,2])} value={10}>ENVIOS</option>
+                    <option className='dropdown-txt' style={hidderHeader([5])} value={10}>ENVIOS</option>
                     <option className='dropdown-txt' value={5}>CORREO</option>
                     <option className='dropdown-txt' style={hidderHeader([5])} value={6}>BUSCAR REPORTES</option>
                     <option className='dropdown-txt' value={7}>SOPORTE TECNICO</option>
