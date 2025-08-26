@@ -80,13 +80,14 @@ export default function Envios () {
             if(insRac.des.length > 0) {
                 remitoRac.pedido_insumos.push(insRac)
                 setReRac({...remitoRac})
-                setInsRac({des: "", rac: 0, kg: 0, cajas: 0, bolsas: 0})
+                setInsRac({des: "", rac: 0, kg: 0, cajas: 0, bolsas: 0, sel: 0})
             } else alert("Ingrese un insumo valido.")
         }
         const deleteInsumoRowRemitoRac = (index: number, ins: string) => {
             if(confirm('¿Quiere eliminar el insumo '+ins+ "?")){
                 remitoRac.pedido_insumos.splice(index, 1)
                 setReRac(remitoRac)
+                setInsRac({des: "", rac: 0, kg: 0, cajas: 0, bolsas: 0, sel: 0})
             }
         }
         const generateRacEnvioPdf = async () => {
@@ -103,6 +104,7 @@ export default function Envios () {
                 ...remitoRac,
                 solicitante_usuario: "",pedido_req: "",
                 pedido_insumos: [],pedido_desglose: ""})
+                setInsRac({des: "", rac: 0, kg: 0, cajas: 0, bolsas: 0,sel: 0})
 
                 
                 
@@ -159,7 +161,7 @@ export default function Envios () {
                     <div>
                         <div style={{ display: "flex",flexDirection: "row"}}>
                             <h4 className='title-Homepage'>Insumo: </h4>
-                            <select name="remitodes" onChange={(e) => setInsRac({...insRac, sel: parseInt(e.target.value),des: insRacionamieto.insumos[parseInt(e.target.value)].des})}>
+                            <select value={insRac.sel} name="remitodes" onChange={(e) => setInsRac({...insRac, sel: parseInt(e.target.value),des: insRacionamieto.insumos[parseInt(e.target.value)].des})}>
                                 {insRacionamieto.insumos.map((ins, i) => (
                                     <option value={i}>{ins.des}</option>
                                 ))}
