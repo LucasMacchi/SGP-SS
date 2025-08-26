@@ -66,6 +66,9 @@ export default function Header () {
             case 9:
                 navigateTo('/admin/users')
                 break;
+            case 10:
+                navigateTo('/envio')
+                break;
             default:
                 navigateTo('/pedidos')
                 break;
@@ -89,6 +92,7 @@ export default function Header () {
                     <option className='dropdown-txt' style={hidderHeader([5])} value={2}>NUEVO PEDIDO</option>
                     <option className='dropdown-txt' value={3}>GENERAR INFORME</option>
                     <option className='dropdown-txt' style={hidderHeader([5])} value={4}>SERVICIOS / INSUMOS</option>
+                    <option className='dropdown-txt' style={hidderHeader([5,4,3,2])} value={10}>ENVIOS</option>
                     <option className='dropdown-txt' value={5}>CORREO</option>
                     <option className='dropdown-txt' style={hidderHeader([5])} value={6}>BUSCAR REPORTES</option>
                     <option className='dropdown-txt' value={7}>SOPORTE TECNICO</option>
@@ -99,45 +103,3 @@ export default function Header () {
         </div>
     )
 }
-
-/*
-            {global?.user.username &&
-                <h5 className='delete-text'>{global.user.username}</h5>}
-            <div className="dropdown">
-                <button className='btn-menu-header' onClick={() => setDrop(!drop)}>Menu</button>
-                {drop && (
-                    <ul className='dropdown-ul'>
-                        <li className='dropdown-li' onClick={() => logOutHeader()}>
-                            Cerrar Sesion
-                            </li>
-                        <li className='dropdown-li' style={hidderHeader([5])} onClick={() => navigateTo('/pedidos')}>
-                            Pedidos
-                        </li>
-                        <li className='dropdown-li' style={hidderHeader([5])} onClick={() => navigateTo('/add')}>
-                            Nuevo Pedido
-                        </li>
-                        <li className='dropdown-li' onClick={() => navigateTo('/informes')}>
-                            Generar Informes
-                        </li>
-                        <li className='dropdown-li' style={hidderHeader([5])} onClick={() => navigateTo('/services')}>
-                        Servicios
-                        </li>
-                        <li className='dropdown-li' onClick={() => navigateTo('/correo')}>
-                            Correo
-                        </li>
-                        <li className='dropdown-li' style={hidderHeader([5])} onClick={() => navigateTo('/reportes')}>
-                            Buscar Reportes
-                        </li>
-                        <li className='dropdown-li' onClick={() => navigateTo('/soporte')}>
-                        Soporte Tecnico
-                        </li>
-                        <li className='dropdown-li' onClick={() => navigateTo('/compras')}>
-                            Compras
-                        </li>
-                        <li className='dropdown-li' style={hidderHeader([2,3,4,5])} onClick={() => navigateTo('/admin/users')}>
-                            Admin - Usuarios
-                        </li>
-                    </ul>
-                )}
-            </div>
-*/

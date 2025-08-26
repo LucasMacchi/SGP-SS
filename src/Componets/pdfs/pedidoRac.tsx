@@ -1,5 +1,5 @@
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
-import { IPedidoRacPDF } from '../../Utils/Interfaces';
+import { IInsumoRac, IPedidoRacPDF } from '../../Utils/Interfaces';
 
 const stylePedido = StyleSheet.create({
     logo: {
@@ -92,6 +92,35 @@ const dateParser = (fecha: string) => {
     return dateFr.getDate() + "/" + (dateFr.getMonth()+1) + "/" + dateFr.getFullYear()
 }
 
+const insumosDisplayer = (insumos: IInsumoRac[]) => {
+    const elements = []
+    const amount = insumos.length > 20 ? insumos.length : 25
+    for (let i = 0; i < amount; i++) {
+        console.log(i)
+        elements.push(
+            <View style={stylePedido.tableRow}>
+                <View style={stylePedido.tableColIns}>
+                    <Text style={stylePedido.tableCell}>{insumos[i] ? insumos[i].des : " "}</Text>
+                </View>
+                <View style={stylePedido.tableColcod}>
+                    <Text style={stylePedido.tableCell}>{insumos[i] ? insumos[i].kg : " "}</Text>
+                </View>
+                <View style={stylePedido.tableColcod}>
+                    <Text style={stylePedido.tableCell}>{insumos[i] ? insumos[i].cajas : " "}</Text>
+                </View>
+                <View style={stylePedido.tableColcod}>
+                    <Text style={stylePedido.tableCell}>{insumos[i] ? insumos[i].bolsas : " "}</Text>
+                </View>
+                <View style={stylePedido.tableColcod}>
+                    <Text style={stylePedido.tableCell}>{insumos[i] ? insumos[i].rac : " "}</Text>
+                </View>
+            </View>
+        )
+        
+    }
+    return elements
+}
+
 const PedidoRacPdf: React.FC<IPedidoRacPDF> = ({pedido}) => (
     <Document>
         <Page size={'A4'} style={stylePedido.page}>
@@ -112,8 +141,6 @@ const PedidoRacPdf: React.FC<IPedidoRacPDF> = ({pedido}) => (
                     <Text style={stylePedido.body}>Fecha: {dateParser(pedido.pedido_req)}</Text>
                     <Text style={stylePedido.body}>Remito: {pedido.remito_nro}</Text>
                     <Text style={stylePedido.body}>Localidad: {pedido.pedido_local}</Text>
-                </View>
-                <View style={stylePedido.viewdataReq}>
                     <Text style={stylePedido.title}>Datos de Contacto</Text>
                     <Text style={stylePedido.body}>Telefono: 3794-586633</Text>
                     <Text style={stylePedido.body}>Correo: info@solucionesyservicios.com.ar</Text>
@@ -139,25 +166,7 @@ const PedidoRacPdf: React.FC<IPedidoRacPDF> = ({pedido}) => (
                     </View>
                 </View>
                 </View>
-                {pedido.pedido_insumos.map((i) => (
-                    <View style={stylePedido.tableRow}>
-                        <View style={stylePedido.tableColIns}>
-                            <Text style={stylePedido.tableCell}>{i.des}</Text>
-                        </View>
-                        <View style={stylePedido.tableColcod}>
-                            <Text style={stylePedido.tableCell}>{i.kg}</Text>
-                        </View>
-                        <View style={stylePedido.tableColcod}>
-                            <Text style={stylePedido.tableCell}>{i.cajas}</Text>
-                        </View>
-                        <View style={stylePedido.tableColcod}>
-                            <Text style={stylePedido.tableCell}>{i.bolsas}</Text>
-                        </View>
-                        <View style={stylePedido.tableColcod}>
-                            <Text style={stylePedido.tableCell}>{i.rac}</Text>
-                        </View>
-                    </View>
-                ))}
+                {insumosDisplayer(pedido.pedido_insumos)}
                 
             </View>
         </Page>
