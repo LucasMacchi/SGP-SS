@@ -76,11 +76,9 @@ export default function CompraDetail () {
                         descripcion: des,
                         cantidad: formCant,
                         compraID: global.compraDetail.compra_id
-
-
                     }
                     console.log(data)
-                    //const res = await global?.addProdCompra(data)
+                    await global?.addProdCompra(data)
                 }
             } else alert("Cantidad invalida, ingrese un numero.")
 

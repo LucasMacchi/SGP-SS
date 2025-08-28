@@ -21,6 +21,16 @@ export interface IAction {
     type: string,
     payload: any
 }
+
+export interface IEndCode {
+  month: string,
+  year: string,
+  day: string,
+  hour: string,
+  sec: number,
+  dayWeek: number
+}
+
 export interface IAddPedido {
   requester: string,
   service_id: number,
@@ -348,4 +358,15 @@ export interface IDesglose {
     descripcion: string,
     localidad: string,
     desglose_id: number
+}
+
+export interface IEnvio {
+    lentregaId: number,
+    desgloseId: number,
+    userId: number,
+    estado: string,
+    nro: string,
+    identificador: string,
+    productos: IInsumoRac[],
+    addprod: IInsumoRac
 }

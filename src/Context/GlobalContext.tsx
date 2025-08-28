@@ -15,6 +15,7 @@ import {
   ICompraDto,
   IDesglose,
   IEmailSender,
+  IEnvio,
   IFilter,
   IInsumoComp,
   ILgarEntrega,
@@ -33,6 +34,7 @@ import ac from "./Actions";
 import { jwtDecode } from "jwt-decode";
 import axios, { AxiosResponse } from "axios";
 import authReturner from "../Utils/authReturner";
+import envioFormater from "../Utils/envioFormater";
 
 export const GlobalContext = createContext<IGlobalContext | null>(null);
 const LOGS = import.meta.env.VITE_USE_LOGS;
@@ -820,14 +822,14 @@ export default function GlobalState(props: IPropsChildren) {
       alert("Error al editar la compra.");
     }
   }
-  async function addProdCompra (data: IAddProd): Promise<boolean> {
+  async function addProdCompra (data: IAddProd) {
     try {
-      await axios.post(SERVER+"/compra/add",data, authReturner())
-      return true
+      await axios.post(SERVER+"/compras/add",data, authReturner())
+      alert("Compra modificada.")
+      window.location.reload()
     } catch (error) {
       console.log(error);
       alert("Error al editar la compra.");
-      return false
     }
   }
   async function deleteProdCompra(detailID: number) {
@@ -904,6 +906,18 @@ export default function GlobalState(props: IPropsChildren) {
       type: ac.SET_MENU,
     });
   }
+
+  async function registerEnvio(envios: IEnvio[]) {
+    try {
+      const formatedEnvios = envioFormater(envios)
+      console.log(formatedEnvios)
+      alert("Envios creados!. Numero "+formatedEnvios[0].identificador)
+    } catch (error) {
+      console.log(error)
+      alert("Error al crear envios.")
+    }
+    
+  }
   
   const innitialState: IGlobalContext = {
     user: {
@@ -973,6 +987,7 @@ export default function GlobalState(props: IPropsChildren) {
     ccosFn,
     collectionRemito,
     sysUsersFn,
+    registerEnvio,
     changeMenu,
     orderAproveFn,
     preaproveCompraFn,
@@ -1061,6 +1076,7 @@ interface IGlobalContext {
     order_id: number,
     comentario: string,
   ) => void;
+  registerEnvio: (envios: IEnvio[]) => void;
   orderRejectFn: (order_id: number, comentario: string) => void;
   orderCancelFn: (order_id: number) => void;
   orderEditFn: () => void;
@@ -1112,5 +1128,5 @@ interface IGlobalContext {
   getInsumosComplete: () => Promise<IInsumoComp[]>;
   changeMenu: (v: number) => void;
   getDesglosesFn: () => void;
-  addProdCompra: (data: IAddProd) => Promise<boolean>;
+  addProdCompra: (data: IAddProd) => void;
 }
