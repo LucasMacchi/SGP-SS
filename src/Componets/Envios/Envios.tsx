@@ -448,7 +448,8 @@ export default function Envios () {
             const envios = await global?.getEnviosTanda(tanda)
             if(envios && envios.length > 0) {
                 const blob: Blob = await pdf(<DesglosePdf envios={envios} />).toBlob()
-                saveAs(blob, 'SGP_REMITODES_'+remitoRac.remito_nro)
+                saveAs(blob, 'SGP_TANDA_'+tanda)
+                setTanda(0)
             }
         }
 
