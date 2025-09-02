@@ -8,6 +8,7 @@ import saveAs from "file-saver";
 import { pdf } from "@react-pdf/renderer";
 import insRacionamieto from "./insumos.json"
 import desgloseReturner from "../../Utils/desgloseReturner";
+import DesglosePdf from "../pdfs/desgloses";
 
 
 export default function Envios () {
@@ -23,6 +24,7 @@ export default function Envios () {
     const [newEnvios, setNewEnvios] = useState<IEnvio[]>([])
     const [displayDes, setDisplayDes] = useState(false)
     const [updater, setUpdater] = useState(0)
+    const [tanda, setTanda] = useState(0)
     const [insRac, setInsRac] = useState<IInsumoRac>({
         des: "",kg: 0,cajas: 0,
         bolsas: 0,rac: 0,sel: 0
@@ -440,6 +442,38 @@ export default function Envios () {
         )
     }
 
+    const displayTraerEnvios = () => {
+
+        const getEnvios = async () => {
+            const envios = await global?.getEnviosTanda(tanda)
+            if(envios && envios.length > 0) {
+                const blob: Blob = await pdf(<DesglosePdf envios={envios} />).toBlob()
+                saveAs(blob, 'SGP_REMITODES_'+remitoRac.remito_nro)
+            }
+        }
+
+        return(
+            <div>
+                <hr color='#3399ff' className='hr-line'/>
+                <div>
+                    <h2 className='title-Homepage' >
+                        Generar Envio 
+                    </h2>
+                    <div>
+                        <h4 className='title-Homepage'>Seleccione la tanda a traer</h4>
+                        <select value={tanda} name="remitodes" onChange={(e) => setTanda(parseInt(e.target.value))}>
+                            <option value={0}>{"---"}</option>
+                            <option value={1}>1</option>
+                            <option value={2}>2</option>
+                            <option value={3}>3</option>
+                        </select>
+                    </div>
+                    {tanda > 0 && <button className='btn-big' onClick={() => getEnvios()}>Generar</button>}
+                </div>
+            </div>
+        )
+    }
+
     return(
         <div>
             <Header />
@@ -452,11 +486,13 @@ export default function Envios () {
                         onChange={(e)=>setDisplay(parseInt(e.target.value))}>
                             <option value={0}>---</option>
                             <option value={1}>Generar desglosado de envio</option>
+                            <option value={3}>Traer envios</option>
                         </select>
                     </div>
                     <div style={{maxWidth: 400}}>
                         {display === 1 && displayDesglosadoGn()}
                         {display === 2 && displayNewEnvio()}
+                        {display === 3 && displayTraerEnvios()}
                     </div>
                 </div>
             </div>
