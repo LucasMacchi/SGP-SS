@@ -24,6 +24,7 @@ import {
   IPersonal,
   IPropsChildren,
   IReport,
+  IrequestEnvio,
   IResponseInsumo,
   IServicio,
   IToken,
@@ -918,6 +919,17 @@ export default function GlobalState(props: IPropsChildren) {
     }
     
   }
+
+  async function getEnviosTanda(tanda: number): Promise<IrequestEnvio[]> {
+    try {
+      const envios: IrequestEnvio[] = (await axios.get(SERVER+"/envios/tanda/"+tanda,authReturner())).data
+      return envios
+    } catch (error) {
+      console.log(error);
+      alert("Error al traer los envios.");
+      return []
+    }
+  }
   
   const innitialState: IGlobalContext = {
     user: {
@@ -1034,7 +1046,8 @@ export default function GlobalState(props: IPropsChildren) {
     getUniqCompraNro,
     addProdCompra,
     getLugaresEntreFn,
-    getDesglosesFn
+    getDesglosesFn,
+    getEnviosTanda
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1129,4 +1142,5 @@ interface IGlobalContext {
   changeMenu: (v: number) => void;
   getDesglosesFn: () => void;
   addProdCompra: (data: IAddProd) => void;
+  getEnviosTanda: (tanda: number) => Promise<IrequestEnvio[]>
 }

@@ -370,3 +370,27 @@ export interface IEnvio {
     productos: IInsumoRac[],
     addprod: IInsumoRac
 }
+
+export interface IDetalleEnvio {
+  kilos: number,
+  cajas: number,
+  bolsas: number,
+  raciones: number,
+  des: string,
+  envio_id: number
+}
+
+export interface IrequestEnvio {
+  entregaId: number,
+  dependencia: string,
+  descripcion: string,
+  detalles: IDetalleEnvio[],
+  envio_id: number,
+  nro_remito: string,
+  localidad: string,
+  direccion: string
+}
+
+export interface desglosesDataPdf {
+    envios: IrequestEnvio[]
+}
