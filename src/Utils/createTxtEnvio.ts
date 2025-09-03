@@ -9,8 +9,8 @@ export default function (txtLines: ITxtEnvios, tanda: number) {
     txtLines.items.forEach(l => items += l+"\n");
 
 
-    zip.file('CCABECER.txt',cabecera)
-    zip.file('CITEMS.txt',items)
+    zip.file('VCABECER.txt',cabecera)
+    zip.file('VITEMS.txt',items)
 
     const dateNow = dateParser(new Date())
 
