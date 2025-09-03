@@ -28,6 +28,7 @@ import {
   IResponseInsumo,
   IServicio,
   IToken,
+  ITxtEnvios,
   IUser,
   rolesNum,
 } from "../Utils/Interfaces";
@@ -930,6 +931,17 @@ export default function GlobalState(props: IPropsChildren) {
       return []
     }
   }
+
+    async function getTxtEnvio(tanda: number): Promise<ITxtEnvios> {
+    try {
+      const envios: ITxtEnvios = (await axios.get(SERVER+"/envios/txt/"+tanda,authReturner())).data
+      return envios
+    } catch (error) {
+      console.log(error);
+      alert("Error al traer los envios.");
+      return {cabecera: [], items: []}
+    }
+  }
   
   const innitialState: IGlobalContext = {
     user: {
@@ -1047,7 +1059,8 @@ export default function GlobalState(props: IPropsChildren) {
     addProdCompra,
     getLugaresEntreFn,
     getDesglosesFn,
-    getEnviosTanda
+    getEnviosTanda,
+    getTxtEnvio
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1142,5 +1155,6 @@ interface IGlobalContext {
   changeMenu: (v: number) => void;
   getDesglosesFn: () => void;
   addProdCompra: (data: IAddProd) => void;
-  getEnviosTanda: (tanda: number) => Promise<IrequestEnvio[]>
+  getEnviosTanda: (tanda: number) => Promise<IrequestEnvio[]>;
+  getTxtEnvio: (tanda: number) => Promise<ITxtEnvios>;
 }

@@ -394,3 +394,8 @@ export interface IrequestEnvio {
 export interface desglosesDataPdf {
     envios: IrequestEnvio[]
 }
+
+export interface ITxtEnvios {
+    cabecera: string[],
+    items: string[]
+}

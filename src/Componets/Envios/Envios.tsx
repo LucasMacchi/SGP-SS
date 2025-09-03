@@ -9,6 +9,7 @@ import { pdf } from "@react-pdf/renderer";
 import insRacionamieto from "./insumos.json"
 import desgloseReturner from "../../Utils/desgloseReturner";
 import DesglosePdf from "../pdfs/desgloses";
+import createTxtEnvio from "../../Utils/createTxtEnvio";
 
 
 export default function Envios () {
@@ -452,6 +453,13 @@ export default function Envios () {
                 setTanda(0)
             }
         }
+        const exportEnvio = async () => {
+            const txt = await global?.getTxtEnvio(tanda)
+            if(txt && txt.cabecera.length > 0 && txt.items.length > 0) {
+                createTxtEnvio(txt, tanda)
+            }
+            else alert("No existen envios en esa tanda.")
+        }
 
         return(
             <div>
@@ -470,6 +478,7 @@ export default function Envios () {
                         </select>
                     </div>
                     {tanda > 0 && <button className='btn-big' onClick={() => getEnvios()}>Generar</button>}
+                    {tanda > 0 && <button className='btn-big' onClick={() => exportEnvio()}>Exportar</button>}
                 </div>
             </div>
         )
