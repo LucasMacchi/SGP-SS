@@ -86,7 +86,7 @@ export default function ReportPage () {
             <hr color='#3399ff' className='hr-line'/>
             <div>
                 <h5 className='filter-sub'>Nro Pedido</h5>
-                <input type='number' id='nro_pedido' className='textfield-search' min={0}
+                <input type='text' id='nro_pedido' className='textfield-search' min={0}
                 value={nro} onChange={e => setNro(e.target.value)}/>
             </div>
             <button className='btn-small-logout' onClick={() => searchReports()}>
