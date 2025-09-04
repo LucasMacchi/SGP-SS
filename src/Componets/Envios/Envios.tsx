@@ -470,12 +470,8 @@ export default function Envios () {
                     </h2>
                     <div>
                         <h4 className='title-Homepage'>Seleccione la tanda a traer</h4>
-                        <select value={tanda} name="remitodes" onChange={(e) => setTanda(parseInt(e.target.value))}>
-                            <option value={0}>{"---"}</option>
-                            <option value={1}>1</option>
-                            <option value={2}>2</option>
-                            <option value={3}>3</option>
-                        </select>
+                        <input type="number" id='otherins' className="data-div-select" value={tanda} min={1}
+                        style={{width: "35%"}} onChange={(e) => setTanda((e.target.value) ? parseInt(e.target.value) : 0)}/>
                     </div>
                     {tanda > 0 && <button className='btn-big' onClick={() => getEnvios()}>Generar</button>}
                     {tanda > 0 && <button className='btn-big' onClick={() => exportEnvio()}>Exportar</button>}
