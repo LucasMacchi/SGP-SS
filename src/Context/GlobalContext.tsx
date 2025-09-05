@@ -932,9 +932,9 @@ export default function GlobalState(props: IPropsChildren) {
     }
   }
 
-    async function getTxtEnvio(tanda: number): Promise<ITxtEnvios> {
+    async function getTxtEnvio(tanda: number, dias: number): Promise<ITxtEnvios> {
     try {
-      const envios: ITxtEnvios = (await axios.get(SERVER+"/envios/txt/"+tanda,authReturner())).data
+      const envios: ITxtEnvios = (await axios.get(SERVER+"/envios/txt/"+tanda+"/"+dias,authReturner())).data
       return envios
     } catch (error) {
       console.log(error);
@@ -1156,5 +1156,5 @@ interface IGlobalContext {
   getDesglosesFn: () => void;
   addProdCompra: (data: IAddProd) => void;
   getEnviosTanda: (tanda: number) => Promise<IrequestEnvio[]>;
-  getTxtEnvio: (tanda: number) => Promise<ITxtEnvios>;
+  getTxtEnvio: (tanda: number, dias: number) => Promise<ITxtEnvios>;
 }
