@@ -26,6 +26,7 @@ export default function Envios () {
     const [displayDes, setDisplayDes] = useState(false)
     const [updater, setUpdater] = useState(0)
     const [tanda, setTanda] = useState(0)
+    const [dias, setDias] = useState(0)
     const [insRac, setInsRac] = useState<IInsumoRac>({
         des: "",kg: 0,cajas: 0,
         bolsas: 0,rac: 0,sel: 0
@@ -454,9 +455,11 @@ export default function Envios () {
             }
         }
         const exportEnvio = async () => {
-            const txt = await global?.getTxtEnvio(tanda)
+            const txt = await global?.getTxtEnvio(tanda, dias)
             if(txt && txt.cabecera.length > 0 && txt.items.length > 0) {
                 createTxtEnvio(txt, tanda)
+                setDias(0)
+                setTanda(0)
             }
             else alert("No existen envios en esa tanda.")
         }
@@ -472,6 +475,13 @@ export default function Envios () {
                         <h4 className='title-Homepage'>Seleccione la tanda a traer</h4>
                         <input type="number" id='otherins' className="data-div-select" value={tanda} min={1}
                         style={{width: "35%"}} onChange={(e) => setTanda((e.target.value) ? parseInt(e.target.value) : 0)}/>
+                    </div>
+                    <div>
+                    <div>
+                        <h4 className='title-Homepage'>Seleccione los dias</h4>
+                        <input type="number" id='otherins' className="data-div-select" value={dias} min={1}
+                        style={{width: "35%"}} onChange={(e) => setDias((e.target.value) ? parseInt(e.target.value) : 0)}/>
+                    </div>
                     </div>
                     {tanda > 0 && <button className='btn-big' onClick={() => getEnvios()}>Generar</button>}
                     {tanda > 0 && <button className='btn-big' onClick={() => exportEnvio()}>Exportar</button>}
