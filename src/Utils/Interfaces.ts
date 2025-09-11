@@ -399,3 +399,32 @@ export interface ITxtEnvios {
     cabecera: string[],
     items: string[]
 }
+
+export interface IDesglosesRuta {
+    nro_remito: string,
+    dependencia: string,
+    localidad: string,
+    direccion: string
+}
+export interface IRemitoRuta {
+    nro_remito: string,
+    localidad: string,
+    direccion: string
+}
+export interface ITotalRutas {
+    des: string,
+    cajas: string,
+    bolsas: string,
+    kilos: string,
+    ucaja: string,
+    palet: number
+}
+export interface IResponseRutas {
+    desgloses: IDesglosesRuta[],
+    remitos: IRemitoRuta[],
+    totales: ITotalRutas[]
+}
+
+export interface IRutaPdf {
+    ruta: IResponseRutas
+}

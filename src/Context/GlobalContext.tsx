@@ -26,6 +26,7 @@ import {
   IReport,
   IrequestEnvio,
   IResponseInsumo,
+  IResponseRutas,
   IServicio,
   IToken,
   ITxtEnvios,
@@ -933,15 +934,26 @@ export default function GlobalState(props: IPropsChildren) {
   }
 
     async function getTxtEnvio(tanda: number, dias: number): Promise<ITxtEnvios> {
-    try {
-      const envios: ITxtEnvios = (await axios.get(SERVER+"/envios/txt/"+tanda+"/"+dias,authReturner())).data
-      return envios
-    } catch (error) {
-      console.log(error);
-      alert("Error al traer los envios.");
-      return {cabecera: [], items: []}
+      try {
+        const envios: ITxtEnvios = (await axios.get(SERVER+"/envios/txt/"+tanda+"/"+dias,authReturner())).data
+        return envios
+      } catch (error) {
+        console.log(error);
+        alert("Error al traer los envios.");
+        return {cabecera: [], items: []}
+      }
     }
-  }
+    async function getRutaEnvio(tanda: number): Promise<IResponseRutas | null> {
+      try {
+        const ruta: IResponseRutas = (await axios.get(SERVER+"/envios/ruta/"+tanda,authReturner())).data
+        return ruta
+      } catch (error) {
+        console.log(error);
+        alert("Error al traer los datos para la ruta.");
+        return null
+      }
+    }
+  
   
   const innitialState: IGlobalContext = {
     user: {
@@ -1060,7 +1072,8 @@ export default function GlobalState(props: IPropsChildren) {
     getLugaresEntreFn,
     getDesglosesFn,
     getEnviosTanda,
-    getTxtEnvio
+    getTxtEnvio,
+    getRutaEnvio
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1157,4 +1170,5 @@ interface IGlobalContext {
   addProdCompra: (data: IAddProd) => void;
   getEnviosTanda: (tanda: number) => Promise<IrequestEnvio[]>;
   getTxtEnvio: (tanda: number, dias: number) => Promise<ITxtEnvios>;
+  getRutaEnvio:(tanda: number) => Promise<IResponseRutas | null>;
 }

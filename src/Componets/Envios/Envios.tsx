@@ -10,6 +10,7 @@ import insRacionamieto from "./insumos.json"
 import desgloseReturner from "../../Utils/desgloseReturner";
 import DesglosePdf from "../pdfs/desgloses";
 import createTxtEnvio from "../../Utils/createTxtEnvio";
+import RutaPdf from "../pdfs/rutaEnvioPdf";
 
 
 export default function Envios () {
@@ -448,7 +449,11 @@ export default function Envios () {
 
         const getEnvios = async () => {
             const envios = await global?.getEnviosTanda(tanda)
-            if(envios && envios.length > 0) {
+            const hojaRuta = await global?.getRutaEnvio(tanda)
+            console.log(hojaRuta)
+            if(envios && envios.length > 0 && hojaRuta) {
+                const blobR = await pdf(<RutaPdf ruta={hojaRuta}/>).toBlob()
+                saveAs(blobR, 'SGP_HR_'+tanda)
                 const blob: Blob = await pdf(<DesglosePdf envios={envios} />).toBlob()
                 saveAs(blob, 'SGP_TANDA_'+tanda)
                 setTanda(0)
