@@ -47,7 +47,7 @@ export default function PaginaPedidos () {
                 }
                 if(global.pedidos.length === 0) global?.pedidosFn( global.user.rol, filtro)
                 if(global.ccos.length === 0 ) global.ccosFn()
-                if(global.sysUsers.length === 0 && (global.user.rol === rolesNum.en_deposito || global.user.rol === rolesNum.admin)) global.sysUsersFn()
+                if(global.sysUsers.length === 0 && (global.user.rol === rolesNum.en_deposito || global.user.rol === rolesNum.admin || global.user.rol === rolesNum.administrativo)) global.sysUsersFn()
             }
         }, waitTime);
     },[global?.user])
