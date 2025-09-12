@@ -242,7 +242,7 @@ const RutaPdf: React.FC<IRutaPdf> = ({ruta}) => (
             </View>
             <View style={stylePedido.viewdata1}>
                 <View >
-                    <View style={{...stylePedido.viewdataHeader, marginTop: 120,borderBottomWidth:0}}>
+                    <View style={{...stylePedido.viewdataHeader, marginTop: 20,borderBottomWidth:0}}>
                         <View>
                             <Text style={stylePedido.title}>Chofer:...........................</Text>
                         </View>
