@@ -230,7 +230,7 @@ const RutaPdf: React.FC<IRutaPdf> = ({ruta}) => (
                         <Text style={stylePedido.tableCell}>Cajas</Text>
                     </View>
                     <View style={stylePedido.tableColcod}>
-                        <Text style={stylePedido.tableCell}>Bolsas</Text>
+                        <Text style={stylePedido.tableCell}>Bolsas/Unid.</Text>
                     </View>
                     <View style={stylePedido.tableColcod}>
                         <Text style={stylePedido.tableCell}>Kilos</Text>
