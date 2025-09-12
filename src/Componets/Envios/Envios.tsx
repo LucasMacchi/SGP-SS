@@ -449,13 +449,17 @@ export default function Envios () {
 
         const getEnvios = async () => {
             const envios = await global?.getEnviosTanda(tanda)
-            const hojaRuta = await global?.getRutaEnvio(tanda)
-            console.log(hojaRuta)
-            if(envios && envios.length > 0 && hojaRuta) {
-                const blobR = await pdf(<RutaPdf ruta={hojaRuta}/>).toBlob()
-                saveAs(blobR, 'SGP_HR_'+tanda)
+            if(envios && envios.length > 0) {
                 const blob: Blob = await pdf(<DesglosePdf envios={envios} />).toBlob()
                 saveAs(blob, 'SGP_TANDA_'+tanda)
+                setTanda(0)
+            }
+        }
+        const getHojaRuta = async () => {
+            const hojaRuta = await global?.getRutaEnvio(tanda)
+            if(hojaRuta) {
+                const blobR = await pdf(<RutaPdf ruta={hojaRuta}/>).toBlob()
+                saveAs(blobR, 'SGP_HR_'+tanda)
                 setTanda(0)
             }
         }
@@ -488,8 +492,16 @@ export default function Envios () {
                         style={{width: "35%"}} onChange={(e) => setDias((e.target.value) ? parseInt(e.target.value) : 0)}/>
                     </div>
                     </div>
-                    {tanda > 0 && <button className='btn-big' onClick={() => getEnvios()}>Generar</button>}
-                    {tanda > 0 && <button className='btn-big' onClick={() => exportEnvio()}>Exportar</button>}
+                    <div>
+                        {tanda > 0 && <button className='btn-big' onClick={() => getEnvios()}>Desgloses</button>}
+                    </div>
+                    <div>
+                        {tanda > 0 && <button className='btn-big' onClick={() => getHojaRuta()}>Hoja de Ruta</button>}
+                    </div>
+                    <div>
+                        {tanda > 0 && <button className='btn-big' onClick={() => exportEnvio()}>Exportar</button>}
+                    </div>
+
                 </div>
             </div>
         )
