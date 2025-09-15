@@ -940,7 +940,7 @@ export default function GlobalState(props: IPropsChildren) {
       } catch (error) {
         console.log(error);
         alert("Error al traer los envios.");
-        return {cabecera: [], items: []}
+        return {cabecera: [], items: [], informe: [] }
       }
     }
     async function getRutaEnvio(tanda: number): Promise<IResponseRutas | null> {
