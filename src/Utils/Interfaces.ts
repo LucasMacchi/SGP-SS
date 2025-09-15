@@ -397,7 +397,8 @@ export interface desglosesDataPdf {
 
 export interface ITxtEnvios {
     cabecera: string[],
-    items: string[]
+    items: string[],
+    informe: string[]
 }
 
 export interface IDesglosesRuta {

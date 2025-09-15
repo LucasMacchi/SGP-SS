@@ -5,10 +5,12 @@ export default function (txtLines: ITxtEnvios, tanda: number) {
     const zip = new JSZip();
     let cabecera = ""
     let items = ""
+    let informe = ""
     txtLines.cabecera.forEach(l => cabecera += l+"\n");
     txtLines.items.forEach(l => items += l+"\n");
+    txtLines.informe.forEach(l => informe += l+"\n")
 
-
+    zip.file('INFORME.txt',informe)
     zip.file('VCABECER.txt',cabecera)
     zip.file('VITEMS.txt',items)
 
