@@ -388,7 +388,8 @@ export interface IrequestEnvio {
   envio_id: number,
   nro_remito: string,
   localidad: string,
-  direccion: string
+  direccion: string,
+  completo: string
 }
 
 export interface desglosesDataPdf {
@@ -410,7 +411,8 @@ export interface IDesglosesRuta {
 export interface IRemitoRuta {
     nro_remito: string,
     localidad: string,
-    direccion: string
+    direccion: string,
+    completo: string
 }
 export interface ITotalRutas {
     des: string,
