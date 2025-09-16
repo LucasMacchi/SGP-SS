@@ -1,5 +1,6 @@
-import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/renderer';
 import {IDesglosesRuta, IRemitoRuta, IRutaPdf, ITotalRutas } from '../../Utils/Interfaces';
+import logoBig from "../../assets/logo_big.png"
 
 const stylePedido = StyleSheet.create({
     logo: {
@@ -109,6 +110,9 @@ const remitoDisplayer = (remitos: IRemitoRuta[]) => {
                     <Text style={stylePedido.tableCell}>{remitos[i].nro_remito}</Text>
                 </View>
                 <View style={stylePedido.tableColIns}>
+                    <Text style={stylePedido.tableCell}>{remitos[i].completo}</Text>
+                </View>
+                <View style={stylePedido.tableColIns}>
                     <Text style={stylePedido.tableCell}>{remitos[i].localidad}</Text>
                 </View>
                 <View style={stylePedido.tableColIns}>
@@ -173,6 +177,7 @@ const insumosDisplayer = (insumos: ITotalRutas[]) => {
 const RutaPdf: React.FC<IRutaPdf> = ({ruta}) => (
     <Document>
         <Page size={'A4'} style={stylePedido.page}>
+            <Image src={logoBig} style={stylePedido.logo}/>
             <View style={stylePedido.viewdataHeader}>
                 <View >
                     <Text style={stylePedido.title}>Soluciones & Servicios</Text>
@@ -203,6 +208,9 @@ const RutaPdf: React.FC<IRutaPdf> = ({ruta}) => (
                 <View style={stylePedido.tableRow_header}>
                     <View style={stylePedido.tableColIns}>
                         <Text style={stylePedido.tableCell}>Numero Remito</Text>
+                    </View>
+                    <View style={stylePedido.tableColIns}>
+                        <Text style={stylePedido.tableCell}>Cabecera</Text>
                     </View>
                     <View style={stylePedido.tableColIns}>
                         <Text style={stylePedido.tableCell}>Localidad</Text>

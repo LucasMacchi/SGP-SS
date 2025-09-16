@@ -1,5 +1,6 @@
-import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/renderer';
 import { desglosesDataPdf, IDetalleEnvio } from '../../Utils/Interfaces';
+import logoBig from "../../assets/logo_big.png"
 
 const stylePedido = StyleSheet.create({
     logo: {
@@ -120,6 +121,7 @@ const DesglosePdf: React.FC<desglosesDataPdf> = ({envios}) => (
     <Document>
         {envios.map((e) => (
         <Page size={'A4'} style={stylePedido.page}>
+            <Image src={logoBig} style={stylePedido.logo}/>
             <View style={stylePedido.viewdataHeader}>
                 <View >
                     <Text style={stylePedido.title}>Soluciones & Servicios</Text>
@@ -132,7 +134,7 @@ const DesglosePdf: React.FC<desglosesDataPdf> = ({envios}) => (
             <View style={stylePedido.viewdata}>
                 <View >
                     <Text style={stylePedido.title}>Desglose de Entrega</Text>
-                    <Text style={stylePedido.body}>Cabecera: {e.descripcion}</Text>
+                    <Text style={stylePedido.body}>Cabecera: {e.completo}</Text>
                     <Text style={stylePedido.body}>Dependencia: {e.dependencia}</Text>
                     <Text style={stylePedido.body}>Fecha: {new Date().toISOString()}</Text>
                     <Text style={stylePedido.body}>Remito: {e.nro_remito}</Text>
