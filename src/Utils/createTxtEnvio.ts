@@ -6,9 +6,9 @@ export default function (txtLines: ITxtEnvios, tanda: number) {
     let cabecera = ""
     let items = ""
     let informe = ""
-    txtLines.cabecera.forEach(l => cabecera += l+"\n");
-    txtLines.items.forEach(l => items += l+"\n");
-    txtLines.informe.forEach(l => informe += l+"\n")
+    txtLines.cabecera.forEach(l => cabecera += l+"\r\n");
+    txtLines.items.forEach(l => items += l+"\r\n");
+    txtLines.informe.forEach(l => informe += l+"\r\n")
 
     zip.file('INFORME.txt',informe)
     zip.file('VCABECER.txt',cabecera)
