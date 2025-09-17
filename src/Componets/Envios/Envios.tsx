@@ -478,7 +478,7 @@ export default function Envios () {
             const actas = await global?.getConformidadEnvio(tanda)
             if(actas) {
                 const blobR = await pdf(<ActaConformidadPDF actas={actas}/>).toBlob()
-                saveAs(blobR, 'SGP_HR_'+tanda)
+                saveAs(blobR, 'SGP_ACTAS_'+tanda)
                 setTanda(0)
             }
         }
