@@ -11,6 +11,7 @@ import desgloseReturner from "../../Utils/desgloseReturner";
 import DesglosePdf from "../pdfs/desgloses";
 import createTxtEnvio from "../../Utils/createTxtEnvio";
 import RutaPdf from "../pdfs/rutaEnvioPdf";
+import ActaConformidadPDF from "../pdfs/actaConformidad";
 
 
 export default function Envios () {
@@ -473,6 +474,15 @@ export default function Envios () {
             else alert("No existen envios en esa tanda.")
         }
 
+        const getActas = async () => {
+            const actas = await global?.getConformidadEnvio(tanda)
+            if(actas) {
+                const blobR = await pdf(<ActaConformidadPDF actas={actas}/>).toBlob()
+                saveAs(blobR, 'SGP_HR_'+tanda)
+                setTanda(0)
+            }
+        }
+
         return(
             <div>
                 <hr color='#3399ff' className='hr-line'/>
@@ -497,6 +507,9 @@ export default function Envios () {
                     </div>
                     <div>
                         {tanda > 0 && <button className='btn-big' onClick={() => getHojaRuta()}>Hoja de Ruta</button>}
+                    </div>
+                    <div>
+                        {tanda > 0 && <button className='btn-big' onClick={() => getActas()}>Actas</button>}
                     </div>
                     <div>
                         {tanda > 0 && <button className='btn-big' onClick={() => exportEnvio()}>Exportar</button>}

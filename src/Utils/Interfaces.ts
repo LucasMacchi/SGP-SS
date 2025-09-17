@@ -431,3 +431,13 @@ export interface IResponseRutas {
 export interface IRutaPdf {
     ruta: IResponseRutas
 }
+
+export interface IConformidad {
+    nro_remito: string,
+    completo: string,
+    localidad: string
+}
+
+export interface IconformidadDataPdf {
+    actas: IConformidad[]
+}

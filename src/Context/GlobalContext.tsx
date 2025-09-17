@@ -13,6 +13,7 @@ import {
   ICollectionoRes,
   ICompra,
   ICompraDto,
+  IConformidad,
   IDesglose,
   IEmailSender,
   IEnvio,
@@ -953,6 +954,16 @@ export default function GlobalState(props: IPropsChildren) {
         return null
       }
     }
+    async function getConformidadEnvio(tanda: number): Promise<IConformidad[]> {
+      try {
+        const ruta: IConformidad[] = (await axios.get(SERVER+"/envios/actas/"+tanda,authReturner())).data
+        return ruta
+      } catch (error) {
+        console.log(error);
+        alert("Error al traer los datos para la ruta.");
+        return []
+      }
+    }
   
   
   const innitialState: IGlobalContext = {
@@ -1018,6 +1029,7 @@ export default function GlobalState(props: IPropsChildren) {
     logoutFn,
     sessionFn,
     pedidosFn,
+    getConformidadEnvio,
     getInsumosComplete,
     insumosFn,
     ccosFn,
@@ -1171,4 +1183,5 @@ interface IGlobalContext {
   getEnviosTanda: (tanda: number) => Promise<IrequestEnvio[]>;
   getTxtEnvio: (tanda: number, dias: number) => Promise<ITxtEnvios>;
   getRutaEnvio:(tanda: number) => Promise<IResponseRutas | null>;
+  getConformidadEnvio: (tanda: number) => Promise<IConformidad[]>;
 }
