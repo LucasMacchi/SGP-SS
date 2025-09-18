@@ -20,7 +20,7 @@ export default function ServicesPage () {
     const [filteredInsumos, setFilteredInsumos] = useState<string[]>([])
     const [filteredLentregas, setFilteredLentregas] = useState<ILgarEntrega[]>([])
     const [searchServ, setSearchServ] = useState('')
-    const [displayType, setDisplayType] = useState(0)
+    const [displayType, setDisplayType] = useState(1)
 
     useEffect(() => {
         if(global) {
