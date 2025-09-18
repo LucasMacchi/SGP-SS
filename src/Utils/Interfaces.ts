@@ -164,6 +164,12 @@ export interface IDataPdf {
     descripcion: string
 }
 
+export interface IDataEntregaPdf {
+    solicitado: string,
+    datos: ILgarEntrega[],
+    descripcion: string
+}
+
 export interface IAddProd {
     descripcion: string,
     compraID: number,
@@ -351,7 +357,8 @@ export interface ILgarEntrega {
     direccion: string,
     lat?: number,
     long?: number,
-    descripcion: string
+    descripcion: string,
+    completo: string
 }
 
 export interface IDesglose {
