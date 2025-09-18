@@ -103,7 +103,7 @@ const DataDocumentEntrega: React.FC<IDataEntregaPdf> = (data) => (
             <View style={stylePedido.view}>
                 <View style={stylePedido.table}>
                 <View style={stylePedido.tableRow_header}>
-                    <View style={stylePedido.tableColIns}>
+                    <View style={stylePedido.tableColID}>
                         <Text style={stylePedido.tableCell}>ID</Text>
                     </View>
                     <View style={stylePedido.tableColIns}>
