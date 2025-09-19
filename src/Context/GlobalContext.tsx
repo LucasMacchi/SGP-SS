@@ -933,7 +933,6 @@ export default function GlobalState(props: IPropsChildren) {
       return []
     }
   }
-
     async function getTxtEnvio(tanda: number, dias: number): Promise<ITxtEnvios> {
       try {
         const envios: ITxtEnvios = (await axios.get(SERVER+"/envios/txt/"+tanda+"/"+dias,authReturner())).data
@@ -962,6 +961,15 @@ export default function GlobalState(props: IPropsChildren) {
         console.log(error);
         alert("Error al traer los datos para la ruta.");
         return []
+      }
+    }
+    async function deleteTandaFn (tanda: number, key: string) {
+      try {
+        const response: string = (await axios.delete(SERVER+`/envios/del/tanda/${tanda}/${key}`,authReturner())).data
+        alert(response)
+      } catch (error) {
+        console.log(error);
+        alert("Error al eliminar la tanda.");
       }
     }
   
@@ -1085,7 +1093,8 @@ export default function GlobalState(props: IPropsChildren) {
     getDesglosesFn,
     getEnviosTanda,
     getTxtEnvio,
-    getRutaEnvio
+    getRutaEnvio,
+    deleteTandaFn
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1184,4 +1193,5 @@ interface IGlobalContext {
   getTxtEnvio: (tanda: number, dias: number) => Promise<ITxtEnvios>;
   getRutaEnvio:(tanda: number) => Promise<IResponseRutas | null>;
   getConformidadEnvio: (tanda: number) => Promise<IConformidad[]>;
+  deleteTandaFn: (tanda: number, key: string) => void;
 }
