@@ -158,7 +158,6 @@ const insumosDisplayer = (insumos: ITotalRutas[]) => {
         bolsasT += parseInt(insumos[i].bolsas)
         kilosT += parseFloat(insumos[i].kilos)
         paletsT += insumos[i].palet
-        console.log(insumos[i])
         elements.push(
             <View style={stylePedido.tableRow}>
                 <View style={stylePedido.tableColIns}>
@@ -195,7 +194,7 @@ const insumosDisplayer = (insumos: ITotalRutas[]) => {
                 <Text style={stylePedido.tableCell}>{bolsasT}</Text>
             </View>
             <View style={stylePedido.tableColcod}>
-                <Text style={stylePedido.tableCell}>{kilosT}</Text>
+                <Text style={stylePedido.tableCell}>{kilosT.toFixed(2)}</Text>
             </View>
         </View>
         )
