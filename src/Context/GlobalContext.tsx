@@ -8,6 +8,8 @@ import {
   ICategoriesRes,
   ICatRub,
   IChangeData,
+  IChangeEnvioInsumo,
+  IChangeEnvioInsumoPlan,
   IClientIns,
   ICollection,
   ICollectionoRes,
@@ -17,15 +19,18 @@ import {
   IDesglose,
   IEmailSender,
   IEnvio,
+  IEnvioInsumos,
   IFilter,
   IInsumoComp,
   ILgarEntrega,
   IOrderRemito,
   IPedido,
   IPersonal,
+  IPlanComplete,
   IPropsChildren,
   IReport,
   IrequestEnvio,
+  IrequestEnvioCom,
   IResponseInsumo,
   IResponseRutas,
   IServicio,
@@ -972,6 +977,80 @@ export default function GlobalState(props: IPropsChildren) {
         alert("Error al eliminar la tanda.");
       }
     }
+    async function getInsumosEnvios (): Promise<IEnvioInsumos[]> {
+      try {
+        const response: IEnvioInsumos[] = (await axios.get(SERVER+`/envios/insumos`,authReturner())).data
+        return response
+      } catch (error) {
+        console.log(error);
+        alert("Error al traer envios.");
+        return []
+      }
+    }
+    async function getEnviosPlanes (): Promise<IPlanComplete[]> {
+      try {
+        const response: IPlanComplete[] = (await axios.get(SERVER+`/envios/planes`,authReturner())).data
+        return response
+      } catch (error) {
+        console.log(error);
+        alert("Error al traer envios.");
+        return []
+      }
+    }
+    async function createEnvios (data: IrequestEnvioCom[], update: boolean): Promise<string> {
+      try {
+        const parsed = {
+          enviados: data,
+          update
+        }
+        const response: string = (await axios.post(SERVER+`/envios/create`,parsed,authReturner())).data
+        return response
+      } catch (error) {
+        console.log(error);
+        alert("Error al crear envios.");
+        return "ERROR"
+      }
+    }
+    async function patchInsumoEnvio (data: IChangeEnvioInsumo): Promise<void> {
+      try {
+        const response: string = (await axios.patch(SERVER+`/envios/insumos`,data,authReturner())).data
+        alert(response);
+        window.location.reload()
+      } catch (error) {
+        console.log(error);
+        alert("Error al modificar insumo.");
+      }
+    }
+    async function patchInsumoEnvioPlan (data: IChangeEnvioInsumoPlan): Promise<void> {
+      try {
+        const response: string = (await axios.patch(SERVER+`/envios/plan/edit/insumo`,data,authReturner())).data
+        alert(response);
+        window.location.reload()
+      } catch (error) {
+        console.log(error);
+        alert("Error al modificar insumo del plan.");
+      }
+    }
+    async function deleteInsumoEnvioPlan (id: number): Promise<void> {
+      try {
+        const response: string = (await axios.delete(SERVER+`/envios/plan/del/insumo/`+id,authReturner())).data
+        alert(response);
+        window.location.reload()
+      } catch (error) {
+        console.log(error);
+        alert("Error al modificar insumo del plan.");
+      }
+    }
+    async function addInsumoEnvioPlan (plan: number, ins: number, dias: number): Promise<void> {
+      try {
+        const response: string = (await axios.post(SERVER+`/envios/plan/add/insumo/${plan}/${ins}/${dias}`,{},authReturner())).data
+        alert(response);
+        window.location.reload()
+      } catch (error) {
+        console.log(error);
+        alert("Error al agregar insumo al plan.");
+      }
+    }
   
   
   const innitialState: IGlobalContext = {
@@ -1094,7 +1173,14 @@ export default function GlobalState(props: IPropsChildren) {
     getEnviosTanda,
     getTxtEnvio,
     getRutaEnvio,
-    deleteTandaFn
+    deleteTandaFn,
+    getInsumosEnvios,
+    getEnviosPlanes,
+    createEnvios,
+    patchInsumoEnvio,
+    patchInsumoEnvioPlan,
+    deleteInsumoEnvioPlan,
+    addInsumoEnvioPlan
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1194,4 +1280,11 @@ interface IGlobalContext {
   getRutaEnvio:(tanda: number) => Promise<IResponseRutas | null>;
   getConformidadEnvio: (tanda: number) => Promise<IConformidad[]>;
   deleteTandaFn: (tanda: number, key: string) => void;
+  getInsumosEnvios: () => Promise<IEnvioInsumos[]>;
+  getEnviosPlanes: () => Promise<IPlanComplete[]>;
+  createEnvios: (data: IrequestEnvioCom[],update: boolean) => Promise<string>;
+  patchInsumoEnvio: (data: IChangeEnvioInsumo) => Promise<void>;
+  patchInsumoEnvioPlan: (data: IChangeEnvioInsumoPlan) => Promise<void>;
+  deleteInsumoEnvioPlan: (id: number) => Promise<void>;
+  addInsumoEnvioPlan: (plan: number, ins: number, dias: number) => Promise<void>;
 }
