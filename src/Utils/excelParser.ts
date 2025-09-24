@@ -23,21 +23,40 @@ export default async function ExcelParserEnvios (excel: File, insumos: IEnvioIns
         plan.details.forEach((p) => {
             insumos.forEach(ins => {
                 if(ins.ins_id === p.ins_id) {
-                    const value: number = linea.raciones / 30 * p.dias
-                    const unidades = Math.ceil(value / (ins.gr_total / ins.gr_racion))
-                    const cajas = Math.floor(unidades / ins.unidades_caja)
-                    const bolsas = Math.ceil(unidades - (cajas * ins.unidades_caja))
-                    const kilos = unidades * ins.gr_total / 1000
-                    envio.detalles.push({
-                        kilos: kilos,
-                        cajas: cajas,
-                        bolsas: bolsas,
-                        raciones: Math.floor(unidades * (ins.gr_total / ins.gr_racion)),
-                        unidades: unidades,
-                        unit_caja: ins.unidades_caja,
-                        caja_palet: ins.caja_palet,
-                        des: ins.des
-                    })
+                    if(ins.unidades_caja > 0) {
+                        const value: number = linea.raciones / 30 * p.dias
+                        const unidades = Math.ceil(value / (ins.gr_total / ins.gr_racion))
+                        const cajas = Math.floor(unidades / ins.unidades_caja)
+                        const bolsas = Math.ceil(unidades - (cajas * ins.unidades_caja))
+                        const kilos = unidades * ins.gr_total / 1000
+                        envio.detalles.push({
+                            kilos: kilos,
+                            cajas: cajas,
+                            bolsas: bolsas,
+                            raciones: Math.floor(unidades * (ins.gr_total / ins.gr_racion)),
+                            unidades: unidades,
+                            unit_caja: ins.unidades_caja,
+                            caja_palet: ins.caja_palet,
+                            des: ins.des
+                        })
+                    }
+                    else {
+                        const value: number = linea.raciones / 30 * p.dias
+                        const unidades = Math.ceil(value / (ins.gr_total / ins.gr_racion))
+                        const cajas = 0
+                        const bolsas = Math.ceil(unidades - (cajas * ins.unidades_caja))
+                        const kilos = unidades * ins.gr_total / 1000
+                        envio.detalles.push({
+                            kilos: kilos,
+                            cajas: cajas,
+                            bolsas: bolsas,
+                            raciones: Math.floor(unidades * (ins.gr_total / ins.gr_racion)),
+                            unidades: unidades,
+                            unit_caja: 0,
+                            caja_palet: ins.caja_palet,
+                            des: ins.des
+                        })
+                    }
                 }
             });
         })
@@ -65,6 +84,7 @@ async function parsedReturned (excel: File): Promise<excelLineas[][]> {
             sheets.forEach(sheet => {
                 const currentSh = workbook.Sheets[sheet]
                 const excelP: excelLineas[] = XLSX.utils.sheet_to_json(currentSh)
+                excelP.sort((a,b) => a.lentrega - b.lentrega)
                 data.push(excelP)
             });
             resolve(data)
