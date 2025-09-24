@@ -20,6 +20,9 @@ export default defineConfig({
         name: 'Sistema Gestor de Pedidos',
         short_name: 'SGP app',
         icons: manifestIcons,
+      },
+      workbox: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024 // 5 MiB
       }
     })
   ],
