@@ -1,232 +1,101 @@
-import { useContext, useEffect, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import Header from "../Header/Header";
-import { IDesglose, IInsumoRac, ILgarEntrega, IpedidoRacDataPDF, IPedidoRacPDF } from "../../Utils/Interfaces";
-import lentregaService from "../../Utils/lentregaService";
 import { GlobalContext } from "../../Context/GlobalContext";
-import PedidoRacPdf from "../pdfs/pedidoRac";
 import saveAs from "file-saver";
 import { pdf } from "@react-pdf/renderer";
-import insRacionamieto from "./insumos.json"
 import DesglosePdf from "../pdfs/desgloses";
 import createTxtEnvio from "../../Utils/createTxtEnvio";
 import RutaPdf from "../pdfs/rutaEnvioPdf";
 import ActaConformidadPDF from "../pdfs/actaConformidad";
+import ExcelParserEnvios from "../../Utils/excelParser";
+import { IChangeEnvioInsumo, IChangeEnvioInsumoPlan, IEnvioInsumos, IPlanComplete, IrequestEnvioCom } from "../../Utils/Interfaces";
+import informeEnviosTxt from "../../Utils/informeEnviosTxt";
+
 
 
 export default function Envios () {
 
     const global = useContext(GlobalContext)
     const [display, setDisplay] = useState(0)
-    const [lgaresF, setLgaresF] = useState<ILgarEntrega[]>([])
-    const [desglosesF, setDesglosesF] = useState<IDesglose[]>([])
-    const [desglosesS, setDesglosesS] = useState("")
-    const [lgaresS, setLgaresS] = useState("")
     const [tanda, setTanda] = useState(0)
     const [delkey, setDelkey] = useState("")
-    const [dias, setDias] = useState(0)
-    const [insRac, setInsRac] = useState<IInsumoRac>({
-        des: "",kg: 0,cajas: 0,
-        bolsas: 0,rac: 0,sel: 0
-    })
-    const [remitoRac, setReRac] = useState<IpedidoRacDataPDF>({
-        solicitante_usuario: "",pedido_req: "",pedido_service: "",
-        pedido_client_id: 0,pedido_service_id: 0,pedido_insumos: [],
-        pedido_desglose: "",remito_nro: "",pedido_local: ""
-    })
-    const racionesCalc = (c: number, b:number, cr: number, br: number): number => {
-        return c*cr+b*br
-    }
-    const racionesKilosCalc = (r: number, w: number, b: number): number => {
-        return r*(w/b)
-    }
+    const [dias, setDias] = useState(30)
+    const [selectedPlan, setSelectedPlan] = useState(1000)
+    const [planes, setPlanes] = useState<IPlanComplete[]>([])
+    const [insumos, setInsumos] = useState<IEnvioInsumos[]>([])
+    const [selectedIns, setSelectedIns] = useState(0)
     useEffect(() => {
-        if(global?.lentregas.length === 0) global.getLugaresEntreFn()
-        if(global?.desgloses.length === 0) global.getDesglosesFn()
+        if(global) {
+            if(global?.lentregas.length === 0) global.getLugaresEntreFn()
+            if(global?.desgloses.length === 0) global.getDesglosesFn()
+            global.getInsumosEnvios().then(i => setInsumos(i))
+            global.getEnviosPlanes().then(p => setPlanes(p)) 
+        }
     },[])
 
     useEffect(() => {
-        setReRac({solicitante_usuario: "",pedido_req: "",pedido_service: "",pedido_client_id: 0,
-        pedido_service_id: 0,pedido_insumos: [],pedido_desglose: "",remito_nro: "",pedido_local: ""})
-        setInsRac({des: "",kg: 0,cajas: 0,bolsas: 0,rac: 0,sel: 0})
-        setLgaresS("")
-        setDesglosesS("")
         setDelkey("")
         setTanda(0)
+        setSelectedPlan(1000)
+        setSelectedIns(0)
     },[display])
 
-    useEffect(() => {
-        if(global){
-            let arr = global?.lentregas
-            const search = lgaresS.toLowerCase()
-            if(lgaresS.length > 0) arr = arr?.filter(s => s.descripcion.toLowerCase().includes(search))
-            setLgaresF(arr)
-        }
-    },[lgaresS, global?.lentregas])
-
-    useEffect(() => {
-        if(global){
-            let arr = global?.desgloses
-            const search = desglosesS.toLowerCase()
-            if(desglosesS.length > 0) arr = arr?.filter(s => s.descripcion.toLowerCase().includes(search))
-            setDesglosesF(arr)
-        }
-    },[desglosesS, global?.desgloses])
-
-    useEffect(() => {
-        if(insRac.sel) {
-            const ins = insRacionamieto.insumos[insRac.sel]
-            const bolsas = insRac.bolsas
-            const cajas = insRac.cajas
-            const raciones = racionesCalc(cajas,bolsas,ins.c,ins.b)
-            const kilos = (racionesKilosCalc(raciones, ins.w, ins.b) / 1000).toFixed(2)
-            setInsRac({...insRac ,rac: raciones, kg: parseFloat(kilos)})
-        }
-    },[insRac.bolsas, insRac.cajas])
 
 
     const displayDesglosadoGn = () => {
-        const addInsRac = () => {
-            if(insRac.des.length > 0) {
-                remitoRac.pedido_insumos.push(insRac)
-                setReRac({...remitoRac})
-                setInsRac({des: "", rac: 0, kg: 0, cajas: 0, bolsas: 0, sel: 0})
-            } else alert("Ingrese un insumo valido.")
-        }
-        const deleteInsumoRowRemitoRac = (index: number, ins: string) => {
-            if(confirm('¿Quiere eliminar el insumo '+ins+ "?")){
-                remitoRac.pedido_insumos.splice(index, 1)
-                setReRac(remitoRac)
-                setInsRac({des: "", rac: 0, kg: 0, cajas: 0, bolsas: 0, sel: 0})
+        const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+            if(e.target.files && e.target.files[0] && global && confirm("¿Quieres crear las tandas de este excel?")) {
+                const updater = confirm("¿Quieres que se actualicen los remitos?")
+                const data: IrequestEnvioCom[][] = await ExcelParserEnvios(e.target.files[0], insumos, planes[selectedPlan])
+                let lineas = []
+                console.log(data)
+                for (let index = 0; index < data.length; index++) {
+                    const res = await global.createEnvios(data[index], updater)
+                    lineas.push(res)
+                }
+                informeEnviosTxt(lineas)
             }
-        }
-        const generateRacEnvioPdf = async () => {
-            if(global && remitoRac.pedido_insumos.length > 0 && remitoRac.pedido_service_id && remitoRac.remito_nro.length > 0 && remitoRac.pedido_desglose.length > 0) {
-                remitoRac.pedido_client_id = 1
-                remitoRac.solicitante_usuario = global.user.username
-                remitoRac.pedido_req = new Date().toISOString()
-                remitoRac.pedido_service = lentregaService(global.lentregas, remitoRac.pedido_service_id).descripcion
-                remitoRac.pedido_local = lentregaService(global.lentregas, remitoRac.pedido_service_id).localidad
-                const data: IPedidoRacPDF = {pedido:remitoRac}
-                const blob: Blob = await pdf(<PedidoRacPdf pedido={data.pedido}/>).toBlob()
-                saveAs(blob, 'SGP_REMITODES_'+remitoRac.remito_nro)
-                setReRac({
-                ...remitoRac,
-                solicitante_usuario: "",pedido_req: "",
-                pedido_insumos: [],pedido_desglose: ""})
-                setInsRac({des: "", rac: 0, kg: 0, cajas: 0, bolsas: 0,sel: 0})
-
-                
-                
-            } else alert("Faltan datos.")
+        };
+        const displayPlan = () => {
+            if(selectedPlan !== 1000){
+                return(
+                    <table style={{fontSize: "small", width: 380}}>
+                        <tbody>
+                            <tr>
+                                <th style={{border: "1px solid", width: "90%"}}>Insumo</th>
+                                <th style={{border: "1px solid", width: "10%"}}>Dias</th>
+                            </tr>
+                            {planes[selectedPlan].details.map((d) => (
+                            <tr key={d.detail_id}>
+                                <th style={{border: "1px solid", width: "90%"}}>{d.des}</th>
+                                <th style={{border: "1px solid", width: "10%"}}>{d.dias}</th>
+                            </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )
+            }
         }
         return(
             <div>
                 <hr color='#3399ff' className='hr-line'/>
                 <div>
                     <h2 className='title-Homepage' >
-                        Remito detalle 
+                        Cargar un envio 
                     </h2>
-                    <div>
-                        <h4 className='title-Homepage'>Cabeceras encontrados - {lgaresF.length}</h4>
-                        <div style={{ display: "flex",flexDirection: "row"}}>
-                            <h4 className='title-Homepage'>Buscar: </h4>
-                            <input type="text" id='otherins' className="data-div-select" value={lgaresS}
-                            style={{width: "58%"}} onChange={(e) => setLgaresS(e.target.value)}/>
-                        </div>
-                        <select defaultValue={0}
-                        value={remitoRac.pedido_service_id} onChange={(e) => setReRac({...remitoRac, pedido_service_id: parseInt(e.target.value)})} className='select-small-cco'>
-                            <option value={0}>---</option>
-                            {
-                                lgaresF.map((lg,i) => (<option key={i} value={lg.lentrega_id}>{lg.lentrega_id+"-"+lg.descripcion}</option>))
-                            }
-                        </select>
+                    <h4 className='title-Homepage'>Seleccione el plan a utilizar</h4>
+                    <select name="plan" className='filter-sub' value={selectedPlan} onChange={(e) => setSelectedPlan(parseInt(e.target.value))}>
+                        <option value={1000}>---</option>
+                        {planes.map((p,i) => (
+                            <option value={i}>{p.des + " x "+p.dias}</option>
+                        ))}
+                    </select>
+                    {displayPlan()}
+                    <div style={{marginTop: 50}}>
+                        <h4 className='title-Homepage'>Seleccione el archivo excel a cargar</h4>
+                        <input type="file" accept=".xlsx,.xls" onChange={handleFileUpload} disabled={selectedPlan === 1000}/>
                     </div>
-                    <div>
-                        <h4 className='title-Homepage'>Desgloses encontrados - {desglosesF.length}</h4>
-                        <div style={{ display: "flex",flexDirection: "row"}}>
-                            <h4 className='title-Homepage'>Buscar: </h4>
-                            <input type="text" id='otherins' className="data-div-select" value={desglosesS}
-                            style={{width: "58%"}} onChange={(e) => setDesglosesS(e.target.value)}/>
-                        </div>
-                        <select defaultValue={""}
-                        value={remitoRac.pedido_desglose} onChange={(e) => setReRac({...remitoRac, pedido_desglose: e.target.value})} className='select-small-cco'>
-                            <option value={""}>---</option>
-                            {(global && remitoRac.pedido_service_id) && 
-                            <option value={lentregaService(global.lentregas, remitoRac.pedido_service_id).descripcion}>
-                                {lentregaService(global.lentregas, remitoRac.pedido_service_id).descripcion}
-                            </option>}
-                            
-                            {
-                                desglosesF.map((lg,i) => (<option key={i} value={lg.descripcion}>{lg.descripcion}</option>))
-                            }
-                        </select>
-                    </div>
-
-                    <div style={{ display: "flex",flexDirection: "row"}}>
-                        <h4 className='title-Homepage'>Nro Remito: </h4>
-                        <input type="text" id='otherins' className="data-div-select" value={remitoRac.remito_nro}
-                        style={{width: "25%"}} onChange={(e) => setReRac({...remitoRac, remito_nro: e.target.value})}/>
-                    </div>
-                    <div>
-                        <div style={{ display: "flex",flexDirection: "row"}}>
-                            <h4 className='title-Homepage'>Insumo: </h4>
-                            <select value={insRac.sel} name="remitodes" onChange={(e) => setInsRac({...insRac, sel: parseInt(e.target.value),des: insRacionamieto.insumos[parseInt(e.target.value)].des})}>
-                                {insRacionamieto.insumos.map((ins, i) => (
-                                    <option value={i}>{ins.des}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div style={{display: "flex", flexDirection: "row", width: 410}}>
-                            <div >
-                                <h4 className='title-Homepage'>Cajas: </h4>
-                                <input type="number" id='otherins' className="data-div-select" value={insRac.cajas} min={1}
-                                style={{width: "35%"}} onChange={(e) => setInsRac({...insRac, cajas: parseInt(e.target.value) ? parseInt(e.target.value) : 0})}/>
-                            </div>
-                            <div >
-                                <h4 className='title-Homepage'>Bolsas: </h4>
-                                <input type="number" id='otherins' className="data-div-select" value={insRac.bolsas} min={1}
-                                style={{width: "35%"}} onChange={(e) => setInsRac({...insRac, bolsas: parseInt(e.target.value) ? parseInt(e.target.value) : 0})}/>
-                            </div>
-                            <div >
-                                <h4 className='title-Homepage'>Raciones: </h4>
-                                <input type="number" id='otherins' className="data-div-select" value={insRac.rac} min={1}
-                                style={{width: "50%"}} disabled/>
-                            </div>
-                            <div >
-                                <h4 className='title-Homepage'>Kilos: </h4>
-                                <input type="number" id='otherins' className="data-div-select" value={insRac.kg} min={1}
-                                style={{width: "50%"}} disabled/>
-                            </div>
-                        </div>
-
-                        <button className="info-popup" style={{ margin: 5}} onClick={() => addInsRac()}>Agregar</button>
-                    </div>
-                    <div>
-                        <h5 className='filter-sub'>Presione en un insumo para eliminarlo.</h5>
-                        <table style={{width: 360, alignItems: "center"}}>
-                            <tbody>
-                                <tr >
-                                    <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 320}}>Insumo</th>
-                                    <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 20}}>Kilos</th>
-                                    <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 20}}>Cajas</th>
-                                    <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 20}}>Bolsas</th>
-                                    <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 20}}>Rac</th>
-                                </tr>
-                                {remitoRac.pedido_insumos.map((ins,i) => (
-                                    <tr onClick={() => deleteInsumoRowRemitoRac(i, ins.des)}>
-                                        <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 320}}>{ins.des}</th>
-                                        <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 20}}>{ins.kg}</th>
-                                        <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 20}}>{ins.cajas}</th>
-                                        <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 20}}>{ins.bolsas}</th>
-                                        <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 20}}>{ins.rac}</th>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        <button className='btn-big' onClick={() => generateRacEnvioPdf()}>
-                            Generar
-                        </button>
-                    </div>
+                    
                 </div>
             </div>
         )
@@ -338,6 +207,153 @@ export default function Envios () {
             </div>
         )
     }
+    const displayInsumos = () => {
+        const changeInsumoStats = async (ins_id: number, stat: string, def: number) => {
+            let newVal = prompt("Ingrese el nuevo valor: ", def.toString())
+            if(newVal !== undefined && newVal !== null && global) {
+                const data: IChangeEnvioInsumo = {ins_id,stat,newVal: parseFloat(newVal)}
+                console.log(data)
+                await global.patchInsumoEnvio(data)
+            }
+            else alert("No se cambio ningun valor.")
+        }
+        const displayInsumosStats = () => {
+            if(selectedIns){
+                const insumo = insumos.filter((insI) => insI.ins_id === selectedIns)[0]
+                if(insumo) {
+                    const bolsasRatio = insumo.gr_total / insumo.gr_racion
+                    const cajaRatio = insumo.unidades_caja * bolsasRatio
+                    return (
+                    <table style={{fontSize: "small", width: 380}}>
+                        <tbody>
+                            <tr>
+                                <th style={{border: "1px solid", width: "20%"}}>Caja x palet (e)</th>
+                                <th style={{border: "1px solid", width: "20%"}}>Bolsa x caja (e)</th>
+                                <th style={{border: "1px solid", width: "20%"}}>Gr x racion (e)</th>
+                                <th style={{border: "1px solid", width: "20%"}}>Rac x bolsa</th>
+                                <th style={{border: "1px solid", width: "20%"}}>Rac x Caja</th>
+                            </tr>
+                            <tr>
+                                <th style={{border: "1px solid", width: "20%"}}
+                                onClick={() => changeInsumoStats(selectedIns,"caja_palet",insumo.caja_palet)}>
+                                    {insumo.caja_palet}
+                                    </th>
+                                <th style={{border: "1px solid", width: "20%"}}
+                                onClick={() => changeInsumoStats(selectedIns,"unidades_caja",insumo.unidades_caja)}>
+                                    {insumo.unidades_caja}
+                                    </th>
+                                <th style={{border: "1px solid", width: "20%"}}
+                                onClick={() => changeInsumoStats(selectedIns,"gr_racion",insumo.gr_racion)}>
+                                    {insumo.gr_racion}
+                                    </th>
+                                <th style={{border: "1px solid", width: "20%"}}>{bolsasRatio}</th>
+                                <th style={{border: "1px solid", width: "20%"}}>{cajaRatio}</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                    )
+                }
+            }
+        }
+        return(
+            <div>
+                <hr color='#3399ff' className='hr-line'/>
+                <div>
+                    <h2 className='title-Homepage' >
+                        Insumos 
+                    </h2>
+                    <h4 className='title-Homepage'>Seleccione el insumo a consultar</h4>
+                    <select name="plan" className='filter-sub' value={selectedIns} onChange={(e) => setSelectedIns(parseInt(e.target.value))}>
+                        <option value={0}>---</option>
+                        {insumos.map((ins) => (
+                            <option value={ins.ins_id}>{ins.des}</option>
+                        ))}
+                    </select>
+                    {displayInsumosStats()}                  
+                </div>
+            </div>
+        )
+    }
+    const displayPlanes = () => {
+        const changeInsumoStats = async (detail_id: number, def: number) => {
+            let newVal = prompt("Ingrese el nuevo valor: ", def.toString())
+            if(newVal !== undefined && newVal !== null && global) {
+                const data: IChangeEnvioInsumoPlan = {detail_id,newVal: parseInt(newVal)}
+                await global.patchInsumoEnvioPlan(data)
+            }
+            else alert("No se cambio ningun valor.")
+        }
+        const deleteInsumoStat = async (detail_id: number, index: number) => {
+            if(confirm("Quieres eliminar este insumo? "+planes[selectedPlan].details[index].des) && global) {
+                await global.deleteInsumoEnvioPlan(detail_id)
+            }
+        }
+        const addInsumo = async (index: number) => {
+            const plan_id = planes[selectedPlan].plan_id
+            const insumo = insumos[index]
+            if(confirm("¿Quieres agregar "+insumo.des+"?")){
+                const dias = prompt("Dias a asignar: ")
+                if(dias !== undefined && dias !== null && global) {
+                    if(confirm(`¿Quieres agregar ${insumo.des} con ${dias} al plan?`)){
+                        await global.addInsumoEnvioPlan(plan_id,insumo.ins_id, parseInt(dias))
+                    }
+                }
+            }
+        }
+        const displayPlan = () => {
+            if(selectedPlan !== 1000){
+                return(
+                    <div>
+                    <table style={{fontSize: "small", width: 380}}>
+                        <tbody>
+                            <tr>
+                                <th style={{border: "1px solid", width: "80%"}}>Insumo (Apreta para eliminar)</th>
+                                <th style={{border: "1px solid", width: "20%"}}>Dias (e)</th>
+                            </tr>
+                            {planes[selectedPlan].details.map((d,i) => (
+                            <tr key={d.detail_id}>
+                                <th style={{border: "1px solid", width: "80%"}}
+                                onClick={() => deleteInsumoStat(d.detail_id,i)}>
+                                    {d.des}
+                                </th>
+                                <th style={{border: "1px solid", width: "20%"}}
+                                onClick={() => changeInsumoStats(d.detail_id,d.dias)}>
+                                    {d.dias}
+                                </th>
+                            </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    <h4 className='title-Homepage'>Seleccione el insumo a agregar</h4>
+                    <select name="plan" className='filter-sub' value={selectedIns} onChange={(e) => addInsumo(parseInt(e.target.value))}>
+                        <option value={0}>---</option>
+                        {insumos.map((ins,i) => (
+                            <option value={i}>{ins.des}</option>
+                        ))}
+                    </select>
+                    </div>
+                )
+            }
+        }
+        return(
+            <div>
+                <hr color='#3399ff' className='hr-line'/>
+                <div>
+                    <h2 className='title-Homepage' >
+                        Planes 
+                    </h2>
+                    <h4 className='title-Homepage'>Seleccione el plan a utilizar</h4>
+                    <select name="plan" className='filter-sub' value={selectedPlan} onChange={(e) => setSelectedPlan(parseInt(e.target.value))}>
+                        <option value={1000}>---</option>
+                        {planes.map((p,i) => (
+                            <option value={i}>{p.des + " x "+p.dias}</option>
+                        ))}
+                    </select>
+                    {displayPlan()}               
+                </div>
+            </div>
+        )
+    }
 
     return(
         <div>
@@ -350,15 +366,19 @@ export default function Envios () {
                         <select name="display" className='filter-sub'
                         onChange={(e)=>setDisplay(parseInt(e.target.value))}>
                             <option value={0}>---</option>
-                            <option value={1}>Generar desglosado de envio</option>
+                            <option value={1}>Generar envios</option>
                             <option value={2}>Eliminar envios</option>
                             <option value={3}>Traer envios</option>
+                            <option value={4}>Insumos</option>
+                            <option value={5}>Planes</option>
                         </select>
                     </div>
                     <div style={{maxWidth: 400}}>
                         {display === 1 && displayDesglosadoGn()}
                         {display === 2 && displayDeleteTanda()}
                         {display === 3 && displayTraerEnvios()}
+                        {display === 4 && displayInsumos()}
+                        {display === 5 && displayPlanes()}
                     </div>
                 </div>
             </div>

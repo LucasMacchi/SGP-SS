@@ -427,7 +427,8 @@ export interface ITotalRutas {
     bolsas: string,
     kilos: string,
     ucaja: string,
-    palet: number
+    palet: number,
+    caja_palet: number
 }
 export interface IResponseRutas {
     desgloses: IDesglosesRuta[],
@@ -447,4 +448,54 @@ export interface IConformidad {
 
 export interface IconformidadDataPdf {
     actas: IConformidad[]
+}
+
+export interface IEnvioInsumos {
+    ins_id: number,
+    des: string,
+    caja_palet: number,
+    unidades_caja: number,
+    gr_racion: number,
+    gr_total: number
+}
+
+export interface IDetailPlan {
+    detail_id: number,
+    plan_id: number,
+    ins_id: number,
+    dias: number,
+    des: string
+}
+
+export interface IPlanComplete {
+    plan_id: number,
+    des: string,
+    dias: number,
+    details: IDetailPlan[]
+}
+export interface IDetalleEnvioCom {
+  kilos: number,
+  cajas: number,
+  bolsas: number,
+  raciones: number,
+  unidades: number,
+  unit_caja: number,
+  caja_palet: number,
+  des: string,
+}
+
+export interface IrequestEnvioCom {
+  entregaId: number,
+  desglose: string,
+  detalles: IDetalleEnvioCom[]
+}
+
+export interface IChangeEnvioInsumo {
+    ins_id: number,
+    stat: string,
+    newVal: number
+}
+export interface IChangeEnvioInsumoPlan {
+    detail_id: number,
+    newVal: number
 }

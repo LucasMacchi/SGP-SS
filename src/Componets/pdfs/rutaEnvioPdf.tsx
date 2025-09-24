@@ -149,11 +149,20 @@ const desgloseDisplayer = (remitos: IDesglosesRuta[]) => {
 }
 const insumosDisplayer = (insumos: ITotalRutas[]) => {
     const elements = []
+    let cajasT = 0
+    let bolsasT = 0
+    let kilosT = 0
+    let paletsT = 0
     for (let i = 0; i < insumos.length; i++) {
+        cajasT += parseInt(insumos[i].cajas)
+        bolsasT += parseInt(insumos[i].bolsas)
+        kilosT += parseFloat(insumos[i].kilos)
+        paletsT += insumos[i].palet
+        console.log(insumos[i])
         elements.push(
             <View style={stylePedido.tableRow}>
                 <View style={stylePedido.tableColIns}>
-                    <Text style={stylePedido.tableCell}>{insumos[i].des}</Text>
+                    <Text style={stylePedido.tableCell}>{insumos[i].des + ` x ${insumos[i].ucaja} cajas x ${insumos[i].caja_palet} pallet`}</Text>
                 </View>
                 <View style={stylePedido.tableColcod}>
                     <Text style={stylePedido.tableCell}>{insumos[i].palet}</Text>
@@ -171,6 +180,25 @@ const insumosDisplayer = (insumos: ITotalRutas[]) => {
         )
     
     }
+        elements.push(
+        <View style={stylePedido.tableRow}>
+            <View style={stylePedido.tableColIns}>
+                <Text style={stylePedido.tableCell}>Total</Text>
+            </View>
+            <View style={stylePedido.tableColcod}>
+                <Text style={stylePedido.tableCell}>{paletsT}</Text>
+            </View>
+            <View style={stylePedido.tableColcod}>
+                <Text style={stylePedido.tableCell}>{cajasT}</Text>
+            </View>
+            <View style={stylePedido.tableColcod}>
+                <Text style={stylePedido.tableCell}>{bolsasT}</Text>
+            </View>
+            <View style={stylePedido.tableColcod}>
+                <Text style={stylePedido.tableCell}>{kilosT}</Text>
+            </View>
+        </View>
+        )
     return elements
 }
 
@@ -232,7 +260,7 @@ const RutaPdf: React.FC<IRutaPdf> = ({ruta}) => (
                         <Text style={stylePedido.tableCell}>Insumo</Text>
                     </View>
                     <View style={stylePedido.tableColcod}>
-                        <Text style={stylePedido.tableCell}>Palets</Text>
+                        <Text style={stylePedido.tableCell}>Pallets</Text>
                     </View>
                     <View style={stylePedido.tableColcod}>
                         <Text style={stylePedido.tableCell}>Cajas</Text>
