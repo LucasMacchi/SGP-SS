@@ -56,6 +56,7 @@ export default function Envios () {
                 informeEnviosTxt(lineas)
             }
         };
+
         const displayPlan = () => {
             if(selectedPlan !== 1000){
                 return(
@@ -280,12 +281,22 @@ export default function Envios () {
             if(newVal !== undefined && newVal !== null && global) {
                 const data: IChangeEnvioInsumoPlan = {detail_id,newVal: parseInt(newVal)}
                 await global.patchInsumoEnvioPlan(data)
+
             }
             else alert("No se cambio ningun valor.")
         }
         const deleteInsumoStat = async (detail_id: number, index: number) => {
             if(confirm("Quieres eliminar este insumo? "+planes[selectedPlan].details[index].des) && global) {
                 await global.deleteInsumoEnvioPlan(detail_id)
+            }
+        }
+        const createPlan = async () => {
+            const des = prompt("¿Ingrese la descripcion del nuevo plan?")
+            if(des && confirm(`¿Quieres crear un nuevo plan llamado ${des}?`)){
+                const dias = prompt("¿Ingrese la descripcion del nuevo plan?")
+                if(dias && parseInt(dias) && confirm(`¿Plan ${des} por ${dias} dias?`) && global){
+                    await global.addPlan(des, parseInt(dias))
+                }
             }
         }
         const addInsumo = async (index: number) => {
@@ -324,6 +335,7 @@ export default function Envios () {
                             ))}
                         </tbody>
                     </table>
+                    <button className='btn-export-pdf' onClick={() => {window.location.reload()}}>Actualizar</button>
                     <h4 className='title-Homepage'>Seleccione el insumo a agregar</h4>
                     <select name="plan" className='filter-sub' value={selectedIns} onChange={(e) => addInsumo(parseInt(e.target.value))}>
                         <option value={0}>---</option>
@@ -349,6 +361,7 @@ export default function Envios () {
                             <option value={i}>{p.des + " x "+p.dias}</option>
                         ))}
                     </select>
+                    <button className='btn-export-pdf' onClick={() => {createPlan()}}>Crear Plan</button>
                     {displayPlan()}               
                 </div>
             </div>
