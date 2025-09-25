@@ -1045,6 +1045,15 @@ export default function GlobalState(props: IPropsChildren) {
       try {
         const response: string = (await axios.post(SERVER+`/envios/plan/add/insumo/${plan}/${ins}/${dias}`,{},authReturner())).data
         alert(response);
+      } catch (error) {
+        console.log(error);
+        alert("Error al agregar insumo al plan.");
+      }
+    }
+    async function addPlan (des: string, dias: number): Promise<void> {
+      try {
+        const response: string = (await axios.post(SERVER+`/envios/add/plan/${des}/${dias}`,{},authReturner())).data
+        alert(response);
         window.location.reload()
       } catch (error) {
         console.log(error);
@@ -1180,7 +1189,8 @@ export default function GlobalState(props: IPropsChildren) {
     patchInsumoEnvio,
     patchInsumoEnvioPlan,
     deleteInsumoEnvioPlan,
-    addInsumoEnvioPlan
+    addInsumoEnvioPlan,
+    addPlan
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1287,4 +1297,5 @@ interface IGlobalContext {
   patchInsumoEnvioPlan: (data: IChangeEnvioInsumoPlan) => Promise<void>;
   deleteInsumoEnvioPlan: (id: number) => Promise<void>;
   addInsumoEnvioPlan: (plan: number, ins: number, dias: number) => Promise<void>;
+  addPlan: (des: string, dias: number) => Promise<void>;
 }
