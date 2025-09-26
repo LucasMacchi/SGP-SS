@@ -44,6 +44,7 @@ import { jwtDecode } from "jwt-decode";
 import axios, { AxiosResponse } from "axios";
 import authReturner from "../Utils/authReturner";
 import envioFormater from "../Utils/envioFormater";
+import refillEmptySpace from "../Utils/refillEmptySpace";
 
 export const GlobalContext = createContext<IGlobalContext | null>(null);
 const LOGS = import.meta.env.VITE_USE_LOGS;
@@ -928,9 +929,11 @@ export default function GlobalState(props: IPropsChildren) {
     
   }
 
-  async function getEnviosTanda(tanda: number): Promise<IrequestEnvio[]> {
+  async function getEnviosTanda(start: number, end: number, pv: number): Promise<IrequestEnvio[]> {
     try {
-      const envios: IrequestEnvio[] = (await axios.get(SERVER+"/envios/tanda/"+tanda,authReturner())).data
+      const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,start)
+      const parsedEnd = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,end)
+      const envios: IrequestEnvio[] = (await axios.get(SERVER+`/envios/tanda/${parsedStart}/${parsedEnd}`,authReturner())).data
       return envios
     } catch (error) {
       console.log(error);
@@ -938,9 +941,11 @@ export default function GlobalState(props: IPropsChildren) {
       return []
     }
   }
-    async function getTxtEnvio(tanda: number, dias: number): Promise<ITxtEnvios> {
+    async function getTxtEnvio(start: number, end: number, pv: number,dias: number): Promise<ITxtEnvios> {
       try {
-        const envios: ITxtEnvios = (await axios.get(SERVER+"/envios/txt/"+tanda+"/"+dias,authReturner())).data
+        const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,start)
+        const parsedEnd = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,end)
+        const envios: ITxtEnvios = (await axios.get(SERVER+`/envios/txt/${parsedStart}/${parsedEnd}/${dias}`,authReturner())).data
         return envios
       } catch (error) {
         console.log(error);
@@ -948,9 +953,11 @@ export default function GlobalState(props: IPropsChildren) {
         return {cabecera: [], items: [], informe: [] }
       }
     }
-    async function getRutaEnvio(tanda: number): Promise<IResponseRutas | null> {
+    async function getRutaEnvio(start: number, end: number, pv: number): Promise<IResponseRutas | null> {
       try {
-        const ruta: IResponseRutas = (await axios.get(SERVER+"/envios/ruta/"+tanda,authReturner())).data
+        const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,start)
+        const parsedEnd = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,end)
+        const ruta: IResponseRutas = (await axios.get(SERVER+`/envios/ruta/${parsedStart}/${parsedEnd}`,authReturner())).data
         return ruta
       } catch (error) {
         console.log(error);
@@ -958,9 +965,21 @@ export default function GlobalState(props: IPropsChildren) {
         return null
       }
     }
-    async function getConformidadEnvio(tanda: number): Promise<IConformidad[]> {
+    async function getPv(): Promise<number | null> {
       try {
-        const ruta: IConformidad[] = (await axios.get(SERVER+"/envios/actas/"+tanda,authReturner())).data
+        const ruta: number = (await axios.get(SERVER+`/envios/pv`,authReturner())).data
+        return ruta
+      } catch (error) {
+        console.log(error);
+        alert("Error al el punto de venta actual.");
+        return null
+      }
+    }
+    async function getConformidadEnvio(start: number, end: number, pv: number): Promise<IConformidad[]> {
+      try {
+        const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,start)
+        const parsedEnd = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,end)
+        const ruta: IConformidad[] = (await axios.get(SERVER+`/envios/actas/${parsedStart}/${parsedEnd}`,authReturner())).data
         return ruta
       } catch (error) {
         console.log(error);
@@ -1058,6 +1077,15 @@ export default function GlobalState(props: IPropsChildren) {
       } catch (error) {
         console.log(error);
         alert("Error al agregar insumo al plan.");
+      }
+    }
+    async function getInformeDate (fecha: string): Promise<string[]> {
+      try {
+        const response: string[] = (await axios.get(SERVER+`/envios/informe/${fecha}`,authReturner())).data
+        return response
+      } catch (error) {
+        console.log(error);
+        return []
       }
     }
   
@@ -1190,7 +1218,9 @@ export default function GlobalState(props: IPropsChildren) {
     patchInsumoEnvioPlan,
     deleteInsumoEnvioPlan,
     addInsumoEnvioPlan,
-    addPlan
+    addPlan,
+    getPv,
+    getInformeDate
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1285,10 +1315,10 @@ interface IGlobalContext {
   changeMenu: (v: number) => void;
   getDesglosesFn: () => void;
   addProdCompra: (data: IAddProd) => void;
-  getEnviosTanda: (tanda: number) => Promise<IrequestEnvio[]>;
-  getTxtEnvio: (tanda: number, dias: number) => Promise<ITxtEnvios>;
-  getRutaEnvio:(tanda: number) => Promise<IResponseRutas | null>;
-  getConformidadEnvio: (tanda: number) => Promise<IConformidad[]>;
+  getEnviosTanda: (start: number, end: number, pv: number) => Promise<IrequestEnvio[]>;
+  getTxtEnvio: (start: number, end: number, pv: number,dias: number) => Promise<ITxtEnvios>;
+  getRutaEnvio:(start: number, end: number, pv: number) => Promise<IResponseRutas | null>;
+  getConformidadEnvio: (start: number, end: number, pv: number) => Promise<IConformidad[]>;
   deleteTandaFn: (tanda: number, key: string) => void;
   getInsumosEnvios: () => Promise<IEnvioInsumos[]>;
   getEnviosPlanes: () => Promise<IPlanComplete[]>;
@@ -1298,4 +1328,6 @@ interface IGlobalContext {
   deleteInsumoEnvioPlan: (id: number) => Promise<void>;
   addInsumoEnvioPlan: (plan: number, ins: number, dias: number) => Promise<void>;
   addPlan: (des: string, dias: number) => Promise<void>;
+  getPv:() => Promise<number | null>;
+  getInformeDate: (fecha: string) => Promise<string[]>;
 }

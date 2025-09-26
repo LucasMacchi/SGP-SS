@@ -1,7 +1,7 @@
 import JSZip from "jszip";
 import { ITxtEnvios } from "./Interfaces";
 
-export default function (txtLines: ITxtEnvios, tanda: number) {
+export default function (txtLines: ITxtEnvios, start: number, end: number) {
     const zip = new JSZip();
     let cabecera = ""
     let items = ""
@@ -20,7 +20,7 @@ export default function (txtLines: ITxtEnvios, tanda: number) {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = dateNow+'-exportacion-envio-tanda'+tanda+".zip";
+        link.download = dateNow+'-exportacion-envio'+start+"_"+end+".zip";
         link.click();
         URL.revokeObjectURL(url);
     })
