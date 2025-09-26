@@ -18,6 +18,10 @@ export default function Envios () {
     const global = useContext(GlobalContext)
     const [display, setDisplay] = useState(0)
     const [tanda, setTanda] = useState(0)
+    const [pv, setPv] = useState(8)
+    const [startRt, setStartRt] = useState(0)
+    const [endRt, setEndtRt] = useState(0)
+    const [fecha, setFecha] = useState("")
     const [delkey, setDelkey] = useState("")
     const [dias, setDias] = useState(30)
     const [selectedPlan, setSelectedPlan] = useState(1000)
@@ -29,7 +33,8 @@ export default function Envios () {
             if(global?.lentregas.length === 0) global.getLugaresEntreFn()
             if(global?.desgloses.length === 0) global.getDesglosesFn()
             global.getInsumosEnvios().then(i => setInsumos(i))
-            global.getEnviosPlanes().then(p => setPlanes(p)) 
+            global.getEnviosPlanes().then(p => setPlanes(p))
+            global.getPv().then(pv => setPv(pv ? pv : 8))
         }
     },[])
 
@@ -38,6 +43,8 @@ export default function Envios () {
         setTanda(0)
         setSelectedPlan(1000)
         setSelectedIns(0)
+        setStartRt(0)
+        setEndtRt(0)
     },[display])
 
 
@@ -138,37 +145,40 @@ export default function Envios () {
     const displayTraerEnvios = () => {
 
         const getEnvios = async () => {
-            const envios = await global?.getEnviosTanda(tanda)
+            const envios = await global?.getEnviosTanda(startRt, endRt, pv)
             if(envios && envios.length > 0) {
                 const blob: Blob = await pdf(<DesglosePdf envios={envios} />).toBlob()
-                saveAs(blob, 'SGP_TANDA_'+tanda)
-                setTanda(0)
+                saveAs(blob, 'SGP_TANDA_'+startRt+"_"+endRt)
+                setStartRt(0)
+                setEndtRt(0)
             }
         }
         const getHojaRuta = async () => {
-            const hojaRuta = await global?.getRutaEnvio(tanda)
+            const hojaRuta = await global?.getRutaEnvio(startRt, endRt, pv)
             if(hojaRuta) {
                 const blobR = await pdf(<RutaPdf ruta={hojaRuta}/>).toBlob()
-                saveAs(blobR, 'SGP_HR_'+tanda)
-                setTanda(0)
+                saveAs(blobR, 'SGP_HR_'+startRt+"_"+endRt)
+                setStartRt(0)
+                setEndtRt(0)
             }
         }
         const exportEnvio = async () => {
-            const txt = await global?.getTxtEnvio(tanda, dias)
+            const txt = await global?.getTxtEnvio(startRt, endRt, pv, dias)
             if(txt && txt.cabecera.length > 0 && txt.items.length > 0) {
-                createTxtEnvio(txt, tanda)
-                setDias(0)
-                setTanda(0)
+                createTxtEnvio(txt, startRt,endRt)
+                setStartRt(0)
+                setEndtRt(0)
             }
             else alert("No existen envios en esa tanda.")
         }
 
         const getActas = async () => {
-            const actas = await global?.getConformidadEnvio(tanda)
+            const actas = await global?.getConformidadEnvio(startRt, endRt, pv)
             if(actas) {
                 const blobR = await pdf(<ActaConformidadPDF actas={actas}/>).toBlob()
-                saveAs(blobR, 'SGP_ACTAS_'+tanda)
-                setTanda(0)
+                saveAs(blobR, 'SGP_ACTAS_'+startRt+"_"+endRt)
+                setStartRt(0)
+                setEndtRt(0)
             }
         }
 
@@ -179,10 +189,13 @@ export default function Envios () {
                     <h2 className='title-Homepage' >
                         Generar Envio 
                     </h2>
+                    <h4 className='title-Homepage'>Punto de venta actual {pv}</h4>
                     <div>
-                        <h4 className='title-Homepage'>Seleccione la tanda a traer</h4>
-                        <input type="number" id='otherins' className="data-div-select" value={tanda} min={1}
-                        style={{width: "35%"}} onChange={(e) => setTanda((e.target.value) ? parseInt(e.target.value) : 0)}/>
+                        <h4 className='title-Homepage'>Ingrese el remito inicial - final</h4>
+                        <input type="number" id='otherins' className="data-div-select" value={startRt} min={1}
+                        style={{width: "35%"}} onChange={(e) => setStartRt((e.target.value) ? parseInt(e.target.value) : 0)}/>
+                        <input type="number" id='otherins' className="data-div-select" value={endRt} min={1}
+                        style={{width: "35%"}} onChange={(e) => setEndtRt((e.target.value) ? parseInt(e.target.value) : 0)}/>
                     </div>
                     <div>
                     <div>
@@ -192,16 +205,16 @@ export default function Envios () {
                     </div>
                     </div>
                     <div>
-                        {tanda > 0 && <button className='btn-big' onClick={() => getEnvios()}>Desgloses</button>}
+                        {(startRt > 0 && endRt > 0 && endRt > startRt) && <button className='btn-big' onClick={() => getEnvios()}>Desgloses</button>}
                     </div>
                     <div>
-                        {tanda > 0 && <button className='btn-big' onClick={() => getHojaRuta()}>Hoja de Ruta</button>}
+                        {(startRt > 0 && endRt > 0 && endRt > startRt) && <button className='btn-big' onClick={() => getHojaRuta()}>Hoja de Ruta</button>}
                     </div>
                     <div>
-                        {tanda > 0 && <button className='btn-big' onClick={() => getActas()}>Actas</button>}
+                        {(startRt > 0 && endRt > 0 && endRt > startRt) && <button className='btn-big' onClick={() => getActas()}>Actas</button>}
                     </div>
                     <div>
-                        {tanda > 0 && <button className='btn-big' onClick={() => exportEnvio()}>Exportar</button>}
+                        {(startRt > 0 && endRt > 0 && endRt > startRt) && <button className='btn-big' onClick={() => exportEnvio()}>Exportar</button>}
                     </div>
 
                 </div>
@@ -367,6 +380,36 @@ export default function Envios () {
             </div>
         )
     }
+    const displayInformes = () => {
+        const getInformeFecha = async () => {
+            const lienas = await global?.getInformeDate(fecha)
+            if(lienas) {
+                setFecha("")
+                informeEnviosTxt(lienas)
+            }
+        }
+        return(
+            <div>
+                <hr color='#3399ff' className='hr-line'/>
+                <div>
+                    <h2 className='title-Homepage' >
+                        Generar informes de Envio 
+                    </h2>
+                    <div>
+                        <h4 className='title-Homepage'>Ingrese la fecha</h4>
+                        <input type="date" id='otherins' className="data-div-select" value={fecha}
+                        style={{width: "35%"}} onChange={(e) => setFecha(e.target.value)}/>
+                    </div>
+                    <div>
+                    </div>
+                    <div>
+                        {fecha && <button className='btn-big' onClick={() => getInformeFecha()}>Informe fecha</button>}
+                    </div>
+
+                </div>
+            </div>
+        )
+    }
 
     return(
         <div>
@@ -384,6 +427,7 @@ export default function Envios () {
                             <option value={3}>Traer envios</option>
                             <option value={4}>Insumos</option>
                             <option value={5}>Planes</option>
+                            <option value={6}>Informes</option>
                         </select>
                     </div>
                     <div style={{maxWidth: 400}}>
@@ -392,6 +436,7 @@ export default function Envios () {
                         {display === 3 && displayTraerEnvios()}
                         {display === 4 && displayInsumos()}
                         {display === 5 && displayPlanes()}
+                        {display === 6 && displayInformes()}
                     </div>
                 </div>
             </div>
