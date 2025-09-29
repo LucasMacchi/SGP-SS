@@ -25,16 +25,16 @@ export default async function ExcelParserEnvios (excel: File, insumos: IEnvioIns
                 if(ins.ins_id === p.ins_id) {
                     if(ins.unidades_caja > 0) {
                         const value: number = linea.raciones / 30 * p.dias
-                        const unidades = Math.ceil(value / (ins.gr_total / ins.gr_racion))
-                        const cajas = Math.floor(unidades / ins.unidades_caja)
-                        const bolsas = Math.ceil(unidades - (cajas * ins.unidades_caja))
-                        const kilos = unidades * ins.gr_total / 1000
+                        const unidades = Math.ceil(value / ins.racbolsa)
+                        const cajas = Math.floor(value / ins.raccaja)
+                        const bolsas = Math.ceil((value - cajas * ins.raccaja) / ins.racbolsa)
+                        const kilos = unidades * ins.gr_racion / 1000
                         envio.detalles.push({
                             kilos: kilos,
                             cajas: cajas,
                             bolsas: bolsas,
-                            raciones: Math.floor(unidades * (ins.gr_total / ins.gr_racion)),
-                            unidades: unidades,
+                            raciones: Math.floor(bolsas * ins.racbolsa + cajas * ins.raccaja),
+                            unidades: Math.floor(bolsas + cajas * ins.unidades_caja),
                             unit_caja: ins.unidades_caja,
                             caja_palet: ins.caja_palet,
                             des: ins.des
@@ -42,16 +42,16 @@ export default async function ExcelParserEnvios (excel: File, insumos: IEnvioIns
                     }
                     else {
                         const value: number = linea.raciones / 30 * p.dias
-                        const unidades = Math.ceil(value / (ins.gr_total / ins.gr_racion))
+                        const unidades = Math.ceil(value / ins.racbolsa)
                         const cajas = 0
-                        const bolsas = Math.ceil(unidades - (cajas * ins.unidades_caja))
+                        const bolsas = Math.ceil(value / ins.racbolsa)
                         const kilos = unidades * ins.gr_total / 1000
                         envio.detalles.push({
                             kilos: kilos,
                             cajas: cajas,
                             bolsas: bolsas,
-                            raciones: Math.floor(unidades * (ins.gr_total / ins.gr_racion)),
-                            unidades: unidades,
+                            raciones: Math.floor(bolsas * ins.racbolsa + cajas * ins.raccaja),
+                            unidades: Math.floor(bolsas + cajas * ins.unidades_caja),
                             unit_caja: 0,
                             caja_palet: ins.caja_palet,
                             des: ins.des
