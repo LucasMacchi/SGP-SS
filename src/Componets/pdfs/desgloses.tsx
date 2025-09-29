@@ -99,7 +99,7 @@ const insumosDisplayer = (insumos: IDetalleEnvio[]) => {
                     <Text style={stylePedido.tableCell}>{insumos[i] ? insumos[i].des : " "}</Text>
                 </View>
                 <View style={stylePedido.tableColcod}>
-                    <Text style={stylePedido.tableCell}>{insumos[i] ? insumos[i].kilos : " "}</Text>
+                    <Text style={stylePedido.tableCell}>{insumos[i] ? insumos[i].kilos.toFixed(2) : " "}</Text>
                 </View>
                 <View style={stylePedido.tableColcod}>
                     <Text style={stylePedido.tableCell}>{insumos[i] ? insumos[i].cajas : " "}</Text>
