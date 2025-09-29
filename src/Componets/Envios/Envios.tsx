@@ -235,15 +235,13 @@ export default function Envios () {
             if(selectedIns){
                 const insumo = insumos.filter((insI) => insI.ins_id === selectedIns)[0]
                 if(insumo) {
-                    const bolsasRatio = insumo.gr_total / insumo.gr_racion
-                    const cajaRatio = insumo.unidades_caja * bolsasRatio
                     return (
                     <table style={{fontSize: "small", width: 380}}>
                         <tbody>
                             <tr>
-                                <th style={{border: "1px solid", width: "20%"}}>Caja x palet (e)</th>
-                                <th style={{border: "1px solid", width: "20%"}}>Bolsa x caja (e)</th>
-                                <th style={{border: "1px solid", width: "20%"}}>Gr x racion (e)</th>
+                                <th style={{border: "1px solid", width: "20%"}}>Caja x palet</th>
+                                <th style={{border: "1px solid", width: "20%"}}>Bolsa x caja</th>
+                                <th style={{border: "1px solid", width: "20%"}}>Gr x racion</th>
                                 <th style={{border: "1px solid", width: "20%"}}>Rac x bolsa</th>
                                 <th style={{border: "1px solid", width: "20%"}}>Rac x Caja</th>
                             </tr>
@@ -259,9 +257,15 @@ export default function Envios () {
                                 <th style={{border: "1px solid", width: "20%"}}
                                 onClick={() => changeInsumoStats(selectedIns,"gr_racion",insumo.gr_racion)}>
                                     {insumo.gr_racion}
-                                    </th>
-                                <th style={{border: "1px solid", width: "20%"}}>{bolsasRatio}</th>
-                                <th style={{border: "1px solid", width: "20%"}}>{cajaRatio}</th>
+                                </th>
+                                <th style={{border: "1px solid", width: "20%"}}
+                                onClick={() => changeInsumoStats(selectedIns,"racbolsa",insumo.racbolsa)}>
+                                    {insumo.racbolsa}
+                                </th>
+                                <th style={{border: "1px solid", width: "20%"}}
+                                onClick={() => changeInsumoStats(selectedIns,"raccaja",insumo.raccaja)}>
+                                    {insumo.raccaja}
+                                </th>
                             </tr>
                         </tbody>
                     </table>
@@ -443,4 +447,3 @@ export default function Envios () {
         </div>
     )
 }
-//<option value={2}>Generar nuevo envio</option>

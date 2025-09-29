@@ -456,7 +456,9 @@ export interface IEnvioInsumos {
     caja_palet: number,
     unidades_caja: number,
     gr_racion: number,
-    gr_total: number
+    gr_total: number,
+    racbolsa: number,
+    raccaja: number
 }
 
 export interface IDetailPlan {
