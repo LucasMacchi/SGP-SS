@@ -975,6 +975,16 @@ export default function GlobalState(props: IPropsChildren) {
         return null
       }
     }
+    async function getLastRt(): Promise<number | null> {
+      try {
+        const ruta: number = (await axios.get(SERVER+`/envios/rt`,authReturner())).data
+        return ruta
+      } catch (error) {
+        console.log(error);
+        alert("Error al el punto de venta actual.");
+        return null
+      }
+    }
     async function getConformidadEnvio(start: number, end: number, pv: number): Promise<IConformidad[]> {
       try {
         const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,start)
@@ -1220,7 +1230,8 @@ export default function GlobalState(props: IPropsChildren) {
     addInsumoEnvioPlan,
     addPlan,
     getPv,
-    getInformeDate
+    getInformeDate,
+    getLastRt
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1329,5 +1340,6 @@ interface IGlobalContext {
   addInsumoEnvioPlan: (plan: number, ins: number, dias: number) => Promise<void>;
   addPlan: (des: string, dias: number) => Promise<void>;
   getPv:() => Promise<number | null>;
+  getLastRt:() => Promise<number | null>;
   getInformeDate: (fecha: string) => Promise<string[]>;
 }

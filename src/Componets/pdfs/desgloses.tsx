@@ -1,5 +1,5 @@
 import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/renderer';
-import { desglosesDataPdf, IDetalleEnvio } from '../../Utils/Interfaces';
+import { desglosesDataPdf, IDetalleEnvio, IrequestEnvio } from '../../Utils/Interfaces';
 import logoBig from "../../assets/logo_big.png"
 
 const stylePedido = StyleSheet.create({
@@ -96,7 +96,7 @@ const insumosDisplayer = (insumos: IDetalleEnvio[]) => {
         elements.push(
             <View style={stylePedido.tableRow}>
                 <View style={stylePedido.tableColIns}>
-                    <Text style={stylePedido.tableCell}>{insumos[i] ? insumos[i].des : " "}</Text>
+                    <Text style={stylePedido.tableCell}>{insumos[i] ? insumos[i].des.split("-")[2] : " "}</Text>
                 </View>
                 <View style={stylePedido.tableColcod}>
                     <Text style={stylePedido.tableCell}>{insumos[i] ? insumos[i].kilos.toFixed(2) : " "}</Text>
@@ -117,9 +117,7 @@ const insumosDisplayer = (insumos: IDetalleEnvio[]) => {
     return elements
 }
 
-const DesglosePdf: React.FC<desglosesDataPdf> = ({envios}) => (
-    <Document>
-        {envios.map((e) => (
+const pageContruct = (e: IrequestEnvio, copia: boolean) => (
         <Page size={'A4'} style={stylePedido.page}>
             <Image src={logoBig} style={stylePedido.logo}/>
             <View style={stylePedido.viewdataHeader}>
@@ -133,7 +131,7 @@ const DesglosePdf: React.FC<desglosesDataPdf> = ({envios}) => (
             </View>
             <View style={stylePedido.viewdata}>
                 <View >
-                    <Text style={stylePedido.title}>Desglose de Entrega</Text>
+                    <Text style={stylePedido.title}>Desglose de Entrega - {copia ? "Copia" : "Original"}</Text>
                     <Text style={stylePedido.body}>Cabecera: {e.completo}</Text>
                     <Text style={stylePedido.body}>Dependencia: {e.dependencia}</Text>
                     <Text style={stylePedido.body}>Fecha: {new Date().toISOString()}</Text>
@@ -166,10 +164,18 @@ const DesglosePdf: React.FC<desglosesDataPdf> = ({envios}) => (
                 </View>
                 </View>
                 {insumosDisplayer(e.detalles)}
-                
             </View>
         </Page>
-        ))}
+
+)
+
+
+const DesglosePdf: React.FC<desglosesDataPdf> = ({envios}) => (
+    <Document>
+        {envios.flatMap((e) => [
+            pageContruct(e,false),
+            pageContruct(e,true)
+        ])}
 
     </Document>
 )

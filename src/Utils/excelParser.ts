@@ -28,6 +28,7 @@ export default async function ExcelParserEnvios (excel: File, insumos: IEnvioIns
                         const unidades = Math.ceil(value / ins.racbolsa)
                         const cajas = Math.floor(value / ins.raccaja)
                         const bolsas = Math.ceil((value - cajas * ins.raccaja) / ins.racbolsa)
+                        console.log(unidades, ins.gr_total)
                         const kilos = unidades * ins.gr_total / 1000
                         envio.detalles.push({
                             kilos: kilos,

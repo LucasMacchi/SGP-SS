@@ -28,6 +28,7 @@ export default function Envios () {
     const [planes, setPlanes] = useState<IPlanComplete[]>([])
     const [insumos, setInsumos] = useState<IEnvioInsumos[]>([])
     const [selectedIns, setSelectedIns] = useState(0)
+    const [lastRt, setLastRt] = useState(0)
     useEffect(() => {
         if(global) {
             if(global?.lentregas.length === 0) global.getLugaresEntreFn()
@@ -35,6 +36,7 @@ export default function Envios () {
             global.getInsumosEnvios().then(i => setInsumos(i))
             global.getEnviosPlanes().then(p => setPlanes(p))
             global.getPv().then(pv => setPv(pv ? pv : 8))
+            global.getLastRt().then(rt => setLastRt(rt ? rt : 0))
         }
     },[])
 
@@ -149,8 +151,6 @@ export default function Envios () {
             if(envios && envios.length > 0) {
                 const blob: Blob = await pdf(<DesglosePdf envios={envios} />).toBlob()
                 saveAs(blob, 'SGP_TANDA_'+startRt+"_"+endRt)
-                setStartRt(0)
-                setEndtRt(0)
             }
         }
         const getHojaRuta = async () => {
@@ -158,16 +158,13 @@ export default function Envios () {
             if(hojaRuta) {
                 const blobR = await pdf(<RutaPdf ruta={hojaRuta}/>).toBlob()
                 saveAs(blobR, 'SGP_HR_'+startRt+"_"+endRt)
-                setStartRt(0)
-                setEndtRt(0)
+
             }
         }
         const exportEnvio = async () => {
             const txt = await global?.getTxtEnvio(startRt, endRt, pv, dias)
             if(txt && txt.cabecera.length > 0 && txt.items.length > 0) {
                 createTxtEnvio(txt, startRt,endRt)
-                setStartRt(0)
-                setEndtRt(0)
             }
             else alert("No existen envios en esa tanda.")
         }
@@ -177,8 +174,7 @@ export default function Envios () {
             if(actas) {
                 const blobR = await pdf(<ActaConformidadPDF actas={actas}/>).toBlob()
                 saveAs(blobR, 'SGP_ACTAS_'+startRt+"_"+endRt)
-                setStartRt(0)
-                setEndtRt(0)
+
             }
         }
 
@@ -190,11 +186,12 @@ export default function Envios () {
                         Generar Envio 
                     </h2>
                     <h4 className='title-Homepage'>Punto de venta actual {pv}</h4>
+                    <h4 className='title-Homepage'>Ultimo Remito {lastRt}</h4>
                     <div>
                         <h4 className='title-Homepage'>Ingrese el remito inicial - final</h4>
-                        <input type="number" id='otherins' className="data-div-select" value={startRt} min={1}
+                        <input type="number" id='startrt' className="data-div-select" value={startRt} min={1}
                         style={{width: "35%"}} onChange={(e) => setStartRt((e.target.value) ? parseInt(e.target.value) : 0)}/>
-                        <input type="number" id='otherins' className="data-div-select" value={endRt} min={1}
+                        <input type="number" id='startrt' className="data-div-select" value={endRt} min={1}
                         style={{width: "35%"}} onChange={(e) => setEndtRt((e.target.value) ? parseInt(e.target.value) : 0)}/>
                     </div>
                     <div>
@@ -205,16 +202,16 @@ export default function Envios () {
                     </div>
                     </div>
                     <div>
-                        {(startRt > 0 && endRt > 0 && endRt > startRt) && <button className='btn-big' onClick={() => getEnvios()}>Desgloses</button>}
+                        {(startRt > 0 && endRt > 0 && endRt >= startRt) && <button className='btn-big' onClick={() => getEnvios()}>Desgloses</button>}
                     </div>
                     <div>
-                        {(startRt > 0 && endRt > 0 && endRt > startRt) && <button className='btn-big' onClick={() => getHojaRuta()}>Hoja de Ruta</button>}
+                        {(startRt > 0 && endRt > 0 && endRt >= startRt) && <button className='btn-big' onClick={() => getHojaRuta()}>Hoja de Ruta</button>}
                     </div>
                     <div>
-                        {(startRt > 0 && endRt > 0 && endRt > startRt) && <button className='btn-big' onClick={() => getActas()}>Actas</button>}
+                        {(startRt > 0 && endRt > 0 && endRt >= startRt) && <button className='btn-big' onClick={() => getActas()}>Actas</button>}
                     </div>
                     <div>
-                        {(startRt > 0 && endRt > 0 && endRt > startRt) && <button className='btn-big' onClick={() => exportEnvio()}>Exportar</button>}
+                        {(startRt > 0 && endRt > 0 && endRt >= startRt) && <button className='btn-big' onClick={() => exportEnvio()}>Exportar</button>}
                     </div>
 
                 </div>
