@@ -249,6 +249,22 @@ const RutaPdf: React.FC<IRutaPdf> = ({ruta}) => (
                 </View> 
                 {remitoDisplayer(ruta.remitos)}               
             </View>
+        </Page>
+        <Page size={'A4'} style={stylePedido.page}>
+            <View style={stylePedido.viewdataHeader}>
+                <View >
+                    <Text style={stylePedido.title}>Soluciones & Servicios</Text>
+                </View>
+                <View >
+                    <Text style={stylePedido.subtitle}>Junin 766 Piso 2 Oficina 4</Text>
+                    <Text style={stylePedido.subtitle}>Corrientes, Corrientes, Argentina</Text>
+                </View>
+            </View>
+            <View style={stylePedido.viewdata1}>
+                <View >
+                    <Text style={stylePedido.title}>Productos</Text>
+                </View>
+            </View>
             <View style={stylePedido.view}>
                 <Text style={stylePedido.title}>Productos</Text>
             </View>
@@ -273,16 +289,15 @@ const RutaPdf: React.FC<IRutaPdf> = ({ruta}) => (
                 </View>
                 </View>
                 {insumosDisplayer(ruta.totales)}
-                
-            </View>
-            <View style={stylePedido.viewdata1}>
-                <View >
-                    <View style={{...stylePedido.viewdataHeader, marginTop: 20,borderBottomWidth:0}}>
-                        <View>
-                            <Text style={stylePedido.title}>Chofer:...........................</Text>
-                        </View>
-                        <View>
-                            <Text style={stylePedido.title}>Res. Carga:...........................</Text>
+                <View style={stylePedido.viewdata1}>
+                    <View >
+                        <View style={{...stylePedido.viewdataHeader, marginTop: 20,borderBottomWidth:0}}>
+                            <View>
+                                <Text style={stylePedido.title}>Chofer:...........................</Text>
+                            </View>
+                            <View>
+                                <Text style={stylePedido.title}>Res. Carga:...........................</Text>
+                            </View>
                         </View>
                     </View>
                 </View>
