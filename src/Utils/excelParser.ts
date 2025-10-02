@@ -20,6 +20,8 @@ export default async function ExcelParserEnvios (excel: File, insumos: IEnvioIns
             desglose: "",
             detalles: [],
         }
+        const parsedDependencia = linea.dependencia.replace('"',"").replace("'","")
+        if(linea.dependencia && linea.lentrega && linea.raciones) {
         plan.details.forEach((p) => {
             insumos.forEach(ins => {
                 if(ins.ins_id === p.ins_id) {
@@ -28,7 +30,6 @@ export default async function ExcelParserEnvios (excel: File, insumos: IEnvioIns
                         const unidades = Math.ceil(value / ins.racbolsa)
                         const cajas = Math.floor(value / ins.raccaja)
                         const bolsas = Math.ceil((value - cajas * ins.raccaja) / ins.racbolsa)
-                        console.log(unidades, ins.gr_total)
                         const kilos = unidades * ins.gr_total / 1000
                         envio.detalles.push({
                             kilos: kilos,
@@ -57,12 +58,16 @@ export default async function ExcelParserEnvios (excel: File, insumos: IEnvioIns
                             caja_palet: ins.caja_palet,
                             des: ins.des
                         })
+                        
                     }
                 }
             });
         })
+        }
+        else console.log("DATO NO VALIDO ",linea)
 
-        envio.desglose = linea.dependencia
+
+        envio.desglose = parsedDependencia
         envio.entregaId = linea.lentrega
         hojaData.push(envio)
     })
