@@ -20,7 +20,7 @@ export default async function ExcelParserEnvios (excel: File, insumos: IEnvioIns
             desglose: "",
             detalles: [],
         }
-        const parsedDependencia = linea.dependencia.replace('"',"").replace("'","")
+        //const parsedDependencia = linea.dependencia.replace('"',"").replace("'","")
         if(linea.dependencia && linea.lentrega && linea.raciones) {
         plan.details.forEach((p) => {
             insumos.forEach(ins => {
@@ -67,7 +67,7 @@ export default async function ExcelParserEnvios (excel: File, insumos: IEnvioIns
         else console.log("DATO NO VALIDO ",linea)
 
 
-        envio.desglose = parsedDependencia
+        envio.desglose = linea.dependencia
         envio.entregaId = linea.lentrega
         hojaData.push(envio)
     })
