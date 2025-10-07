@@ -501,3 +501,27 @@ export interface IChangeEnvioInsumoPlan {
     detail_id: number,
     newVal: number
 }
+
+export interface IRemitoEnvioDetails {
+    descripcion: string,
+    total_raciones: number,
+    total_kilos: number,
+    total_bolsas: number,
+    total_cajas: number,
+    total_unidades: number
+}
+
+export interface IRemitoEnvio {
+    nro_remito: string,
+    le_des: string,
+    le_direccion: string,
+    le_localidad: string,
+    fcha_venc: string,
+    cai: string,
+    detalles: IRemitoEnvioDetails[],
+    cant_desgloses: number
+}
+
+export interface IRemitosPrintData {
+    envios: IRemitoEnvio[]
+}

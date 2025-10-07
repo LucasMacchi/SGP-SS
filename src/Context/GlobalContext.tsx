@@ -28,6 +28,7 @@ import {
   IPersonal,
   IPlanComplete,
   IPropsChildren,
+  IRemitoEnvio,
   IReport,
   IrequestEnvio,
   IrequestEnvioCom,
@@ -1098,6 +1099,18 @@ export default function GlobalState(props: IPropsChildren) {
         return []
       }
     }
+
+    async function getRemitosData(start: number, end: number,pv: number): Promise<IRemitoEnvio[]> {
+        const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,start)
+        const parsedEnd = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,end)
+        try {
+          const data: IRemitoEnvio[] = (await axios.get(SERVER+`/envios/remitos/${parsedStart}/${parsedEnd}`,authReturner())).data
+          return data
+        } catch (error) {
+          console.log(error);
+          return []
+        }
+    }
   
   
   const innitialState: IGlobalContext = {
@@ -1231,7 +1244,8 @@ export default function GlobalState(props: IPropsChildren) {
     addPlan,
     getPv,
     getInformeDate,
-    getLastRt
+    getLastRt,
+    getRemitosData
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1342,4 +1356,5 @@ interface IGlobalContext {
   getPv:() => Promise<number | null>;
   getLastRt:() => Promise<number | null>;
   getInformeDate: (fecha: string) => Promise<string[]>;
+  getRemitosData: (start: number, end: number,pv: number) => Promise<IRemitoEnvio[]>
 }
