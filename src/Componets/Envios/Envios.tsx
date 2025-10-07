@@ -10,7 +10,7 @@ import ActaConformidadPDF from "../pdfs/actaConformidad";
 import ExcelParserEnvios from "../../Utils/excelParser";
 import { IChangeEnvioInsumo, IChangeEnvioInsumoPlan, IEnvioInsumos, IPlanComplete, IrequestEnvioCom } from "../../Utils/Interfaces";
 import informeEnviosTxt from "../../Utils/informeEnviosTxt";
-
+import RemitoEnvioPdf from "../pdfs/remitoEnvio";
 
 
 export default function Envios () {
@@ -178,6 +178,15 @@ export default function Envios () {
             }
         }
 
+        const getRemitos = async () => {
+            const envios = await global?.getRemitosData(startRt, endRt, pv)
+            if(envios) {
+                const blobR = await pdf(<RemitoEnvioPdf envios={envios}/>).toBlob()
+                saveAs(blobR, 'SGP_REMITOS_'+startRt+"_"+endRt)
+
+            }
+        }
+
         return(
             <div>
                 <hr color='#3399ff' className='hr-line'/>
@@ -202,16 +211,19 @@ export default function Envios () {
                     </div>
                     </div>
                     <div>
-                        {(startRt > 0 && endRt > 0 && endRt >= startRt) && <button className='btn-big' onClick={() => getEnvios()}>Desgloses</button>}
+                        {(startRt > 0 && endRt > 0 && endRt >= startRt) && <button className='btn-big' style={{width: "85%"}} onClick={() => getEnvios()}>Desgloses</button>}
                     </div>
                     <div>
-                        {(startRt > 0 && endRt > 0 && endRt >= startRt) && <button className='btn-big' onClick={() => getHojaRuta()}>Hoja de Ruta</button>}
+                        {(startRt > 0 && endRt > 0 && endRt >= startRt) && <button className='btn-big' style={{width: "85%"}} onClick={() => getHojaRuta()}>Hoja de Ruta</button>}
                     </div>
                     <div>
-                        {(startRt > 0 && endRt > 0 && endRt >= startRt) && <button className='btn-big' onClick={() => getActas()}>Actas</button>}
+                        {(startRt > 0 && endRt > 0 && endRt >= startRt) && <button className='btn-big' style={{width: "85%"}} onClick={() => getActas()}>Actas</button>}
                     </div>
                     <div>
-                        {(startRt > 0 && endRt > 0 && endRt >= startRt) && <button className='btn-big' onClick={() => exportEnvio()}>Exportar</button>}
+                        {(startRt > 0 && endRt > 0 && endRt >= startRt) && <button className='btn-big' style={{width: "85%"}} onClick={() => exportEnvio()}>Exportar</button>}
+                    </div>
+                    <div>
+                        {(startRt > 0 && endRt > 0 && endRt >= startRt) && <button className='btn-big' style={{width: "85%"}} onClick={() => getRemitos()}>Remitos WIP</button>}
                     </div>
 
                 </div>

@@ -1,0 +1,59 @@
+{
+    "nro_remito": "00008-00000197",
+    "le_des": "ESC. N 463-PS",
+    "le_direccion":"PAGO LARGO Y SALTO",
+    "le_localidad": "GOYA",
+    "fcha_venc": "21/08/2026",
+    "cai": "513452114488051",
+    "cant_desgloses": 4,
+    "detalles": [
+        {
+            "descripcion": "Leche",
+            "total_raciones": 2500,
+            "total_kilos": 15.5,
+            "total_bolsas": 15,
+            "total_cajas":4,
+            "total_unidades": 2647
+        },
+        {
+            "descripcion": "Azucar",
+            "total_raciones": 2500,
+            "total_kilos": 15.5,
+            "total_bolsas": 15,
+            "total_cajas":4,
+            "total_unidades": 2647
+        },
+        {
+            "descripcion": "Yerba",
+            "total_raciones": 2500,
+            "total_kilos": 15.5,
+            "total_bolsas": 15,
+            "total_cajas":4,
+            "total_unidades": 2647
+        },
+        {
+            "descripcion": "Galletitas",
+            "total_raciones": 2500,
+            "total_kilos": 15.5,
+            "total_bolsas": 15,
+            "total_cajas":4,
+            "total_unidades": 2647
+        },
+        {
+            "descripcion": "Turrones",
+            "total_raciones": 2500,
+            "total_kilos": 15.5,
+            "total_bolsas": 15,
+            "total_cajas":4,
+            "total_unidades": 2647
+        },
+        {
+            "descripcion": "Total",
+            "total_raciones": 2500,
+            "total_kilos": 15.5,
+            "total_bolsas": 15,
+            "total_cajas":4,
+            "total_unidades": 2647
+        }
+    ]
+}

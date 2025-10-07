@@ -20,8 +20,8 @@ export default async function ExcelParserEnvios (excel: File, insumos: IEnvioIns
             desglose: "",
             detalles: [],
         }
-        //const parsedDependencia = linea.dependencia.replace('"',"").replace("'","")
         if(linea.dependencia && linea.lentrega && linea.raciones) {
+        const parsedDependencia = linea.dependencia.replace(/\"/g,"").replace("'","")
         plan.details.forEach((p) => {
             insumos.forEach(ins => {
                 if(ins.ins_id === p.ins_id) {
@@ -63,13 +63,12 @@ export default async function ExcelParserEnvios (excel: File, insumos: IEnvioIns
                 }
             });
         })
+            envio.desglose = parsedDependencia
+            envio.entregaId = linea.lentrega
+            hojaData.push(envio)
         }
         else console.log("DATO NO VALIDO ",linea)
 
-
-        envio.desglose = linea.dependencia
-        envio.entregaId = linea.lentrega
-        hojaData.push(envio)
     })
         envios.push(hojaData)
     });
