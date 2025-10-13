@@ -119,9 +119,19 @@ const dateReturner = () => {
 
 const insumosDisplayer = (insumos: IRemitoEnvioDetails[]) => {
     const elements = []
-    const amount = insumos.length > 25 ? insumos.length : 25
+    const amount = insumos.length > 24 ? insumos.length : 24
+    let undT = 0
+    let kgT = 0
+    let cajasT = 0
+    let bolsT = 0
+    let racT = 0
     for (let i = 0; i < amount; i++) {
         const ins = insumos[i]
+        undT += ins ? ins.total_unidades : 0
+        kgT += ins ? ins.total_kilos : 0
+        cajasT += ins ? ins.total_cajas : 0
+        bolsT += ins ? ins.total_bolsas : 0
+        racT += ins ? ins.total_raciones : 0
         elements.push(
             <View style={stylePedido.tableRow}>
                 <View style={stylePedido.tableColIns2}>
@@ -146,6 +156,28 @@ const insumosDisplayer = (insumos: IRemitoEnvioDetails[]) => {
         )
     
     }
+        elements.push(
+            <View style={stylePedido.tableRow}>
+                <View style={stylePedido.tableColIns2}>
+                    <Text style={stylePedido.tableCell}>Total</Text>
+                </View>
+                <View style={stylePedido.tableColcod2}>
+                    <Text style={stylePedido.tableCell}>{undT}</Text>
+                </View>
+                <View style={stylePedido.tableColcod2}>
+                    <Text style={stylePedido.tableCell}>{kgT.toFixed(2)}</Text>
+                </View>
+                <View style={stylePedido.tableColcod2}>
+                    <Text style={stylePedido.tableCell}>{cajasT}</Text>
+                </View>
+                <View style={stylePedido.tableColcod2}>
+                    <Text style={stylePedido.tableCell}>{bolsT}</Text>
+                </View>
+                <View style={stylePedido.tableColcod}>
+                    <Text style={stylePedido.tableCell}>{racT}</Text>
+                </View>
+            </View>
+        )
         elements.push(
             <View style={stylePedido.tableRow}>
                 <View style={stylePedido.tableColIns}>
