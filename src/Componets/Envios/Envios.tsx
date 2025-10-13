@@ -19,8 +19,11 @@ export default function Envios () {
     const [display, setDisplay] = useState(0)
     const [tanda, setTanda] = useState(0)
     const [pv, setPv] = useState(8)
+    const [cai, setCai] = useState(0)
+    const [venc, setVenc] = useState(0)
     const [startRt, setStartRt] = useState(0)
     const [endRt, setEndtRt] = useState(0)
+    const [endTal, setEndTal] = useState(0)
     const [fecha, setFecha] = useState("")
     const [delkey, setDelkey] = useState("")
     const [dias, setDias] = useState(30)
@@ -37,6 +40,7 @@ export default function Envios () {
             global.getEnviosPlanes().then(p => setPlanes(p))
             global.getPv().then(pv => setPv(pv ? pv : 8))
             global.getLastRt().then(rt => setLastRt(rt ? rt : 0))
+            global.getFinTalo().then(end => setEndTal(end ? end : 0))
         }
     },[])
 
@@ -47,7 +51,19 @@ export default function Envios () {
         setSelectedIns(0)
         setStartRt(0)
         setEndtRt(0)
+        if(global) {
+            global.getLastRt().then(rt => setLastRt(rt ? rt : 0))
+            global.getPv().then(pv => setPv(pv ? pv : 8))
+            global.getCai().then(c => setCai(c ? c : 0))
+            global.getVenc().then(v => setVenc(v ? v : 0))
+            global.getFinTalo().then(end => setEndTal(end ? end : 0))
+        }
     },[display])
+
+    useEffect(() => {
+        const remain = endTal - lastRt
+        if(endTal && lastRt && remain <= 100) alert("Remitos restantes hasta el final del talonario: "+remain)
+    }, [lastRt])
 
 
 
@@ -423,6 +439,45 @@ export default function Envios () {
             </div>
         )
     }
+    const displayData = () => {
+        const modData = async (id: number) => {
+            const payload = prompt("Ingrese el nuevo valor numerico")
+            if(payload !== undefined && payload !== null && global) {
+                await global.editDataEnvios(id,parseInt(payload))
+            }
+            else alert("No se cambio ningun valor.")
+        }
+        return(
+            <div>
+                <hr color='#3399ff' className='hr-line'/>
+                <div>
+                    <h2 className='title-Homepage' >
+                        Datos 
+                    </h2>
+                    <div>
+                        <h4 className='title-Homepage'>Siguiente Remito: {lastRt + 1}</h4>
+                        <button className='btn-export-pdf' onClick={() => modData(1)}>Modificar</button>
+                    </div>
+                    <div>
+                        <h4 className='title-Homepage'>Fin de Talonario: {endTal}</h4>
+                        <button className='btn-export-pdf' onClick={() => modData(6)}>Modificar</button>
+                    </div>
+                    <div>
+                        <h4 className='title-Homepage'>PV: {pv}</h4>
+                        <button className='btn-export-pdf' onClick={() => modData(2)}>Modificar</button>
+                    </div>
+                    <div>
+                        <h4 className='title-Homepage'>CAI: {cai}</h4>
+                        <button className='btn-export-pdf' onClick={() => modData(4)}>Modificar</button>
+                    </div>
+                    <div>
+                        <h4 className='title-Homepage'>Fecha de Vencimiento: {venc}</h4>
+                        <button className='btn-export-pdf' onClick={() => modData(5)}>Modificar</button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
     return(
         <div>
@@ -441,6 +496,7 @@ export default function Envios () {
                             <option value={4}>Insumos</option>
                             <option value={5}>Planes</option>
                             <option value={6}>Informes</option>
+                            <option value={7}>Datos</option>
                         </select>
                     </div>
                     <div style={{maxWidth: 400}}>
@@ -450,6 +506,7 @@ export default function Envios () {
                         {display === 4 && displayInsumos()}
                         {display === 5 && displayPlanes()}
                         {display === 6 && displayInformes()}
+                        {display === 7 && displayData()}
                     </div>
                 </div>
             </div>

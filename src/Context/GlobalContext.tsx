@@ -1111,6 +1111,51 @@ export default function GlobalState(props: IPropsChildren) {
           return []
         }
     }
+    async function getCai(): Promise<number | null> {
+      try {
+        const ruta: number = (await axios.get(SERVER+`/envios/cai`,authReturner())).data
+        console.log("Load CAI...")
+        return ruta
+      } catch (error) {
+        console.log(error);
+        alert("Error al CAI.");
+        return null
+      }
+    }
+    async function getVenc(): Promise<number | null> {
+      try {
+        const ruta: number = (await axios.get(SERVER+`/envios/vencimiento`,authReturner())).data
+        console.log("Load Vencimiento...")
+        return ruta
+      } catch (error) {
+        console.log(error);
+        alert("Error al Vencimiento.");
+        return null
+      }
+    }
+
+    async function editDataEnvios (id: number, payload: number) {
+      try {
+        await axios.patch(SERVER+`/envios/edit/data/${id}/${payload}`,{},authReturner())
+        alert("Datos actualizados")
+        window.location.reload()
+      } catch (error) {
+        console.log(error);
+        alert("Error al modificar el valor.");
+      }
+    }
+    async function getFinTalo(): Promise<number | null> {
+      try {
+        const ruta: number = (await axios.get(SERVER+`/envios/fintalo`,authReturner())).data
+        console.log("Load Talonario End...")
+        return ruta
+      } catch (error) {
+        console.log(error);
+        alert("Error al traer fin de talonario.");
+        return null
+      }
+    }
+
   
   
   const innitialState: IGlobalContext = {
@@ -1184,6 +1229,8 @@ export default function GlobalState(props: IPropsChildren) {
     sysUsersFn,
     registerEnvio,
     changeMenu,
+    editDataEnvios,
+    getCai,
     orderAproveFn,
     preaproveCompraFn,
     orderRejectFn,
@@ -1245,7 +1292,9 @@ export default function GlobalState(props: IPropsChildren) {
     getPv,
     getInformeDate,
     getLastRt,
-    getRemitosData
+    getRemitosData,
+    getVenc,
+    getFinTalo
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1356,5 +1405,9 @@ interface IGlobalContext {
   getPv:() => Promise<number | null>;
   getLastRt:() => Promise<number | null>;
   getInformeDate: (fecha: string) => Promise<string[]>;
-  getRemitosData: (start: number, end: number,pv: number) => Promise<IRemitoEnvio[]>
+  getRemitosData: (start: number, end: number,pv: number) => Promise<IRemitoEnvio[]>;
+  getCai: () => Promise<number | null>;
+  getFinTalo: () => Promise<number | null>;
+  getVenc: () => Promise<number | null>;
+  editDataEnvios: (id: number, payload: number) => void;
 }
