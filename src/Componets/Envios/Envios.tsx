@@ -65,6 +65,10 @@ export default function Envios () {
         if(endTal && lastRt && remain <= 100) alert("Remitos restantes hasta el final del talonario: "+remain)
     }, [lastRt])
 
+    const remitosRemain = () => {
+        const remain = endTal - lastRt
+        return remain
+    }
 
 
     const displayDesglosadoGn = () => {
@@ -109,6 +113,7 @@ export default function Envios () {
                     <h2 className='title-Homepage' >
                         Cargar un envio 
                     </h2>
+                    {remitosRemain() <= 100 && <h4 className='title-Homepage' style={{color: "red"}}>Remitos restantes del talonario {remitosRemain()}</h4>}
                     <h4 className='title-Homepage'>Seleccione el plan a utilizar</h4>
                     <select name="plan" className='filter-sub' value={selectedPlan} onChange={(e) => setSelectedPlan(parseInt(e.target.value))}>
                         <option value={1000}>---</option>
