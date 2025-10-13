@@ -285,7 +285,7 @@ const pageContruct = (e: IRemitoEnvio, copia: boolean) => (
                         <Text style={stylePedido.tableCellH}>Kg / lts</Text>
                     </View>
                     <View style={stylePedido.tableColcod}>
-                        <Text style={stylePedido.tableCellH}>Caja</Text>
+                        <Text style={stylePedido.tableCellH}>Pack</Text>
                     </View>
                     <View style={stylePedido.tableColcod}>
                         <Text style={stylePedido.tableCellH}>Bolsas</Text>
