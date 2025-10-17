@@ -489,7 +489,9 @@ export interface IDetalleEnvioCom {
 export interface IrequestEnvioCom {
   entregaId: number,
   desglose: string,
-  detalles: IDetalleEnvioCom[]
+  detalles: IDetalleEnvioCom[],
+  cue: number,
+  fortificado: boolean
 }
 
 export interface IChangeEnvioInsumo {
@@ -525,3 +527,36 @@ export interface IRemitoEnvio {
 export interface IRemitosPrintData {
     envios: IRemitoEnvio[]
 }
+
+export interface IDesglosesReturner {
+    cue: string,
+    lentrega_id: number,
+    localidad: string,
+    completo: string,
+    des: string,
+    rac_cl: number | null,
+    rac_al: number | null,
+    planId?: number,
+    fortificado: boolean
+}
+
+export interface ILentrega {
+    lentrega_id: number,
+    completo: string
+}
+
+export interface ILugaresResponse {
+    cabeceras: ILentrega[],
+    desgloses: IDesglosesReturner[]
+}
+
+export interface IRemitosEnvio {
+    nro_remito:string,
+    estado: string,
+    departamento: string,
+    localidad: string,
+    completo: string,
+    ultima_mod: string
+}
+
+export type TRemitoEnvio = ""

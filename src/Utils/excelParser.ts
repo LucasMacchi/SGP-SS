@@ -1,15 +1,16 @@
 import * as XLSX from 'xlsx';
-import { IEnvioInsumos, IPlanComplete, IrequestEnvioCom } from './Interfaces';
+import {IEnvioInsumos, IPlanComplete, IrequestEnvioCom } from './Interfaces';
 
 
 
 interface excelLineas {
+    cue: number,
     lentrega: number,
     dependencia: string,
     raciones: number
 }
 
-export default async function ExcelParserEnvios (excel: File, insumos: IEnvioInsumos[], plan: IPlanComplete): Promise<IrequestEnvioCom[][]>{
+export default async function ExcelParserEnvios ( excel: File,insumos: IEnvioInsumos[], plan: IPlanComplete): Promise<IrequestEnvioCom[][]>{
     const data = await parsedReturned(excel)
     let envios: IrequestEnvioCom[][] = []
     data.forEach(hoja => {
@@ -19,6 +20,7 @@ export default async function ExcelParserEnvios (excel: File, insumos: IEnvioIns
             entregaId: 0,
             desglose: "",
             detalles: [],
+            cue: 0
         }
         if(linea.dependencia && linea.lentrega && linea.raciones) {
         const parsedDependencia = linea.dependencia.replace(/\"/g,"").replace("'","")
@@ -65,6 +67,7 @@ export default async function ExcelParserEnvios (excel: File, insumos: IEnvioIns
         })
             envio.desglose = parsedDependencia
             envio.entregaId = linea.lentrega
+            envio.cue = linea.cue
             hojaData.push(envio)
         }
         else console.log("DATO NO VALIDO ",linea)
