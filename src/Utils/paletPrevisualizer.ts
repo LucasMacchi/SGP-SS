@@ -5,9 +5,8 @@ export default function paletPrevisualizer
 (lugares: IDesglosesReturner[], planes: IPlanComplete[], insumos: IEnvioInsumos[]) {
     let totalPalets = 0
     let totalRac = 0
-    let planDias = 0
-    const lugaresCL = lugares.filter(lg => lg.fortificado).sort((a,b) => a.lentrega_id - b.lentrega_id)
-    const lugaresAL = lugares.filter(lg => !lg.fortificado).sort((a,b) => a.lentrega_id - b.lentrega_id)
+    const lugaresCL = lugares.filter(lg => !lg.fortificado).sort((a,b) => a.lentrega_id - b.lentrega_id)
+    const lugaresAL = lugares.filter(lg => lg.fortificado).sort((a,b) => a.lentrega_id - b.lentrega_id)
     //const lugaresFinal = lugaresCL.concat(lugaresAL)
     let auxId = 0
     let totalRemitos = 0
@@ -29,29 +28,46 @@ export default function paletPrevisualizer
         });
     }
 
-    
+    console.log(lugaresCL,lugaresAL)
     if(planes) {
-        lugares.forEach(lg => {
-            const rac = lg.fortificado ? lg.rac_al : lg.rac_cl
-            if(rac){
-                planes.forEach((p) => {
-                    if(lg.planId && lg.planId === p.plan_id){
-                        planDias = p.dias
-                        p.details.forEach(p => {
-                            const racxdays = rac * p.dias
-                            insumos.forEach(ins => {
-                                if(ins.ins_id === p.ins_id) {
-                                    const racxpalet = ins.unidades_caja > 0 ? ins.raccaja * ins.caja_palet : ins.racbolsa * ins.caja_palet
-                                    totalPalets += Math.floor(racxdays / racxpalet)
+        if(lugaresCL.length > 0) {
+            lugaresCL.forEach(cl => {
+                planes.forEach(pln => {
+                    if(pln.plan_id === cl.planId && cl.rac_cl) {
+                        const racionesxplan = cl.rac_cl * pln.dias
+                        pln.details.forEach((pld) => {
+                            insumos.forEach((ins) => {
+                                if(ins.ins_id === pld.ins_id) {
+                                    const racxpalet = ins.raccaja ? ins.raccaja * ins.caja_palet : ins.racbolsa * ins.caja_palet
+                                    const palet = Math.floor(racionesxplan / racxpalet)
+                                    totalPalets += palet
                                 }
                             })
                         })
+                        totalRac += racionesxplan
                     }
-                    
-                })
-                totalRac += rac * planDias
-            }
-        })
+                });
+            });
+        }
+        if(lugaresAL.length > 0) {
+            lugaresAL.forEach(al => {
+                planes.forEach(pln => {
+                    if(pln.plan_id === al.planId && al.rac_cl) {
+                        const racionesxplan = al.rac_cl * pln.dias
+                        pln.details.forEach((pld) => {
+                            insumos.forEach((ins) => {
+                                if(ins.ins_id === pld.ins_id) {
+                                    const racxpalet = ins.raccaja ? ins.raccaja * ins.caja_palet : ins.racbolsa * ins.caja_palet
+                                    const palet = Math.floor(racionesxplan / racxpalet)
+                                    totalPalets += palet
+                                }
+                            })
+                        })
+                        totalRac += racionesxplan
+                    }
+                });
+            });
+        }
     }
 
     return {palets: totalPalets, racs: totalRac, totalRemitos: totalRemitos}
