@@ -17,18 +17,20 @@ import {
   ICompraDto,
   IConformidad,
   IDesglose,
+  IDesglosesReturner,
   IEmailSender,
   IEnvio,
   IEnvioInsumos,
   IFilter,
   IInsumoComp,
-  ILgarEntrega,
+  ILugaresResponse,
   IOrderRemito,
   IPedido,
   IPersonal,
   IPlanComplete,
   IPropsChildren,
   IRemitoEnvio,
+  IRemitosEnvio,
   IReport,
   IrequestEnvio,
   IrequestEnvioCom,
@@ -870,7 +872,6 @@ export default function GlobalState(props: IPropsChildren) {
       const insumos: IInsumoComp[] = (await axios.get(SERVER+"/data/insumos/complete",authReturner())).data
       return insumos
     } catch (error) {
-      alert("Error al traer insumos.");
       return []
     }
   }
@@ -886,16 +887,14 @@ export default function GlobalState(props: IPropsChildren) {
     }
   }
 
-  async function getLugaresEntreFn() {
+  async function getLugaresEntreFn(departamento: string, fort: number): Promise<ILugaresResponse> {
     try {
-      const entregas: ILgarEntrega[] = (await axios.get(SERVER+"/envios/entregas",authReturner())).data
-      dispatch({
-        payload: entregas,
-        type: ac.SET_LENTREGAS,
-      });
+      const entregas: ILugaresResponse = (await axios.get(SERVER+"/envios/entregas/"+departamento+"/"+fort,authReturner())).data
+      entregas.cabeceras.sort((a,b) => a.lentrega_id-b.lentrega_id)
+      return entregas
     } catch (error) {
       console.log(error);
-      alert("Error al traer lugares de entrega.");
+      return {cabeceras: [],desgloses: []}
     }
   }
   async function getDesglosesFn() {
@@ -942,6 +941,16 @@ export default function GlobalState(props: IPropsChildren) {
       return []
     }
   }
+  async function getEnviosTandaCustom(remitos: string[]): Promise<IrequestEnvio[]> {
+    try {
+      const envios: IrequestEnvio[] = (await axios.post(SERVER+`/envios/custom/tanda`,{remitos},authReturner())).data
+      return envios
+    } catch (error) {
+      console.log(error);
+      alert("Error al traer los envios.");
+      return []
+    }
+  }
     async function getTxtEnvio(start: number, end: number, pv: number,dias: number): Promise<ITxtEnvios> {
       try {
         const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,start)
@@ -966,13 +975,22 @@ export default function GlobalState(props: IPropsChildren) {
         return null
       }
     }
+    async function getRutaEnvioCustom(remitos: string[]): Promise<IResponseRutas | null> {
+      try {
+        const ruta: IResponseRutas = (await axios.post(SERVER+`/envios/custom/ruta`,{remitos},authReturner())).data
+        return ruta
+      } catch (error) {
+        console.log(error);
+        alert("Error al traer los datos para la ruta.");
+        return null
+      }
+    }
     async function getPv(): Promise<number | null> {
       try {
         const ruta: number = (await axios.get(SERVER+`/envios/pv`,authReturner())).data
         return ruta
       } catch (error) {
         console.log(error);
-        alert("Error al el punto de venta actual.");
         return null
       }
     }
@@ -982,7 +1000,6 @@ export default function GlobalState(props: IPropsChildren) {
         return ruta
       } catch (error) {
         console.log(error);
-        alert("Error al el punto de venta actual.");
         return null
       }
     }
@@ -991,6 +1008,16 @@ export default function GlobalState(props: IPropsChildren) {
         const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,start)
         const parsedEnd = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,end)
         const ruta: IConformidad[] = (await axios.get(SERVER+`/envios/actas/${parsedStart}/${parsedEnd}`,authReturner())).data
+        return ruta
+      } catch (error) {
+        console.log(error);
+        alert("Error al traer los datos para la ruta.");
+        return []
+      }
+    }
+    async function getConformidadEnvioCustom(remitos: string[]): Promise<IConformidad[]> {
+      try {
+        const ruta: IConformidad[] = (await axios.post(SERVER+`/envios/custom/actas`,{remitos},authReturner())).data
         return ruta
       } catch (error) {
         console.log(error);
@@ -1013,7 +1040,6 @@ export default function GlobalState(props: IPropsChildren) {
         return response
       } catch (error) {
         console.log(error);
-        alert("Error al traer envios.");
         return []
       }
     }
@@ -1023,21 +1049,47 @@ export default function GlobalState(props: IPropsChildren) {
         return response
       } catch (error) {
         console.log(error);
-        alert("Error al traer envios.");
         return []
+      }
+    }
+    async function getEnviosRemitos (): Promise<IRemitosEnvio[][]> {
+      try {
+        const response: IRemitosEnvio[] = (await axios.get(SERVER+`/envios/remitos`,authReturner())).data
+        const pages: IRemitosEnvio[][] = []
+        const paginasCount = 15
+        for (let i = 0; i < response.length; i += paginasCount) {
+          const arr = response.slice(i,i + paginasCount)
+          pages.push(arr)
+        }
+        return pages
+      } catch (error) {
+        console.log(error);
+        return []
+      }
+    }
+    async function changeEnviosStateRemitos (state: string, remito: string) {
+      try {
+        await axios.patch(SERVER+`/envios/remitos/estado/${state}/${remito}`,authReturner())
+        alert(`Remito ${remito} cambiado al estado ${state}`)
+        //window.location.reload()
+      } catch (error) {
+        console.log(error);
+        alert("Error al cambiar el estado del remito "+remito)
       }
     }
     async function createEnvios (data: IrequestEnvioCom[], update: boolean): Promise<string> {
       try {
+        const enviadosCL = data.filter(env => !env.fortificado)
+        const enviadosAL = data.filter(env => env.fortificado)
         const parsed = {
-          enviados: data,
-          update
+          enviadosCL,
+          enviadosAL,
+          update        
         }
         const response: string = (await axios.post(SERVER+`/envios/create`,parsed,authReturner())).data
         return response
       } catch (error) {
         console.log(error);
-        alert("Error al crear envios.");
         return "ERROR"
       }
     }
@@ -1111,6 +1163,15 @@ export default function GlobalState(props: IPropsChildren) {
           return []
         }
     }
+    async function getRemitosDataCustom(remitos: string[]): Promise<IRemitoEnvio[]> {
+        try {
+          const data: IRemitoEnvio[] = (await axios.post(SERVER+`/envios/custom/remitos`,{remitos},authReturner())).data
+          return data
+        } catch (error) {
+          console.log(error);
+          return []
+        }
+    }
     async function getCai(): Promise<number | null> {
       try {
         const ruta: number = (await axios.get(SERVER+`/envios/cai`,authReturner())).data
@@ -1118,7 +1179,6 @@ export default function GlobalState(props: IPropsChildren) {
         return ruta
       } catch (error) {
         console.log(error);
-        alert("Error al CAI.");
         return null
       }
     }
@@ -1129,7 +1189,6 @@ export default function GlobalState(props: IPropsChildren) {
         return ruta
       } catch (error) {
         console.log(error);
-        alert("Error al Vencimiento.");
         return null
       }
     }
@@ -1151,8 +1210,16 @@ export default function GlobalState(props: IPropsChildren) {
         return ruta
       } catch (error) {
         console.log(error);
-        alert("Error al traer fin de talonario.");
         return null
+      }
+    }
+    async function getDepartamentos(): Promise<string[]> {
+      try {
+        const ruta: string[] = (await axios.get(SERVER+`/envios/departamentos`,authReturner())).data
+        return ruta
+      } catch (error) {
+        console.log(error);
+        return []
       }
     }
 
@@ -1294,7 +1361,14 @@ export default function GlobalState(props: IPropsChildren) {
     getLastRt,
     getRemitosData,
     getVenc,
-    getFinTalo
+    getFinTalo,
+    getDepartamentos,
+    getEnviosTandaCustom,
+    getRutaEnvioCustom,
+    getRemitosDataCustom,
+    getConformidadEnvioCustom,
+    getEnviosRemitos,
+    changeEnviosStateRemitos
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1308,7 +1382,7 @@ export default function GlobalState(props: IPropsChildren) {
 interface IGlobalContext {
   user: IUser;
   menu: number;
-  lentregas: ILgarEntrega[];
+  lentregas: IDesglosesReturner[];
   createPersonal: (personal: IPersonal) => void;
   personal: IPersonal[];
   categories: string[];
@@ -1379,7 +1453,7 @@ interface IGlobalContext {
   preaproveCompraFn: (id: number, comentario: string) => void;
   getAllCompras: (revised:boolean, fullname?: string) => void;
   getUniqCompra: (id:number) => void;
-  getLugaresEntreFn: () => void;
+  getLugaresEntreFn: (departamento: string, fort: number) => Promise<ILugaresResponse>;
   editDesProdCompra: (detailID: number, descripcion: string) => void;
   editCantProdCompra: (detailID: number, cantidad: number) => void;
   deleteProdCompra: (detailID: number) => void;
@@ -1410,4 +1484,11 @@ interface IGlobalContext {
   getFinTalo: () => Promise<number | null>;
   getVenc: () => Promise<number | null>;
   editDataEnvios: (id: number, payload: number) => void;
+  getDepartamentos: () => Promise<string[]>;
+  getEnviosTandaCustom: (remitos: string[]) => Promise<IrequestEnvio[]>;
+  getRutaEnvioCustom: (remitos: string[]) => Promise<IResponseRutas | null>;
+  getRemitosDataCustom: (remitos: string[]) => Promise<IRemitoEnvio[]>;
+  getConformidadEnvioCustom: (remitos: string[]) => Promise<IConformidad[]>;
+  getEnviosRemitos: () => Promise<IRemitosEnvio[][]>;
+  changeEnviosStateRemitos: (state: string, remito: string) => void;
 }
