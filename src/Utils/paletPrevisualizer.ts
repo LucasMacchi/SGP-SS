@@ -31,6 +31,7 @@ export default function paletPrevisualizer
     console.log(lugaresCL,lugaresAL)
     if(planes) {
         if(lugaresCL.length > 0) {
+            console.log("COPA LECHE ->")
             lugaresCL.forEach(cl => {
                 planes.forEach(pln => {
                     if(pln.plan_id === cl.planId && cl.rac_cl) {
@@ -39,6 +40,7 @@ export default function paletPrevisualizer
                             insumos.forEach((ins) => {
                                 if(ins.ins_id === pld.ins_id) {
                                     const racxpalet = ins.raccaja ? ins.raccaja * ins.caja_palet : ins.racbolsa * ins.caja_palet
+                                    console.log(ins.des,racionesxplan, racxpalet)
                                     const palet = Math.floor(racionesxplan / racxpalet)
                                     totalPalets += palet
                                 }
@@ -50,6 +52,7 @@ export default function paletPrevisualizer
             });
         }
         if(lugaresAL.length > 0) {
+            console.log("ALMUERZO ->")
             lugaresAL.forEach(al => {
                 planes.forEach(pln => {
                     if(pln.plan_id === al.planId && al.rac_cl) {
