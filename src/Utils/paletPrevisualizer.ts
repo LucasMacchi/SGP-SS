@@ -28,7 +28,6 @@ export default function paletPrevisualizer
         });
     }
 
-    console.log(lugaresCL,lugaresAL)
     if(planes) {
         if(lugaresCL.length > 0) {
             lugaresCL.forEach(cl => {
