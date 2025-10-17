@@ -20,7 +20,8 @@ export default async function ExcelParserEnvios ( excel: File,insumos: IEnvioIns
             entregaId: 0,
             desglose: "",
             detalles: [],
-            cue: 0
+            cue: 0,
+            fortificado: false
         }
         if(linea.dependencia && linea.lentrega && linea.raciones) {
         const parsedDependencia = linea.dependencia.replace(/\"/g,"").replace("'","")
