@@ -18,7 +18,7 @@ export default function ServicesPage () {
     const [filterDepartment, setDepartment] = useState('')
     const [filterServ, setFilterServ] = useState<IServicio[]>([])
     const [filteredInsumos, setFilteredInsumos] = useState<string[]>([])
-    const [filteredLentregas, _setFilteredLentregas] = useState<ILgarEntrega[]>([])
+    const [filteredLentregas, setFilteredLentregas] = useState<ILgarEntrega[]>([])
     const [searchServ, setSearchServ] = useState('')
     const [displayType, setDisplayType] = useState(1)
 
@@ -27,7 +27,7 @@ export default function ServicesPage () {
             if(global.login === false) global.sessionFn()
             if(global.insumos.length === 0) global?.insumosFn(false)
             if(global.ccos.length === 0) global?.ccosFn()
-            //if(global.lentregas.length === 0) global.getLugaresEntreFn()
+            if(global.lentregas.length === 0) global.lugaresDeEntrega()
         }
     },[])
 
@@ -63,7 +63,8 @@ export default function ServicesPage () {
             const search = searchServ.toLowerCase()
             if(arr){
                 if(searchServ.length > 2)  arr = arr.filter(c => c.completo.toLowerCase().includes(search))
-                //setFilteredLentregas(arr)
+                console.log(global?.lentregas)
+                setFilteredLentregas(arr)
             }
             
         }
