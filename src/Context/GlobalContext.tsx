@@ -17,12 +17,12 @@ import {
   ICompraDto,
   IConformidad,
   IDesglose,
-  IDesglosesReturner,
   IEmailSender,
   IEnvio,
   IEnvioInsumos,
   IFilter,
   IInsumoComp,
+  ILgarEntrega,
   ILugaresResponse,
   IOrderRemito,
   IPedido,
@@ -886,7 +886,19 @@ export default function GlobalState(props: IPropsChildren) {
       alert("Error al cambiar la compra.");
     }
   }
-
+  async function lugaresDeEntrega () : Promise<ILgarEntrega[]> {
+    try {
+      const lugares:ILgarEntrega[] = (await axios.get(SERVER+"/envios/lentrega",authReturner())).data
+      dispatch({
+        payload: lugares,
+        type: ac.SET_LENTREGAS,
+      });
+      return lugares
+    } catch (error) {
+      console.log(error);
+      return []
+    }
+  }
   async function getLugaresEntreFn(departamento: string, fort: number): Promise<ILugaresResponse> {
     try {
       const entregas: ILugaresResponse = (await axios.get(SERVER+"/envios/entregas/"+departamento+"/"+fort,authReturner())).data
@@ -1368,7 +1380,8 @@ export default function GlobalState(props: IPropsChildren) {
     getRemitosDataCustom,
     getConformidadEnvioCustom,
     getEnviosRemitos,
-    changeEnviosStateRemitos
+    changeEnviosStateRemitos,
+    lugaresDeEntrega
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1382,7 +1395,7 @@ export default function GlobalState(props: IPropsChildren) {
 interface IGlobalContext {
   user: IUser;
   menu: number;
-  lentregas: IDesglosesReturner[];
+  lentregas: ILgarEntrega[];
   createPersonal: (personal: IPersonal) => void;
   personal: IPersonal[];
   categories: string[];
@@ -1491,4 +1504,5 @@ interface IGlobalContext {
   getConformidadEnvioCustom: (remitos: string[]) => Promise<IConformidad[]>;
   getEnviosRemitos: () => Promise<IRemitosEnvio[][]>;
   changeEnviosStateRemitos: (state: string, remito: string) => void;
+  lugaresDeEntrega: () => Promise<ILgarEntrega[]>;
 }
