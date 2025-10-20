@@ -10,7 +10,7 @@ interface excelLineas {
     raciones: number
 }
 
-export default async function ExcelParserEnvios ( excel: File,insumos: IEnvioInsumos[], plan: IPlanComplete): Promise<IrequestEnvioCom[][]>{
+export default async function ExcelParserEnvios ( excel: File,insumos: IEnvioInsumos[], plan: IPlanComplete,fortificado: boolean): Promise<IrequestEnvioCom[][]>{
     const data = await parsedReturned(excel)
     let envios: IrequestEnvioCom[][] = []
     data.forEach(hoja => {
@@ -21,7 +21,7 @@ export default async function ExcelParserEnvios ( excel: File,insumos: IEnvioIns
             desglose: "",
             detalles: [],
             cue: 0,
-            fortificado: false
+            fortificado: fortificado
         }
         if(linea.dependencia && linea.lentrega && linea.raciones) {
         const parsedDependencia = linea.dependencia.replace(/\"/g,"").replace("'","")

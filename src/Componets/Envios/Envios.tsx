@@ -149,7 +149,7 @@ export default function Envios () {
         const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
             if(e.target.files && e.target.files[0] && global && confirm("¿Quieres crear las tandas de este excel?")) {
                 const updater = confirm("¿Quieres que se actualicen los remitos?")
-                const data: IrequestEnvioCom[][] = await ExcelParserEnvios(e.target.files[0], insumos, planes[selectedPlan])
+                const data: IrequestEnvioCom[][] = await ExcelParserEnvios(e.target.files[0], insumos, planes[selectedPlan],fortificado ? true: false)
                 let lineas = []
                 console.log(data)
                 for (let index = 0; index < data.length; index++) {
