@@ -32,6 +32,7 @@ import {
   IRemitoEnvio,
   IRemitosEnvio,
   IReport,
+  IReportEnvio,
   IrequestEnvio,
   IrequestEnvioCom,
   IResponseInsumo,
@@ -48,7 +49,6 @@ import axios, { AxiosResponse } from "axios";
 import authReturner from "../Utils/authReturner";
 import envioFormater from "../Utils/envioFormater";
 import refillEmptySpace from "../Utils/refillEmptySpace";
-
 export const GlobalContext = createContext<IGlobalContext | null>(null);
 const LOGS = import.meta.env.VITE_USE_LOGS;
 const SERVER = import.meta.env.VITE_SERVER;
@@ -1015,6 +1015,29 @@ export default function GlobalState(props: IPropsChildren) {
         return null
       }
     }
+    async function getReportesEnvio(remito: string): Promise<IReportEnvio[]> {
+      try {
+        const reps: IReportEnvio[] = (await axios.get(SERVER+`/envios/reportes/${remito}`,authReturner())).data
+        return reps
+      } catch (error) {
+        console.log(error);
+        return []
+      }
+    }
+    async function createReportesEnvio(remito: string,titulo:string, des:string) {
+      try {
+        const data = {
+          remito,
+          titulo,
+          des
+        }
+        await axios.post(SERVER+`/envios/reportes/create`,data,authReturner())
+        alert("Reporte creado.")
+      } catch (error) {
+        console.log(error);
+        alert("Error en  crear Reporte.")
+      }
+    }
     async function getConformidadEnvio(start: number, end: number, pv: number): Promise<IConformidad[]> {
       try {
         const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,start)
@@ -1037,6 +1060,7 @@ export default function GlobalState(props: IPropsChildren) {
         return []
       }
     }
+    
     async function deleteTandaFn (tanda: number, key: string) {
       try {
         const response: string = (await axios.delete(SERVER+`/envios/del/tanda/${tanda}/${key}`,authReturner())).data
@@ -1381,7 +1405,9 @@ export default function GlobalState(props: IPropsChildren) {
     getConformidadEnvioCustom,
     getEnviosRemitos,
     changeEnviosStateRemitos,
-    lugaresDeEntrega
+    lugaresDeEntrega,
+    getReportesEnvio,
+    createReportesEnvio
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1505,4 +1531,6 @@ interface IGlobalContext {
   getEnviosRemitos: () => Promise<IRemitosEnvio[][]>;
   changeEnviosStateRemitos: (state: string, remito: string) => void;
   lugaresDeEntrega: () => Promise<ILgarEntrega[]>;
+  getReportesEnvio: (remito: string) => Promise<IReportEnvio[]>;
+  createReportesEnvio: (remito: string,titulo:string, des:string) => Promise<void>;
 }

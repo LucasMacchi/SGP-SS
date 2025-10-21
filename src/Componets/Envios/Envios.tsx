@@ -8,12 +8,13 @@ import createTxtEnvio from "../../Utils/createTxtEnvio";
 import RutaPdf from "../pdfs/rutaEnvioPdf";
 import ActaConformidadPDF from "../pdfs/actaConformidad";
 import ExcelParserEnvios from "../../Utils/excelParser";
-import { IChangeEnvioInsumo, IChangeEnvioInsumoPlan, IDesglosesReturner, IEnvioInsumos, ILentrega, IPlanComplete, IRemitosEnvio, IrequestEnvioCom } from "../../Utils/Interfaces";
+import { IChangeEnvioInsumo, IChangeEnvioInsumoPlan, IDesglosesReturner, IEnvioInsumos, ILentrega, IPlanComplete, IRemitosEnvio, IReportEnvio, IrequestEnvioCom } from "../../Utils/Interfaces";
 import informeEnviosTxt from "../../Utils/informeEnviosTxt";
 import RemitoEnvioPdf from "../pdfs/remitoEnvio";
 import paletPrevisualizer from "../../Utils/paletPrevisualizer";
 import desglosesParser from "../../Utils/desglosesParser";
 import refillEmptySpace from "../../Utils/refillEmptySpace";
+import reportesCategoriasJSON from "./reporteCategorias.json";
 
 
 export default function Envios () {
@@ -49,7 +50,10 @@ export default function Envios () {
     const [customRt, setCustomRt] = useState<string[]>([])
     const [remitosView, setRemitosView] = useState<IRemitosEnvio[][]>([])
     const [remitoPage, setRemitoPage] = useState(0)
+    const [remitosReport, setRemitoReport] = useState<IReportEnvio[]>([])
     const [selectedRemito, setSelectedRemito] = useState<IRemitosEnvio | null>(null)
+    const [selectedReporte, setSelectedReporte] = useState(10000)
+    const [createReporte, setCreateReporte] = useState({titulo: "", des: ""})
     const [Crt, setCRt] = useState("")
     useEffect(() => {
         if(global) {
@@ -81,6 +85,8 @@ export default function Envios () {
         setCustomCheck(false)
         setSelectedLgsEnt([])
         setRemitoPage(0)
+        setRemitoReport([])
+        setSelectedReporte(10000)
     },[display])
 
     useEffect(() => {
@@ -122,6 +128,15 @@ export default function Envios () {
         setUpdater(updater+1)
     },[remitosView])
 
+    useEffect(() =>  {
+        setRemitoReport([])
+        setSelectedReporte(10000)
+    },[selectedRemito])
+
+    useEffect(() => {
+        setCreateReporte({titulo: "",des: ""})
+    },[selectedReporte])
+
 
     const limpiarTodo = () => {
         setDelkey("")
@@ -137,6 +152,8 @@ export default function Envios () {
         setCustomRt([])
         setCustomCheck(false)
         setSelectedLgsEnt([])
+        setRemitoReport([])
+        setSelectedReporte(10000)
     }
 
     const remitosRemain = () => {
@@ -830,6 +847,20 @@ export default function Envios () {
             }
         }
 
+        const traerReportes = async () => {
+            if(global && selectedRemito) {
+                global.getReportesEnvio(selectedRemito.nro_remito).then(rpts => setRemitoReport(rpts))
+            }
+        }
+
+        const createReporteFn = async () => {
+            console.log(selectedRemito?.nro_remito,createReporte.des,createReporte.titulo)
+            if(global &&  selectedRemito && createReporte.titulo.length > 0 && createReporte.des.length > 0 && selectedRemito.nro_remito.length > 0 && confirm("¿Quieres crear el reporte?")) {
+                global.createReportesEnvio(selectedRemito?.nro_remito,createReporte.titulo,createReporte.des)
+                setCreateReporte({titulo: "",des: ""})
+            }
+        }
+
         return (
             <div>
                 <hr color='#3399ff' className='hr-line'/>
@@ -844,7 +875,55 @@ export default function Envios () {
                                 <h5 className='title-Homepage'>Estado: {selectedRemito.estado}</h5>
                                 <h5 className='title-Homepage'>Ultimo movimiento: {selectedRemito.ultima_mod.split("T")[0]}</h5>
                                 <h5 className='title-Homepage'>Cambiar Estado:{stateManagement(selectedRemito.estado,selectedRemito.nro_remito)}</h5>
-                                
+                                <button className='btn-export-pdf' onClick={() => traerReportes()}>REPORTES</button>
+                                <button className='btn-export-pdf' onClick={() => setSelectedReporte(-1)}>CREAR REPORTE</button>
+                                <div>
+                                {remitosReport.length > 0 && (
+                                    <table style={{fontSize: "small", width: 350,tableLayout: "fixed"}}>
+                                        <tbody>
+                                            <tr >
+                                                <th style={{border: "1px solid", width: "50%"}}>Titulo</th>
+                                                <th style={{border: "1px solid", width: "50%"}}>Fecha</th>
+                                            </tr>
+                                            { remitosReport.map((d,i) => (
+                                            <tr key={i} style={{backgroundColor: selectedReporte === i ? "grey": "white"}}
+                                            onClick={() => setSelectedReporte(i)}>
+                                                <th style={{border: "1px solid", width: "50%"}}>{d.titulo}</th>
+                                                <th style={{border: "1px solid", width: "50%"}}>{d.fecha.split("T")[0]}</th>
+                                            </tr>
+                                            ))}
+                                        </tbody>
+                                    </table> 
+                                )}
+                                {selectedReporte === -1 && (
+                                    <div>
+                                        <hr color='#3399ff' className='hr-line'/>
+                                        <div>
+                                            <h4 className='title-Homepage'>Categoria:</h4>
+                                            <select name="plan" className='filter-sub' value={createReporte.titulo} onChange={(e) => setCreateReporte({...createReporte, titulo: e.target.value})}>
+                                                <option key={"nada"} value={""}>----</option>
+                                                {reportesCategoriasJSON.cats.map((ct) => (
+                                                    <option key={ct} value={ct}>{ct}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <textarea value={createReporte.des} className='texarea-details-big' style={{height: 120}} onChange={(e) => setCreateReporte({...createReporte, des: e.target.value})}/>
+                                        </div>
+                                        <button className='btn-export-pdf' onClick={() => createReporteFn()}>REGISTRAR REPORTE</button>
+                                    </div>
+                                )}
+                                {(selectedReporte < 10000 && selectedReporte >= 0) && (
+                                    <div>
+                                        <hr color='#3399ff' className='hr-line'/>
+                                        <h4 className='title-Homepage'>Descripcion:</h4>
+                                        <p className='description-report'>
+                                            {remitosReport[selectedReporte].des}
+                                        </p>
+                                    </div>
+                                )}
+
+                                </div>
                             </div>
                         )}
                     </div>
