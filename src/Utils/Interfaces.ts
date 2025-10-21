@@ -125,6 +125,13 @@ export interface IServicio {
     localidad: string
 }
 
+export interface IReportEnvio {
+    remito: string,
+    titulo: string,
+    des: string,
+    fecha: string
+}
+
 export interface IDetailChange {
     detail_id: number,
     amount: number

@@ -1,0 +1,14 @@
+{
+    "cats": [
+        "Falta de mercaderia",
+        "Mercaderia insuficiente",
+        "Entrega fuera de horario",
+        "Entrega tardia",
+        "Mercaderia vencida/mal estado",
+        "Falta firma",
+        "Falta documentacion",
+        "Firma/Sello invalido",
+        "Documentacion invalida",
+        "Otros"
+    ]
+}

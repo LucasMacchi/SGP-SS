@@ -24,7 +24,8 @@ export default function ( desgloses: IDesglosesReturner[],insumos: IEnvioInsumos
                             const value: number = raciones / 30 * p.dias
                             const unidades = Math.ceil(value / ins.racbolsa)
                             const cajas = Math.floor(value / ins.raccaja)
-                            const bolsas = Math.ceil((value - cajas * ins.raccaja) / ins.racbolsa)
+                            const racxcajas = value - ins.raccaja * cajas
+                            const bolsas = Math.ceil(racxcajas / ins.racbolsa)
                             const kilos = unidades * ins.gr_total / 1000
                             envio.detalles.push({
                                 kilos: kilos,
