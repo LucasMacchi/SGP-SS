@@ -1,35 +1,77 @@
 {
 
-    "reportes": [
+    "insumos": [
         {
-            "remito": "0008-000456",
-            "titulo": "Queja",
-            "des": "Se quejo la profesora del colegio porque no le llego la cantidad suficiente de pure de papa.cccccccccccccccc",
-            "fecha": "2025-10-21"
+            "id": 1,
+            "des": "9000-000078-Leche entera en polvo 800 gr",
+            "cod": "LRaciones",
+            "caja_palet": 64,
+            "unidades_caja":12,
+            "gr_racion": 25,
+            "gr_total": 800
         },
         {
-            "remito": "0008-000456",
-            "titulo": "Queja",
-            "des": "Se quejo la profesora del colegio porque no le llego la cantidad suficiente de pure de papa.",
-            "fecha": "2025-10-21"
+            "id": 2,
+            "des": "9003-000011-Azucar 1 Kg",
+            "cod": "ARaciones",
+            "caja_palet": 150,
+            "unidades_caja":10,
+            "gr_racion": 10,
+            "gr_total": 1000
         },
         {
-            "remito": "0008-000456",
-            "titulo": "Queja",
-            "des": "Se quejo la profesora del colegio porque no le llego la cantidad suficiente de pure de papa.",
-            "fecha": "2025-10-21"
+            "id": 3,
+            "des": "9002-000011-Yerba 1 Kg",
+            "cod": "YRaciones",
+            "caja_palet": 60,
+            "unidades_caja":10,
+            "gr_racion": 2,
+            "gr_total": 1000
         },
         {
-            "remito": "0008-000456",
-            "titulo": "Queja",
-            "des": "Se quejo la profesora del colegio porque no le llego la cantidad suficiente de pure de papa.",
-            "fecha": "2025-10-21"
+            "id": 4,
+            "des": "9007-000082-Alfajores 28gr",
+            "cod": "ALRaciones",
+            "caja_palet": 300,
+            "unidades_caja":60,
+            "gr_racion": 28,
+            "gr_total": 28
         },
         {
-            "remito": "0008-000456",
-            "titulo": "Queja",
-            "des": "Se quejo la profesora del colegio porque no le llego la cantidad suficiente de pure de papa.",
-            "fecha": "2025-10-21"
+            "id": 5,
+            "des": "9004-000079-Galletita 15x180g",
+            "cod": "GRaciones",
+            "caja_palet": 80,
+            "unidades_caja":12,
+            "gr_racion": 35,
+            "gr_total": 350
+        },
+        {
+            "id": 6,
+            "des": "9005-000080-Budin 20x170g",
+            "cod": "BRaciones",
+            "caja_palet": 120,
+            "unidades_caja":15,
+            "gr_racion": 34,
+            "gr_total": 170
+        },
+        {
+            "id": 7,
+            "des": "9008-000083-Turron x 50 unid.",
+            "cod": "TRaciones",
+            "caja_palet": 300,
+            "unidades_caja":50,
+            "gr_racion": 25,
+            "gr_total": 25
+        },
+        {
+            "id": 8,
+            "des": "9001-000011-Leche Chocolatada en polvo 1 kg",
+            "cod": "CLRaciones",
+            "caja_palet": 77,
+            "unidades_caja":10,
+            "gr_racion": 35.71428,
+            "gr_total": 1000
         }
     ]
 
