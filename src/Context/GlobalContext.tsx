@@ -1105,7 +1105,7 @@ export default function GlobalState(props: IPropsChildren) {
     }
     async function changeEnviosStateRemitos (state: string, remito: string) {
       try {
-        await axios.patch(SERVER+`/envios/remitos/estado/${state}/${remito}`,authReturner())
+        await axios.patch(SERVER+`/envios/remitos/estado/${state}/${remito}`,{},authReturner())
         alert(`Remito ${remito} cambiado al estado ${state}`)
         //window.location.reload()
       } catch (error) {
