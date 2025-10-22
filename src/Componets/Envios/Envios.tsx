@@ -8,7 +8,7 @@ import createTxtEnvio from "../../Utils/createTxtEnvio";
 import RutaPdf from "../pdfs/rutaEnvioPdf";
 import ActaConformidadPDF from "../pdfs/actaConformidad";
 import ExcelParserEnvios from "../../Utils/excelParser";
-import { IChangeEnvioInsumo, IChangeEnvioInsumoPlan, IDesglosesReturner, IEnvioInsumos, ILentrega, IPlanComplete, IRemitosEnvio, IReportEnvio, IrequestEnvioCom } from "../../Utils/Interfaces";
+import { IChangeEnvioInsumo, IChangeEnvioInsumoPlan, IDesglosesReturner, IEnvioInsumos, ILentrega, IPlanComplete, IRemitosEnvio, IReportEnvio, IrequestEnvioCom, rolesNum } from "../../Utils/Interfaces";
 import informeEnviosTxt from "../../Utils/informeEnviosTxt";
 import RemitoEnvioPdf from "../pdfs/remitoEnvio";
 import paletPrevisualizer from "../../Utils/paletPrevisualizer";
@@ -858,6 +858,7 @@ export default function Envios () {
             if(global &&  selectedRemito && createReporte.titulo.length > 0 && createReporte.des.length > 0 && selectedRemito.nro_remito.length > 0 && confirm("¿Quieres crear el reporte?")) {
                 global.createReportesEnvio(selectedRemito?.nro_remito,createReporte.titulo,createReporte.des)
                 setCreateReporte({titulo: "",des: ""})
+                setSelectedReporte(10000)
             }
         }
 
@@ -963,32 +964,40 @@ export default function Envios () {
             <div>
                 <div>
                    <hr color='#3399ff' className='hr-line'/>
-                    <div>
-                        <h4 className='title-Homepage'>Seleccione la accion a realizar</h4>
-                        <select name="display" className='filter-sub'
-                        onChange={(e)=>setDisplay(parseInt(e.target.value))}>
-                            <option value={0}>---</option>
-                            <option value={1}>Generar envios Excel</option>
-                            <option value={8}>Generar envios</option>
-                            <option value={2}>Eliminar envios</option>
-                            <option value={3}>Traer envios</option>
-                            <option value={9}>Ver remitos</option>
-                            <option value={4}>Insumos</option>
-                            <option value={5}>Planes</option>
-                            <option value={6}>Informes</option>
-                            <option value={7}>Datos</option>
-                        </select>
-                    </div>
+                   {(global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin) ? (
+                        <div>
+                            <h4 className='title-Homepage'>Seleccione la accion a realizar</h4>
+                            <select name="display" className='filter-sub'
+                            onChange={(e)=>setDisplay(parseInt(e.target.value))}>
+                                <option value={0}>---</option>
+                                <option value={1}>Generar envios Excel</option>
+                                <option value={8}>Generar envios</option>
+                                <option value={2}>Eliminar envios</option>
+                                <option value={3}>Traer envios</option>
+                                <option value={9}>Ver remitos</option>
+                                <option value={4}>Insumos</option>
+                                <option value={5}>Planes</option>
+                                <option value={6}>Informes</option>
+                                <option value={7}>Datos</option>
+                            </select>
+                        </div>
+                   ) : 
+                   (
+                        <div>
+                            <h4 className='title-Homepage'>NO TIENE PERMITIDO</h4>
+                        </div>
+                   )}
+
                     <div style={{maxWidth: 800}}>
-                        {display === 1 && displayGenerarEnvioExcel()}
-                        {display === 2 && displayDeleteTanda()}
-                        {display === 3 && displayTraerEnvios()}
-                        {display === 4 && displayInsumos()}
-                        {display === 5 && displayPlanes()}
-                        {display === 6 && displayInformes()}
-                        {display === 7 && displayData()}
-                        {display === 8 && displayGenerarEnvio()}
-                        {display === 9 && displayRemitos()}
+                        {(display === 1 && (global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin)) && displayGenerarEnvioExcel()}
+                        {(display === 2 && (global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin)) && displayDeleteTanda()}
+                        {(display === 3 && (global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin)) && displayTraerEnvios()}
+                        {(display === 4 && (global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin)) && displayInsumos()}
+                        {(display === 5 && (global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin)) && displayPlanes()}
+                        {(display === 6 && (global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin)) && displayInformes()}
+                        {(display === 7 && (global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin)) && displayData()}
+                        {(display === 8 && (global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin)) && displayGenerarEnvio()}
+                        {(display === 9 && (global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin)) && displayRemitos()}
                     </div>
                 </div>
             </div>
