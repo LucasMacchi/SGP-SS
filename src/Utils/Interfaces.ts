@@ -532,7 +532,8 @@ export interface IRemitoEnvio {
 }
 
 export interface IRemitosPrintData {
-    envios: IRemitoEnvio[]
+    envios: IRemitoEnvio[],
+    dias: number
 }
 
 export interface IDesglosesReturner {
