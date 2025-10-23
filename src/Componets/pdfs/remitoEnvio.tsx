@@ -69,8 +69,13 @@ const stylePedido = StyleSheet.create({
       },
       tableCell: {
         margin: 2,
-        fontSize: 11,
+        fontSize: 10,
         textAlign: 'center',
+      },
+      tableCell2: {
+        margin: 2,
+        fontSize: 10,
+        textAlign: 'left',
       },
         tableCellH: {
         margin: 2,
@@ -117,7 +122,7 @@ const dateReturner = () => {
 }
 
 
-const insumosDisplayer = (insumos: IRemitoEnvioDetails[]) => {
+const insumosDisplayer = (insumos: IRemitoEnvioDetails[],desgloses: number, dias: number) => {
     const elements = []
     const amount = insumos.length > 24 ? insumos.length : 24
     let undT = 0
@@ -135,7 +140,7 @@ const insumosDisplayer = (insumos: IRemitoEnvioDetails[]) => {
         elements.push(
             <View style={stylePedido.tableRow}>
                 <View style={stylePedido.tableColIns2}>
-                    <Text style={stylePedido.tableCell}>{ins ? ins.descripcion.toUpperCase() : " "}</Text>
+                    <Text style={stylePedido.tableCell2}>{ins ? ins.descripcion.toUpperCase() : " "}</Text>
                 </View>
                 <View style={stylePedido.tableColcod2}>
                     <Text style={stylePedido.tableCell}>{ins ? ins.total_unidades : " "}</Text>
@@ -181,7 +186,7 @@ const insumosDisplayer = (insumos: IRemitoEnvioDetails[]) => {
         elements.push(
             <View style={stylePedido.tableRow}>
                 <View style={stylePedido.tableColIns}>
-                    <Text style={stylePedido.tableCell}>Total de Desgloses: 20</Text>
+                    <Text style={stylePedido.tableCell2}>Total de Desgloses: {desgloses}</Text>
                 </View>
                 <View style={stylePedido.tableColcod}>
                     <Text style={stylePedido.tableCell}>{" "}</Text>
@@ -203,7 +208,7 @@ const insumosDisplayer = (insumos: IRemitoEnvioDetails[]) => {
         elements.push(
             <View style={stylePedido.tableRow}>
                 <View style={stylePedido.tableColIns}>
-                    <Text style={stylePedido.tableCell}>Raciones por 30 dias habiles</Text>
+                    <Text style={stylePedido.tableCell2}>Raciones por {dias} dias habiles</Text>
                 </View>
                 <View style={stylePedido.tableColcod}>
                     <Text style={stylePedido.tableCell}>{" "}</Text>
@@ -225,7 +230,7 @@ const insumosDisplayer = (insumos: IRemitoEnvioDetails[]) => {
     return elements
 }
 
-const pageContruct = (e: IRemitoEnvio, copia: boolean) => (
+const pageContruct = (e: IRemitoEnvio, copia: boolean,dias: number) => (
         <Page size={'A4'} style={stylePedido.page}>
             <View style={{flexDirection: 'row', justifyContent: "center"}}>
                 <Image src={logoBig} style={stylePedido.logo}/>
@@ -295,7 +300,7 @@ const pageContruct = (e: IRemitoEnvio, copia: boolean) => (
                     </View>
                 </View>
                 </View>
-                {insumosDisplayer(e.detalles)}
+                {insumosDisplayer(e.detalles,e.cant_desgloses,dias)}
             </View>
             <View style={stylePedido.viewdata}>
                 <Text style={stylePedido.body}>Lugar de Entrega: {e.le_des}</Text>
@@ -322,11 +327,11 @@ const pageContruct = (e: IRemitoEnvio, copia: boolean) => (
 )
 
 
-const RemitoEnvioPdf: React.FC<IRemitosPrintData> = ({envios}) => (
+const RemitoEnvioPdf: React.FC<IRemitosPrintData> = ({envios,dias}) => (
     <Document>
         {envios.flatMap((e) => [
-            pageContruct(e,false),
-            pageContruct(e,true)
+            pageContruct(e,false,dias),
+            pageContruct(e,true,dias)
         ])}
 
     </Document>

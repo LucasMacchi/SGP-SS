@@ -38,6 +38,7 @@ export default function Envios () {
     const [selectedIns, setSelectedIns] = useState(0)
     const [departamentos, setDepartamentos] = useState<string[]>([])
     const [selectedDep, setSelectedDep] = useState("")
+    const [customDate, setCustomDate] = useState("")
     const [lugaresEntrega, setLugaresEntrega] = useState<IDesglosesReturner[]>([])
     const [selectedLgsEnt, setSelectedLgsEnt] = useState<IDesglosesReturner[]>([])
     const [cabeceras, setCabeceras] = useState<ILentrega[]>([])
@@ -87,6 +88,7 @@ export default function Envios () {
         setRemitoPage(0)
         setRemitoReport([])
         setSelectedReporte(10000)
+        setCustomDate("")
     },[display])
 
     useEffect(() => {
@@ -126,11 +128,13 @@ export default function Envios () {
 
     useEffect(() => {
         setUpdater(updater+1)
+        setCustomDate("")
     },[remitosView])
 
     useEffect(() =>  {
         setRemitoReport([])
         setSelectedReporte(10000)
+        setCustomDate("")
     },[selectedRemito])
 
     useEffect(() => {
@@ -299,7 +303,7 @@ export default function Envios () {
         const getRemitos = async () => {
             const envios = customRt.length > 0 ? await global?.getRemitosDataCustom(customRt) : await global?.getRemitosData(startRt, endRt, pv)
             if(envios) {
-                const blobR = await pdf(<RemitoEnvioPdf envios={envios}/>).toBlob()
+                const blobR = await pdf(<RemitoEnvioPdf envios={envios} dias={dias}/>).toBlob()
                 if(customCheck && customRt.length > 0) saveAs(blobR, 'SGP_REMITOS_PERSONALIZADO')
                 else saveAs(blobR, 'SGP_REMITOS_'+startRt+"_"+endRt)
 
@@ -806,7 +810,7 @@ export default function Envios () {
             else if(state === "ENTREGADO") {
                 return "Lime"
             }
-            else if(state === "NO ENTREGADO") {
+            else if(state === "NO ENTREGADO" || state === "EXTRAVIADO") {
                 return "Tomato"
             }
             else if(state === "ENTRADA"){
@@ -816,32 +820,44 @@ export default function Envios () {
 
         const stateManagement = (state: string,rt: string) => {
             if(state === "PENDIENTE") {
-                return <button className='btn-export-pdf' onClick={() => changeState(rt,"PREPARADO")}>PREPARADO</button>
+                const newState = "PREPARADO"
+                return <button className='btn-export-pdf' style={{backgroundColor: colorChange(newState),borderColor: colorChange(newState)}} onClick={() => changeState(rt,newState)}>PREPARADO</button>
             }
             else if(state === "PREPARADO") {
-                return <button className='btn-export-pdf' onClick={() => changeState(rt,"DESPACHADO")}>DESPACHADO</button>
+                const newState = "DESPACHADO"
+                return <button className='btn-export-pdf' style={{backgroundColor: colorChange(newState),borderColor: colorChange(newState)}} onClick={() => changeState(rt,newState)}>DESPACHADO</button>
             }
             else if(state === "DESPACHADO") {
+                const newState = "ENTREGADO"
+                const newState2 = "NO ENTREGADO"
                 return (
                     <div>
-                        <button className='btn-export-pdf' onClick={() => changeState(rt,"ENTREGADO")}>ENTREGADO</button>
-                        <button className='btn-export-pdf' onClick={() => changeState(rt,"NO ENTREGADO")}>NO ENTREGADO</button>
+                        <button className='btn-export-pdf' style={{backgroundColor: colorChange(newState),borderColor: colorChange(newState)}} onClick={() => changeState(rt,newState)}>ENTREGADO</button>
+                        <button className='btn-export-pdf' style={{backgroundColor: colorChange(newState2),borderColor: colorChange(newState2)}} onClick={() => changeState(rt,newState2)}>NO ENTREGADO</button>
                     </div>
                 )
             }
             else if(state === "ENTREGADO") {
-                return <button className='btn-export-pdf' onClick={() => changeState(rt,"ENTRADA")}>ENTRADA</button>
+                const newState = "ENTRADA"
+                const newState2 = "EXTRAVIADO"
+                return (
+                    <div>
+                        <button className='btn-export-pdf' style={{backgroundColor: colorChange(newState),borderColor: colorChange(newState)}} onClick={() => changeState(rt,newState)}>ENTRADA</button>
+                        <button className='btn-export-pdf' style={{backgroundColor: colorChange(newState2),borderColor: colorChange(newState2)}} onClick={() => changeState(rt,newState2)}>EXTRAVIADO</button>
+                    </div>
+                )
             }
         }
 
         const changeState = async (remito: string, newstate: string) => {
             if(confirm("Quieres cambiar el estado del remito "+remito+"?") && global) {
-                global.changeEnviosStateRemitos(newstate,remito)
+                global.changeEnviosStateRemitos(newstate,remito,customDate.length > 0 ? customDate : "" )
                 remitosView.forEach(rts => {
                     rts.forEach(rt => {
                         if(rt.nro_remito === remito) rt.estado = newstate
                     });
                 });
+                setCustomDate("")
                 //setRemitosView(remitosView)
                 setUpdater(updater+1)
             }
@@ -875,6 +891,10 @@ export default function Envios () {
                                 <h4 className='title-Homepage'>Remito: {selectedRemito.nro_remito}</h4>
                                 <h5 className='title-Homepage'>Estado: {selectedRemito.estado}</h5>
                                 <h5 className='title-Homepage'>Ultimo movimiento: {selectedRemito.ultima_mod.split("T")[0]}</h5>
+                                <div>
+                                    <h5 className='title-Homepage'>Fecha de cambio de estado (dejar vacio si quiere la fecha de hoy)</h5>
+                                    <input type="date" value={customDate} onChange={(e) => setCustomDate(e.target.value)}/>
+                                </div>
                                 <h5 className='title-Homepage'>Cambiar Estado:{stateManagement(selectedRemito.estado,selectedRemito.nro_remito)}</h5>
                                 <button className='btn-export-pdf' onClick={() => traerReportes()}>REPORTES</button>
                                 <button className='btn-export-pdf' onClick={() => setSelectedReporte(-1)}>CREAR REPORTE</button>

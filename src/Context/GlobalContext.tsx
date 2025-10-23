@@ -1103,9 +1103,10 @@ export default function GlobalState(props: IPropsChildren) {
         return []
       }
     }
-    async function changeEnviosStateRemitos (state: string, remito: string) {
+    async function changeEnviosStateRemitos (state: string, remito: string,date?:string) {
       try {
-        await axios.patch(SERVER+`/envios/remitos/estado/${state}/${remito}`,{},authReturner())
+        const dateP = (date && date.length > 0) ? "/"+date : "/non"
+        await axios.patch(SERVER+`/envios/remitos/estado/${state}/${remito}`+dateP,{},authReturner())
         alert(`Remito ${remito} cambiado al estado ${state}`)
         //window.location.reload()
       } catch (error) {
@@ -1529,7 +1530,7 @@ interface IGlobalContext {
   getRemitosDataCustom: (remitos: string[]) => Promise<IRemitoEnvio[]>;
   getConformidadEnvioCustom: (remitos: string[]) => Promise<IConformidad[]>;
   getEnviosRemitos: () => Promise<IRemitosEnvio[][]>;
-  changeEnviosStateRemitos: (state: string, remito: string) => void;
+  changeEnviosStateRemitos: (state: string, remito: string,date?:string) => void;
   lugaresDeEntrega: () => Promise<ILgarEntrega[]>;
   getReportesEnvio: (remito: string) => Promise<IReportEnvio[]>;
   createReportesEnvio: (remito: string,titulo:string, des:string) => Promise<void>;
