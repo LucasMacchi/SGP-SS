@@ -31,7 +31,7 @@ export default async function ExcelParserEnvios ( excel: File,insumos: IEnvioIns
                     if(ins.unidades_caja > 0) {
                         const value: number = linea.raciones / 30 * p.dias
                         const unidades = Math.ceil(value / ins.racbolsa)
-                        const cajas = Math.floor(value / ins.raccaja)
+                        const cajas = value >= ins.unidades_caja ?  Math.floor(value / ins.raccaja) : 0
                         const bolsas = Math.ceil((value - cajas * ins.raccaja) / ins.racbolsa)
                         const kilos = unidades * ins.gr_total / 1000
                         envio.detalles.push({

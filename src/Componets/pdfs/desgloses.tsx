@@ -156,7 +156,7 @@ const pageContruct = (e: IrequestEnvio, copia: boolean) => (
                         <Text style={stylePedido.tableCell}>Caja</Text>
                     </View>
                     <View style={stylePedido.tableColcod}>
-                        <Text style={stylePedido.tableCell}>Bolsas</Text>
+                        <Text style={stylePedido.tableCell}>Unidades</Text>
                     </View>
                     <View style={stylePedido.tableColcod}>
                         <Text style={stylePedido.tableCell}>Raciones</Text>

@@ -70,7 +70,7 @@ const stylePedido = StyleSheet.create({
       tableCell: {
         margin: 2,
         fontSize: 11,
-        textAlign: 'left',
+        textAlign: 'center',
       },
         tableCellH: {
         margin: 2,
@@ -279,7 +279,7 @@ const pageContruct = (e: IRemitoEnvio, copia: boolean) => (
                         <Text style={stylePedido.tableCellH}>Insumo</Text>
                     </View>
                     <View style={stylePedido.tableColcod}>
-                        <Text style={stylePedido.tableCellH}>Unid.</Text>
+                        <Text style={stylePedido.tableCellH}>Unid. Totales</Text>
                     </View>
                     <View style={stylePedido.tableColcod}>
                         <Text style={stylePedido.tableCellH}>Kg / lts</Text>
@@ -288,7 +288,7 @@ const pageContruct = (e: IRemitoEnvio, copia: boolean) => (
                         <Text style={stylePedido.tableCellH}>Pack</Text>
                     </View>
                     <View style={stylePedido.tableColcod}>
-                        <Text style={stylePedido.tableCellH}>Bolsas</Text>
+                        <Text style={stylePedido.tableCellH}>Unid.</Text>
                     </View>
                     <View style={stylePedido.tableColcod}>
                         <Text style={stylePedido.tableCellH}>Raciones</Text>
