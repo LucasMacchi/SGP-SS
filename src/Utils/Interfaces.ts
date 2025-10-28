@@ -565,7 +565,8 @@ export interface IRemitosEnvio {
     departamento: string,
     localidad: string,
     completo: string,
-    ultima_mod: string
+    ultima_mod: string,
+    dias: number
 }
 
 export type TRemitoEnvio = ""
