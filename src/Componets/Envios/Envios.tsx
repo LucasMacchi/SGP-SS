@@ -51,10 +51,12 @@ export default function Envios () {
     const [customRt, setCustomRt] = useState<string[]>([])
     const [remitosView, setRemitosView] = useState<IRemitosEnvio[][]>([])
     const [remitoPage, setRemitoPage] = useState(0)
+    const [filteredRemitosView, setFilteredRemitosView] = useState<IRemitosEnvio[]>([])
     const [remitosReport, setRemitoReport] = useState<IReportEnvio[]>([])
     const [selectedRemito, setSelectedRemito] = useState<IRemitosEnvio | null>(null)
     const [selectedReporte, setSelectedReporte] = useState(10000)
     const [createReporte, setCreateReporte] = useState({titulo: "", des: ""})
+    const [searchRemito, setSearchRemito] = useState("")
     const [Crt, setCRt] = useState("")
     useEffect(() => {
         if(global) {
@@ -856,6 +858,18 @@ export default function Envios () {
             }
         }
 
+        const searchRemitoFn = () => {
+            const format = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,parseInt(searchRemito))
+            console.log(format)
+            setSearchRemito("")
+            const totalRemitos: IRemitosEnvio[] = []
+            remitosView.forEach(rtv => {
+                rtv.forEach((rts) => totalRemitos.push(rts))
+            });
+            const parsedRemitos = totalRemitos.filter(rts => rts.nro_remito === format)
+            setFilteredRemitosView(parsedRemitos)
+        }
+
         const changeState = async (remito: string, newstate: string) => {
             if(confirm("Quieres cambiar el estado del remito "+remito+"?") && global) {
                 global.changeEnviosStateRemitos(newstate,remito,customDate.length > 0 ? customDate : "" )
@@ -897,6 +911,7 @@ export default function Envios () {
                             <div style={{textAlign:"left"}}>
                                 <h4 className='title-Homepage'>Remito: {selectedRemito.nro_remito}</h4>
                                 <h5 className='title-Homepage'>Estado: {selectedRemito.estado}</h5>
+                                <h5 className='title-Homepage'>Dias habiles de cobertura: {selectedRemito.dias}</h5>
                                 <h5 className='title-Homepage'>Ultimo movimiento: {selectedRemito.ultima_mod.split("T")[0]}</h5>
                                 <div>
                                     <h5 className='title-Homepage'>Fecha de cambio de estado (dejar vacio si quiere la fecha de hoy)</h5>
@@ -956,6 +971,12 @@ export default function Envios () {
                         )}
                     </div>
                     <hr color='#3399ff' className='hr-line'/>
+                    <div style={{display: "flex"}}>
+                        <h4 className='title-Homepage' style={{alignContent: "center"}}>REMITO</h4>
+                        <input type="number" value={searchRemito} className="data-div-select" style={{width: 50}} onChange={(e) => setSearchRemito(e.target.value)}/>
+                        <button className='btn-export-pdf' onClick={() => searchRemitoFn()}>BUSCAR</button>
+                        <button className='btn-export-pdf' onClick={() => setFilteredRemitosView([])}>BORRAR</button>
+                    </div>
                     <div style={{overflow: "scroll",width: 500, minHeight: 600,maxHeight: 800}}>
                     <table style={{fontSize: "small", width: "100%", tableLayout: "fixed", textOverflow: "ellipsis"}}>
                         <tbody>
@@ -965,7 +986,16 @@ export default function Envios () {
                                 <th style={{border: "1px solid", width: "25%"}}>Depart.</th>
                                 <th style={{border: "1px solid", width: "25%"}}>Estado</th>
                             </tr>
-                            { remitosView[remitoPage] && remitosView[remitoPage].map((d) => (
+                            { filteredRemitosView.length > 0 ? 
+                            filteredRemitosView.map((d) => (
+                            <tr key={d.nro_remito} onClick={() => setSelectedRemito(d)} style={{backgroundColor: colorChange(d.estado)}}>
+                                <th style={{border: "1px solid", width: "25%"}}>{d.nro_remito}</th>
+                                <th style={{border: "1px solid", width: "25%"}}>{d.localidad.toUpperCase()}</th>
+                                <th style={{border: "1px solid", width: "25%"}}>{d.departamento}</th>
+                                <th style={{border: "1px solid", width: "25%"}}>{d.estado}</th>
+                            </tr>
+                            )) 
+                            : remitosView[remitoPage] && remitosView[remitoPage].map((d) => (
                             <tr key={d.nro_remito} onClick={() => setSelectedRemito(d)} style={{backgroundColor: colorChange(d.estado)}}>
                                 <th style={{border: "1px solid", width: "25%"}}>{d.nro_remito}</th>
                                 <th style={{border: "1px solid", width: "25%"}}>{d.localidad.toUpperCase()}</th>

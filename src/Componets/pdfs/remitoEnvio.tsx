@@ -262,7 +262,7 @@ const pageContruct = (e: IRemitoEnvio, copia: boolean,dias: number) => (
                     <Text style={stylePedido.body}>Remito {e.nro_remito}</Text>
                     <Text style={stylePedido.body}>Fecha: {dateReturner()}</Text>
                     <Text style={stylePedido.body}>CUIT: 30-71609306-5</Text>
-                    <Text style={stylePedido.body}>Inicio Actividades: 01/12/2021</Text>
+                    <Text style={stylePedido.body}>Inicio Actividades: 01/07/2018</Text>
                 </View>
             </View>
             <View style={stylePedido.viewdata}>
