@@ -382,7 +382,7 @@ export default function Envios () {
                         {(startRt > 0 && endRt > 0 && endRt >= startRt) && <button className='btn-big' style={{width: "85%"}} onClick={() => exportEnvio()}>Exportar</button>}
                     </div>
                     <div>
-                        {((startRt > 0 && endRt > 0 && endRt >= startRt) || customRt.length > 0) && <button className='btn-big' style={{width: "85%"}} onClick={() => getRemitos()}>Remitos WIP</button>}
+                        {((startRt > 0 && endRt > 0 && endRt >= startRt) || customRt.length > 0) && <button className='btn-big' style={{width: "85%"}} onClick={() => getRemitos()}>Remitos</button>}
                     </div>
 
                 </div>
@@ -628,6 +628,11 @@ export default function Envios () {
                 setLugaresEntrega(lgs.desgloses)
             })
         }
+        const addTotalLugar = () => {
+            filteredDesgloses.forEach((fd) => {
+                addLugar(parseInt(fd.cue))
+            })
+        }
         const addLugar = (cue: number) => {
             let newArr:IDesglosesReturner[] = []
             let check = false
@@ -736,12 +741,14 @@ export default function Envios () {
                     {(lugaresEntrega.length > 0 && selectedCabecera > 0) && (
                     <div style={{marginTop: 20}}>
                         <h4 className='title-Homepage'>Seleccione la Dependencia</h4>
-                        <select name="plan" className='select-small-cco' value={selectedDep} onChange={(e) => addLugar(parseInt(e.target.value))} disabled={selectedPlan < 1000 ? false : true}>
+                        <select name="plan" className='select-small-cco' style={{width: 200}} value={selectedDep} onChange={(e) => addLugar(parseInt(e.target.value))} disabled={selectedPlan < 1000 ? false : true}>
                             <option value={0}>---</option>
                             {filteredDesgloses.map((p) => (
                                 <option value={p.cue}>{p.des}</option>
                             ))}
                         </select>
+                        <button className='btn-export-pdf' onClick={() => addTotalLugar()}>Agregar todos</button>
+
                     </div>  
                     )}
                     {selectedLgsEnt.length > 0 && (

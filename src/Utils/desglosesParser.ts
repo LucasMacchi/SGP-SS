@@ -11,7 +11,8 @@ export default function ( desgloses: IDesglosesReturner[],insumos: IEnvioInsumos
             desglose: "",
             detalles: [],
             cue: 0,
-            fortificado: false
+            fortificado: false,
+            dias: 0
         }
         if(linea.des && linea.lentrega_id && (linea.fortificado ? linea.rac_al : linea.rac_cl)) {
         plan.forEach((p1) => {
@@ -59,6 +60,7 @@ export default function ( desgloses: IDesglosesReturner[],insumos: IEnvioInsumos
                     }
                 });
             })
+            envio.dias = p1.dias
             }
         
         })
