@@ -21,7 +21,8 @@ export default async function ExcelParserEnvios ( excel: File,insumos: IEnvioIns
             desglose: "",
             detalles: [],
             cue: 0,
-            fortificado: fortificado
+            fortificado: fortificado,
+            dias: 0
         }
         if(linea.dependencia && linea.lentrega && linea.raciones) {
         const parsedDependencia = linea.dependencia.replace(/\"/g,"").replace("'","")
@@ -63,6 +64,7 @@ export default async function ExcelParserEnvios ( excel: File,insumos: IEnvioIns
                         })
                         
                     }
+                    envio.dias = p.dias
                 }
             });
         })

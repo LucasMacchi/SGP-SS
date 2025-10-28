@@ -498,7 +498,8 @@ export interface IrequestEnvioCom {
   desglose: string,
   detalles: IDetalleEnvioCom[],
   cue: number,
-  fortificado: boolean
+  fortificado: boolean,
+  dias: number
 }
 
 export interface IChangeEnvioInsumo {
