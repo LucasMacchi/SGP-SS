@@ -53,8 +53,8 @@ export default function paletPrevisualizer
         if(lugaresAL.length > 0) {
             lugaresAL.forEach(al => {
                 planes.forEach(pln => {
-                    if(pln.plan_id === al.planId && al.rac_cl) {
-                        const racionesxplan = al.rac_cl * pln.dias
+                    if(pln.plan_id === al.planId && al.rac_al) {
+                        const racionesxplan = al.rac_al * pln.dias
                         totalRacAL += racionesxplan
                         pln.details.forEach((pld) => {
                             insumos.forEach((ins) => {
