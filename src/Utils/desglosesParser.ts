@@ -21,7 +21,24 @@ export default function ( desgloses: IDesglosesReturner[],insumos: IEnvioInsumos
             p1.details.forEach((p) => {
                 insumos.forEach(ins => {
                     if(ins.ins_id === p.ins_id) {
-                        if(ins.unidades_caja > 0) {
+                        if(ins.unidades_caja === 1) {
+                            const value: number = raciones / p1.dias * p.dias
+                            const unidades = Math.ceil(value / ins.racbolsa)
+                            const cajas = unidades
+                            const bolsas = 0
+                            const kilos = unidades * ins.gr_total / 1000
+                            envio.detalles.push({
+                                kilos: kilos,
+                                cajas: cajas,
+                                bolsas: bolsas,
+                                raciones: Math.floor(bolsas * ins.racbolsa + cajas * ins.raccaja),
+                                unidades: Math.floor(bolsas + cajas * ins.unidades_caja),
+                                unit_caja: ins.unidades_caja,
+                                caja_palet: ins.caja_palet,
+                                des: ins.des
+                            })
+                        }
+                        else if(ins.unidades_caja > 0) {
                             const value: number = raciones / p1.dias * p.dias
                             const unidades = Math.ceil(value / ins.racbolsa)
                             const cajas = value >= ins.unidades_caja ?  Math.floor(value / ins.raccaja) : 0
