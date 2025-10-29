@@ -40,7 +40,7 @@ export default function ( desgloses: IDesglosesReturner[],insumos: IEnvioInsumos
                             })
                         }
                         else {
-                            const value: number = raciones / 30 * p.dias
+                            const value: number = raciones / p1.dias * p.dias
                             const unidades = Math.ceil(value / ins.racbolsa)
                             const cajas = 0
                             const bolsas = Math.ceil(value / ins.racbolsa)
