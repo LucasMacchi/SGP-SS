@@ -22,7 +22,7 @@ export default function ( desgloses: IDesglosesReturner[],insumos: IEnvioInsumos
                 insumos.forEach(ins => {
                     if(ins.ins_id === p.ins_id) {
                         if(ins.unidades_caja > 0) {
-                            const value: number = raciones / 30 * p.dias
+                            const value: number = raciones / p1.dias * p.dias
                             const unidades = Math.ceil(value / ins.racbolsa)
                             const cajas = value >= ins.unidades_caja ?  Math.floor(value / ins.raccaja) : 0
                             const racxcajas = value - ins.raccaja * cajas
