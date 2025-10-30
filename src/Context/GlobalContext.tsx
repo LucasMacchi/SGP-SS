@@ -963,11 +963,11 @@ export default function GlobalState(props: IPropsChildren) {
       return []
     }
   }
-    async function getTxtEnvio(start: number, end: number, pv: number,dias: number): Promise<ITxtEnvios> {
+    async function getTxtEnvio(start: number, end: number, pv: number): Promise<ITxtEnvios> {
       try {
         const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,start)
         const parsedEnd = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,end)
-        const envios: ITxtEnvios = (await axios.get(SERVER+`/envios/txt/${parsedStart}/${parsedEnd}/${dias}`,authReturner())).data
+        const envios: ITxtEnvios = (await axios.get(SERVER+`/envios/txt/${parsedStart}/${parsedEnd}`,authReturner())).data
         return envios
       } catch (error) {
         console.log(error);
@@ -1092,7 +1092,7 @@ export default function GlobalState(props: IPropsChildren) {
       try {
         const response: IRemitosEnvio[] = (await axios.get(SERVER+`/envios/remitos`,authReturner())).data
         const pages: IRemitosEnvio[][] = []
-        const paginasCount = 15
+        const paginasCount = 50
         for (let i = 0; i < response.length; i += paginasCount) {
           const arr = response.slice(i,i + paginasCount)
           pages.push(arr)
@@ -1504,7 +1504,7 @@ interface IGlobalContext {
   getDesglosesFn: () => void;
   addProdCompra: (data: IAddProd) => void;
   getEnviosTanda: (start: number, end: number, pv: number) => Promise<IrequestEnvio[]>;
-  getTxtEnvio: (start: number, end: number, pv: number,dias: number) => Promise<ITxtEnvios>;
+  getTxtEnvio: (start: number, end: number, pv: number) => Promise<ITxtEnvios>;
   getRutaEnvio:(start: number, end: number, pv: number) => Promise<IResponseRutas | null>;
   getConformidadEnvio: (start: number, end: number, pv: number) => Promise<IConformidad[]>;
   deleteTandaFn: (tanda: number, key: string) => void;

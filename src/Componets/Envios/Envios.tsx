@@ -31,7 +31,6 @@ export default function Envios () {
     const [endTal, setEndTal] = useState(0)
     const [fecha, setFecha] = useState("")
     const [delkey, setDelkey] = useState("")
-    const [dias, setDias] = useState(30)
     const [selectedPlan, setSelectedPlan] = useState(1000)
     const [planes, setPlanes] = useState<IPlanComplete[]>([])
     const [insumos, setInsumos] = useState<IEnvioInsumos[]>([])
@@ -285,7 +284,7 @@ export default function Envios () {
             }
         }
         const exportEnvio = async () => {
-            const txt = await global?.getTxtEnvio(startRt, endRt, pv, dias)
+            const txt = await global?.getTxtEnvio(startRt, endRt, pv)
             if(txt && txt.cabecera.length > 0 && txt.items.length > 0) {
                 createTxtEnvio(txt, startRt,endRt)
             }
@@ -305,7 +304,7 @@ export default function Envios () {
         const getRemitos = async () => {
             const envios = customRt.length > 0 ? await global?.getRemitosDataCustom(customRt) : await global?.getRemitosData(startRt, endRt, pv)
             if(envios) {
-                const blobR = await pdf(<RemitoEnvioPdf envios={envios} dias={dias}/>).toBlob()
+                const blobR = await pdf(<RemitoEnvioPdf envios={envios}/>).toBlob()
                 if(customCheck && customRt.length > 0) saveAs(blobR, 'SGP_REMITOS_PERSONALIZADO')
                 else saveAs(blobR, 'SGP_REMITOS_'+startRt+"_"+endRt)
 
@@ -348,11 +347,6 @@ export default function Envios () {
                     </div>
                     )}
                     <div>
-                    <div>
-                        <h4 className='title-Homepage'>Seleccione los dias</h4>
-                        <input type="number" id='otherins' className="data-div-select" value={dias} min={1}
-                        style={{width: "35%"}} onChange={(e) => setDias((e.target.value) ? parseInt(e.target.value) : 0)}/>
-                    </div>
                     </div>
                     {customRt.length > 0 && (
                     <div style={{marginTop: 20}}>
@@ -819,7 +813,7 @@ export default function Envios () {
             else if(state === "ENTREGADO") {
                 return "Lime"
             }
-            else if(state === "NO ENTREGADO" || state === "EXTRAVIADO") {
+            else if(state === "NO ENTREGADO" || state === "EXTRAVIADO" || state === "DEVOLUCION") {
                 return "Tomato"
             }
             else if(state === "ENTRADA"){
@@ -849,12 +843,22 @@ export default function Envios () {
             else if(state === "ENTREGADO") {
                 const newState = "ENTRADA"
                 const newState2 = "EXTRAVIADO"
+                const newState3 = "DEVOLUCION"
                 return (
                     <div>
                         <button className='btn-export-pdf' style={{backgroundColor: colorChange(newState),borderColor: colorChange(newState)}} onClick={() => changeState(rt,newState)}>ENTRADA</button>
                         <button className='btn-export-pdf' style={{backgroundColor: colorChange(newState2),borderColor: colorChange(newState2)}} onClick={() => changeState(rt,newState2)}>EXTRAVIADO</button>
+                        <button className='btn-export-pdf' style={{backgroundColor: colorChange(newState3),borderColor: colorChange(newState3)}} onClick={() => changeState(rt,newState3)}>DEVOLUCION</button>
                     </div>
                 )
+            }
+            else if(state === "DEVOLUCION") {
+                const newState = "ENTRADA"
+                return (
+                    <div>
+                        <button className='btn-export-pdf' style={{backgroundColor: colorChange(newState),borderColor: colorChange(newState)}} onClick={() => changeState(rt,newState)}>ENTRADA</button>
+                    </div>
+                )    
             }
         }
 
@@ -971,36 +975,39 @@ export default function Envios () {
                         )}
                     </div>
                     <hr color='#3399ff' className='hr-line'/>
-                    <div style={{display: "flex"}}>
+                    <div style={{display: "flex", justifyContent: "center"}}>
                         <h4 className='title-Homepage' style={{alignContent: "center"}}>REMITO</h4>
                         <input type="number" value={searchRemito} className="data-div-select" style={{width: 50}} onChange={(e) => setSearchRemito(e.target.value)}/>
                         <button className='btn-export-pdf' onClick={() => searchRemitoFn()}>BUSCAR</button>
                         <button className='btn-export-pdf' onClick={() => setFilteredRemitosView([])}>BORRAR</button>
                     </div>
-                    <div style={{overflow: "scroll",width: 500, minHeight: 600,maxHeight: 800}}>
-                    <table style={{fontSize: "small", width: "100%", tableLayout: "fixed", textOverflow: "ellipsis"}}>
+                    <div style={{overflow: "scroll",width: "auto", minHeight: 600,maxHeight: 800}}>
+                    <table style={{fontSize: 9, width: "100%", tableLayout: "fixed", textOverflow: "ellipsis"}}>
                         <tbody>
                             <tr >
-                                <th style={{border: "1px solid", width: "25%"}}>Remito</th>
-                                <th style={{border: "1px solid", width: "25%"}}>Localidad</th>
-                                <th style={{border: "1px solid", width: "25%"}}>Depart.</th>
-                                <th style={{border: "1px solid", width: "25%"}}>Estado</th>
+                                <th style={{border: "1px solid", width: "20%"}}>Remito</th>
+                                <th style={{border: "1px solid", width: "20%"}}>Localidad</th>
+                                <th style={{border: "1px solid", width: "20%"}}>Depart.</th>
+                                <th style={{border: "1px solid", width: "20%"}}>Estado</th>
+                                <th style={{border: "1px solid", width: "8%"}}>Rep.</th>
                             </tr>
                             { filteredRemitosView.length > 0 ? 
                             filteredRemitosView.map((d) => (
                             <tr key={d.nro_remito} onClick={() => setSelectedRemito(d)} style={{backgroundColor: colorChange(d.estado)}}>
-                                <th style={{border: "1px solid", width: "25%"}}>{d.nro_remito}</th>
-                                <th style={{border: "1px solid", width: "25%"}}>{d.localidad.toUpperCase()}</th>
-                                <th style={{border: "1px solid", width: "25%"}}>{d.departamento}</th>
-                                <th style={{border: "1px solid", width: "25%"}}>{d.estado}</th>
+                                <th style={{border: "1px solid", width: "20%"}}>{d.nro_remito}</th>
+                                <th style={{border: "1px solid", width: "20%"}}>{d.localidad.toUpperCase()}</th>
+                                <th style={{border: "1px solid", width: "20%"}}>{d.departamento}</th>
+                                <th style={{border: "1px solid", width: "20%"}}>{d.estado}</th>
+                                <th style={{border: "1px solid", width: "8%"}}>{d.reportes}</th>
                             </tr>
                             )) 
                             : remitosView[remitoPage] && remitosView[remitoPage].map((d) => (
                             <tr key={d.nro_remito} onClick={() => setSelectedRemito(d)} style={{backgroundColor: colorChange(d.estado)}}>
-                                <th style={{border: "1px solid", width: "25%"}}>{d.nro_remito}</th>
-                                <th style={{border: "1px solid", width: "25%"}}>{d.localidad.toUpperCase()}</th>
-                                <th style={{border: "1px solid", width: "25%"}}>{d.departamento}</th>
-                                <th style={{border: "1px solid", width: "25%"}}>{d.estado}</th>
+                                <th style={{border: "1px solid", width: "20%"}}>{d.nro_remito}</th>
+                                <th style={{border: "1px solid", width: "20%"}}>{d.localidad.toUpperCase()}</th>
+                                <th style={{border: "1px solid", width: "20%"}}>{d.departamento}</th>
+                                <th style={{border: "1px solid", width: "20%"}}>{d.estado}</th>
+                                <th style={{border: "1px solid", width: "8%"}}>{d.reportes}</th>
                             </tr>
                             ))}
                         </tbody>

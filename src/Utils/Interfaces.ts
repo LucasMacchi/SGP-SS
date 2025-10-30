@@ -529,12 +529,12 @@ export interface IRemitoEnvio {
     fcha_venc: string,
     cai: string,
     detalles: IRemitoEnvioDetails[],
-    cant_desgloses: number
+    cant_desgloses: number,
+    dias: number
 }
 
 export interface IRemitosPrintData {
-    envios: IRemitoEnvio[],
-    dias: number
+    envios: IRemitoEnvio[]
 }
 
 export interface IDesglosesReturner {
@@ -566,7 +566,8 @@ export interface IRemitosEnvio {
     localidad: string,
     completo: string,
     ultima_mod: string,
-    dias: number
+    dias: number,
+    reportes: number
 }
 
 export type TRemitoEnvio = ""
