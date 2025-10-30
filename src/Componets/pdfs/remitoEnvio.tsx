@@ -230,7 +230,7 @@ const insumosDisplayer = (insumos: IRemitoEnvioDetails[],desgloses: number, dias
     return elements
 }
 
-const pageContruct = (e: IRemitoEnvio, copia: boolean,dias: number) => (
+const pageContruct = (e: IRemitoEnvio, copia: boolean) => (
         <Page size={'A4'} style={stylePedido.page}>
             <View style={{flexDirection: 'row', justifyContent: "center"}}>
                 <Image src={logoBig} style={stylePedido.logo}/>
@@ -300,7 +300,7 @@ const pageContruct = (e: IRemitoEnvio, copia: boolean,dias: number) => (
                     </View>
                 </View>
                 </View>
-                {insumosDisplayer(e.detalles,e.cant_desgloses,dias)}
+                {insumosDisplayer(e.detalles,e.cant_desgloses,e.dias)}
             </View>
             <View style={stylePedido.viewdata}>
                 <Text style={stylePedido.body}>Lugar de Entrega: {e.le_des}</Text>
@@ -327,11 +327,11 @@ const pageContruct = (e: IRemitoEnvio, copia: boolean,dias: number) => (
 )
 
 
-const RemitoEnvioPdf: React.FC<IRemitosPrintData> = ({envios,dias}) => (
+const RemitoEnvioPdf: React.FC<IRemitosPrintData> = ({envios}) => (
     <Document>
         {envios.flatMap((e) => [
-            pageContruct(e,false,dias),
-            pageContruct(e,true,dias)
+            pageContruct(e,false),
+            pageContruct(e,true)
         ])}
 
     </Document>
