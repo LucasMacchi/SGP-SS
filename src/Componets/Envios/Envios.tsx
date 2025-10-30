@@ -31,7 +31,6 @@ export default function Envios () {
     const [endTal, setEndTal] = useState(0)
     const [fecha, setFecha] = useState("")
     const [delkey, setDelkey] = useState("")
-    const [dias, setDias] = useState(30)
     const [selectedPlan, setSelectedPlan] = useState(1000)
     const [planes, setPlanes] = useState<IPlanComplete[]>([])
     const [insumos, setInsumos] = useState<IEnvioInsumos[]>([])
@@ -285,7 +284,7 @@ export default function Envios () {
             }
         }
         const exportEnvio = async () => {
-            const txt = await global?.getTxtEnvio(startRt, endRt, pv, dias)
+            const txt = await global?.getTxtEnvio(startRt, endRt, pv)
             if(txt && txt.cabecera.length > 0 && txt.items.length > 0) {
                 createTxtEnvio(txt, startRt,endRt)
             }
@@ -348,11 +347,6 @@ export default function Envios () {
                     </div>
                     )}
                     <div>
-                    <div>
-                        <h4 className='title-Homepage'>Seleccione los dias</h4>
-                        <input type="number" id='otherins' className="data-div-select" value={dias} min={1}
-                        style={{width: "35%"}} onChange={(e) => setDias((e.target.value) ? parseInt(e.target.value) : 0)}/>
-                    </div>
                     </div>
                     {customRt.length > 0 && (
                     <div style={{marginTop: 20}}>
