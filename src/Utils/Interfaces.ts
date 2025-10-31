@@ -468,6 +468,25 @@ export interface IEnvioInsumos {
     raccaja: number
 }
 
+export interface ICreateInsumo {
+    des: string,
+    caja_palet: number,
+    unidades_caja: number,
+    gr_racion: number,
+    gr_total: number,
+    racbolsa: number,
+    raccaja: number,
+    cod1: string,
+    cod2: string
+}
+
+export interface ICreateFactura {
+    factura_cod1: string,
+    factura_cod2: string,
+    remitos: string[],
+    fecha: string
+}
+
 export interface IDetailPlan {
     detail_id: number,
     plan_id: number,
@@ -567,7 +586,8 @@ export interface IRemitosEnvio {
     completo: string,
     ultima_mod: string,
     dias: number,
-    reportes: number
+    reportes: number,
+    factura: string | null
 }
 
 export type TRemitoEnvio = ""

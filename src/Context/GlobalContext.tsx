@@ -16,6 +16,7 @@ import {
   ICompra,
   ICompraDto,
   IConformidad,
+  ICreateInsumo,
   IDesglose,
   IEmailSender,
   IEnvio,
@@ -1240,6 +1241,30 @@ export default function GlobalState(props: IPropsChildren) {
         alert("Error al modificar el valor.");
       }
     }
+    async function postNewInsumoEnvio (data: ICreateInsumo) {
+      try {
+        await axios.post(SERVER+`/envios/insumos`,data,authReturner())
+        alert("Insumo creado.")
+        window.location.reload()
+      } catch (error) {
+        console.log(error);
+        alert("Error al crear el insumo.");
+      }
+    }
+    async function postFacturaRemito (fact: string, fecha: string, remitos: string[]) {
+      try {
+        const data = {
+          factura: fact,
+          fechaF: fecha,
+          remitos: remitos
+        }
+        await axios.post(SERVER+`/envios/facturacion`,data,authReturner())
+        alert("Facturacion creada.")
+      } catch (error) {
+        console.log(error);
+        alert("Error al crear la Facturacion.");
+      }
+    }
     async function getFinTalo(): Promise<number | null> {
       try {
         const ruta: number = (await axios.get(SERVER+`/envios/fintalo`,authReturner())).data
@@ -1257,6 +1282,15 @@ export default function GlobalState(props: IPropsChildren) {
       } catch (error) {
         console.log(error);
         return []
+      }
+    }
+    async function checkRemitoFacturacionFn(remito: string): Promise<boolean> {
+      try {
+        const ruta: boolean = (await axios.get(SERVER+`/envios/facturacion/check/${remito}`,authReturner())).data
+        return ruta
+      } catch (error) {
+        console.log(error);
+        return false
       }
     }
 
@@ -1408,7 +1442,10 @@ export default function GlobalState(props: IPropsChildren) {
     changeEnviosStateRemitos,
     lugaresDeEntrega,
     getReportesEnvio,
-    createReportesEnvio
+    createReportesEnvio,
+    postNewInsumoEnvio,
+    postFacturaRemito,
+    checkRemitoFacturacionFn
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1534,4 +1571,7 @@ interface IGlobalContext {
   lugaresDeEntrega: () => Promise<ILgarEntrega[]>;
   getReportesEnvio: (remito: string) => Promise<IReportEnvio[]>;
   createReportesEnvio: (remito: string,titulo:string, des:string) => Promise<void>;
+  postNewInsumoEnvio: (data: ICreateInsumo) => Promise<void>;
+  postFacturaRemito: (fact: string, fecha: string, remitos: string[]) => Promise<void>;
+  checkRemitoFacturacionFn: (remito: string) => Promise<boolean> ;
 }
