@@ -8,7 +8,7 @@ import createTxtEnvio from "../../Utils/createTxtEnvio";
 import RutaPdf from "../pdfs/rutaEnvioPdf";
 import ActaConformidadPDF from "../pdfs/actaConformidad";
 import ExcelParserEnvios from "../../Utils/excelParser";
-import { IChangeEnvioInsumo, IChangeEnvioInsumoPlan, IDesglosesReturner, IEnvioInsumos, ILentrega, IPlanComplete, IRemitosEnvio, IReportEnvio, IrequestEnvioCom, rolesNum } from "../../Utils/Interfaces";
+import { IChangeEnvioInsumo, IChangeEnvioInsumoPlan, ICreateFactura, ICreateInsumo, IDesglosesReturner, IEnvioInsumos, ILentrega, IPlanComplete, IRemitosEnvio, IReportEnvio, IrequestEnvioCom, rolesNum } from "../../Utils/Interfaces";
 import informeEnviosTxt from "../../Utils/informeEnviosTxt";
 import RemitoEnvioPdf from "../pdfs/remitoEnvio";
 import paletPrevisualizer from "../../Utils/paletPrevisualizer";
@@ -57,6 +57,12 @@ export default function Envios () {
     const [createReporte, setCreateReporte] = useState({titulo: "", des: ""})
     const [searchRemito, setSearchRemito] = useState("")
     const [Crt, setCRt] = useState("")
+    const [createInsumo, setCreateIns] = useState<ICreateInsumo>({
+        des: "",caja_palet: 0,unidades_caja: 0,gr_racion: 0,gr_total: 0,racbolsa: 0,raccaja: 0,cod1:"",cod2:""
+    })
+    const [createFactura, setCreateFactura] = useState<ICreateFactura>({
+        factura_cod1: "",factura_cod2:"",remitos:[],fecha:""
+    })
     useEffect(() => {
         if(global) {
             global?.sessionFn()
@@ -90,6 +96,7 @@ export default function Envios () {
         setRemitoReport([])
         setSelectedReporte(10000)
         setCustomDate("")
+        setCreateIns({des: "",caja_palet: 0,unidades_caja: 0,gr_racion: 0,gr_total: 0,racbolsa: 0,raccaja: 0,cod1:"",cod2:""})
     },[display])
 
     useEffect(() => {
@@ -395,6 +402,14 @@ export default function Envios () {
             }
             else alert("No se cambio ningun valor.")
         }
+        const createNewInsumoFn = async () => {
+            if(global && createInsumo.des.length > 0 && createInsumo.cod1.length > 0 && createInsumo.cod2.length > 0 && createInsumo.gr_racion && createInsumo.gr_total && createInsumo.racbolsa
+                && confirm("¿Quieres crear este nuevo insumo?")) {
+                    await global.postNewInsumoEnvio(createInsumo)
+                    setCreateIns({des: "",caja_palet: 0,unidades_caja: 0,gr_racion: 0,gr_total: 0,racbolsa: 0,raccaja: 0,cod1:"",cod2:""})
+                }
+            else alert("Faltan datos para crear el insumo.")
+        }
         const displayInsumosStats = () => {
             if(selectedIns){
                 const insumo = insumos.filter((insI) => insI.ins_id === selectedIns)[0]
@@ -451,7 +466,48 @@ export default function Envios () {
                             <option value={ins.ins_id}>{ins.des}</option>
                         ))}
                     </select>
-                    {displayInsumosStats()}                  
+                    {displayInsumosStats()}
+                    <div>
+                        <h4 className='title-Homepage'>Agregar Insumo</h4>
+                        <div>
+                            <div style={{display: "flex", justifyContent: "center", height: 25, alignItems: "center"}}>
+                                <h5 className='title-Homepage'>Codigo: </h5>
+                                <input type="number" value={createInsumo.cod1} style={{width: 80}} onChange={(e) => setCreateIns({...createInsumo, cod1:e.target.value})}/>
+                                <h5 className='title-Homepage'>-</h5>
+                                <input type="number" value={createInsumo.cod2} style={{width: 80}} onChange={(e) => setCreateIns({...createInsumo, cod2:e.target.value})}/>
+                            </div>
+                            <div style={{display: "flex", justifyContent: "center", height: 25, alignItems: "center"}}>
+                                <h5 className='title-Homepage'>Descripcion: </h5>
+                                <input type="text" value={createInsumo.des} onChange={(e) => setCreateIns({...createInsumo, des:e.target.value})}/>
+                            </div>
+                            <div style={{display: "flex", justifyContent: "center", height: 25, alignItems: "center"}}>
+                                <h5 className='title-Homepage'>Unidades por caja: </h5>
+                                <input type="number" value={createInsumo.unidades_caja} style={{width: 80}} onChange={(e) => setCreateIns({...createInsumo, unidades_caja:parseInt(e.target.value)})}/>
+                            </div>
+                            <div style={{display: "flex", justifyContent: "center", height: 25, alignItems: "center"}}>
+                                <h5 className='title-Homepage'>Raciones unidad: </h5>
+                                <input type="number" value={createInsumo.racbolsa} style={{width: 80}} onChange={(e) => setCreateIns({...createInsumo, racbolsa:parseInt(e.target.value)})}/>
+                            </div>
+                            <div style={{display: "flex", justifyContent: "center", height: 25, alignItems: "center"}}>
+                                <h5 className='title-Homepage'>Raciones Caja: </h5>
+                                <input type="number" value={createInsumo.raccaja} style={{width: 80}} onChange={(e) => setCreateIns({...createInsumo, raccaja:parseInt(e.target.value)})}/>
+                            </div>
+                            <div style={{display: "flex", justifyContent: "center", height: 25, alignItems: "center"}}>
+                                <h5 className='title-Homepage'>Gramos por racion: </h5>
+                                <input type="number" value={createInsumo.gr_racion} style={{width: 80}} onChange={(e) => setCreateIns({...createInsumo, gr_racion:parseFloat(e.target.value)})}/>
+                            </div>
+                            <div style={{display: "flex", justifyContent: "center", height: 25, alignItems: "center"}}>
+                                <h5 className='title-Homepage'>Gramos totales: </h5>
+                                <input type="number" value={createInsumo.gr_total} style={{width: 80}} onChange={(e) => setCreateIns({...createInsumo, gr_total:parseInt(e.target.value)})}/>
+                            </div>
+                            <div style={{display: "flex", justifyContent: "center", height: 25, alignItems: "center"}}>
+                                <h5 className='title-Homepage'>Cajas por palet: </h5>
+                                <input type="number" value={createInsumo.caja_palet} style={{width: 80}} onChange={(e) => setCreateIns({...createInsumo, caja_palet:parseInt(e.target.value)})}/>
+                            </div>
+                            <button className='btn-export-pdf' onClick={() => createNewInsumoFn()}>CREAR</button>
+                        </div>
+
+                    </div>                
                 </div>
             </div>
         )
@@ -915,6 +971,7 @@ export default function Envios () {
                             <div style={{textAlign:"left"}}>
                                 <h4 className='title-Homepage'>Remito: {selectedRemito.nro_remito}</h4>
                                 <h5 className='title-Homepage'>Estado: {selectedRemito.estado}</h5>
+                                {selectedRemito.factura && <h5 className='title-Homepage'>Factura: {selectedRemito.factura}</h5>}
                                 <h5 className='title-Homepage'>Dias habiles de cobertura: {selectedRemito.dias}</h5>
                                 <h5 className='title-Homepage'>Ultimo movimiento: {selectedRemito.ultima_mod.split("T")[0]}</h5>
                                 <div>
@@ -990,6 +1047,7 @@ export default function Envios () {
                                 <th style={{border: "1px solid", width: "20%"}}>Depart.</th>
                                 <th style={{border: "1px solid", width: "20%"}}>Estado</th>
                                 <th style={{border: "1px solid", width: "8%"}}>Rep.</th>
+                                <th style={{border: "1px solid", width: "8%"}}>Fac.</th>
                             </tr>
                             { filteredRemitosView.length > 0 ? 
                             filteredRemitosView.map((d) => (
@@ -999,6 +1057,7 @@ export default function Envios () {
                                 <th style={{border: "1px solid", width: "20%"}}>{d.departamento}</th>
                                 <th style={{border: "1px solid", width: "20%"}}>{d.estado}</th>
                                 <th style={{border: "1px solid", width: "8%"}}>{d.reportes}</th>
+                                <th style={{border: "1px solid", width: "8%"}}>{d.factura ? "SI" : "NO"}</th>
                             </tr>
                             )) 
                             : remitosView[remitoPage] && remitosView[remitoPage].map((d) => (
@@ -1008,6 +1067,8 @@ export default function Envios () {
                                 <th style={{border: "1px solid", width: "20%"}}>{d.departamento}</th>
                                 <th style={{border: "1px solid", width: "20%"}}>{d.estado}</th>
                                 <th style={{border: "1px solid", width: "8%"}}>{d.reportes}</th>
+                                <th style={{border: "1px solid", width: "8%"}}>{d.factura ? "SI" : "NO"}</th>
+
                             </tr>
                             ))}
                         </tbody>
@@ -1019,6 +1080,82 @@ export default function Envios () {
                         <h4 className='title-Homepage'>{remitoPage + 1}</h4>
                         {remitoPage < remitosView.length - 1 && <button className='btn-export-pdf' onClick={() => setRemitoPage(remitoPage + 1)}>{"--->"}</button>}
                     </div>
+            </div>
+        )
+    }
+    const displayFacturacion = () => {
+
+        const addRt = async () => {
+            if(parseInt(Crt) <= lastRt) {
+                const format = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,parseInt(Crt))
+                const check = await global?.checkRemitoFacturacionFn(format)
+                const checkRt = customRt.includes(format)
+                if(check && !checkRt) {
+                    setCustomRt(rt => [...rt, format])
+                    setCRt("")
+                }
+                else alert("Remito ya tiene asignada una factura o ya esta agregado en la lista.")
+            }
+            else {
+                alert("Remito no existente")
+                setCRt("")
+            }
+        }
+
+        const delRt = (index: number) => {
+            const arr = customRt
+            arr.splice(index,1)
+            setCustomRt(arr)
+            setUpdater(updater+1)
+        }
+
+        const createFacturacion = () => {
+            if(global && createFactura.factura_cod1.length > 0 && createFactura.factura_cod2.length > 0 && customRt.length > 0){
+                const format = refillEmptySpace(5,parseInt(createFactura.factura_cod1))+"-"+refillEmptySpace(6,parseInt(createFactura.factura_cod2))
+                if(confirm("¿Quieres facturar "+format+"?") && global) {
+                    global.postFacturaRemito(format,createFactura.fecha,customRt)
+                    setCustomRt([])
+                    setCreateFactura({factura_cod1: "",factura_cod2:"",remitos:[],fecha:""})
+                }
+            }
+        }
+
+        return (
+            <div>
+                <hr color='#3399ff' className='hr-line'/>
+                    <h2 className='title-Homepage' >
+                        Facturar 
+                    </h2>
+                    <div>
+                        <div style={{display: "flex", justifyContent: "center", height: 25, alignItems: "center"}}>
+                            <h5 className='title-Homepage'>Factura: </h5>
+                            <input type="number" value={createFactura.factura_cod1} style={{width: 80}} onChange={(e) => setCreateFactura({...createFactura, factura_cod1:e.target.value})}/>
+                            <h5 className='title-Homepage'>-</h5>
+                            <input type="number" value={createFactura.factura_cod2} style={{width: 120}} onChange={(e) => setCreateFactura({...createFactura, factura_cod2:e.target.value})}/>
+                        </div>
+                        <div>
+                            <h5 className='title-Homepage' style={{margin: 5}}>Fecha de facturacion: </h5>
+                            <input type="date" value={createFactura.fecha} style={{width: 120}} onChange={(e) => setCreateFactura({...createFactura, fecha:e.target.value})}/>
+                        </div>
+                        <div>
+                            <h5 className='title-Homepage' style={{margin: 5}}>Remito: </h5>
+                            <input type="number" id='startrt' className="data-div-select" value={Crt} min={1} style={{width: "35%"}} onChange={(e) => setCRt(e.target.value)}/>
+                            <button className='btn-export-pdf' onClick={() => addRt()}>+</button>
+                        </div>
+                    </div>
+                    <button className='btn-export-pdf' onClick={() => createFacturacion()}>CREAR FACTURACION</button>
+                    {customRt.length > 0 && (
+                    <div style={{marginTop: 20}}>
+                    <h4 className='title-Homepage'>Remitos a Facturar:</h4>
+                    <h5 className='title-Homepage' style={{margin: 5}}>(Click para eliminar)</h5>
+                    <table style={{fontSize: "small", width: 380}}>
+                        <tbody>
+                            <tr><th style={{border: "1px solid", width: "25%"}}>Remitos</th></tr>
+                            {customRt.map((rt,i) => (<tr onClick={() => delRt(i)}><th style={{border: "1px solid", width: "25%"}}>{rt}</th></tr>))}
+                        </tbody>
+                    </table>
+                    </div>  
+                    )}
             </div>
         )
     }
@@ -1042,6 +1179,7 @@ export default function Envios () {
                                 <option value={4}>Insumos</option>
                                 <option value={5}>Planes</option>
                                 <option value={6}>Informes</option>
+                                <option value={10}>Facturacion</option>
                                 <option value={7}>Datos</option>
                             </select>
                         </div>
@@ -1062,6 +1200,7 @@ export default function Envios () {
                         {(display === 7 && (global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin)) && displayData()}
                         {(display === 8 && (global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin)) && displayGenerarEnvio()}
                         {(display === 9 && (global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin)) && displayRemitos()}
+                        {(display === 10 && (global?.user.rol === rolesNum.administrativo || global?.user.rol === rolesNum.admin)) && displayFacturacion()}
                     </div>
                 </div>
             </div>
