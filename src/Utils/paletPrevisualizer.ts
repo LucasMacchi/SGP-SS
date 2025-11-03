@@ -17,7 +17,9 @@ export default function paletPrevisualizer
                 auxId = lg.lentrega_id
                 totalRemitos++
             }
+            totalRacCL += lg.rac_cl ? lg.rac_cl : 0
         });
+
     }
     auxId = 0
     if(lugaresAL.length) {
@@ -26,49 +28,48 @@ export default function paletPrevisualizer
                 auxId = lg.lentrega_id
                 totalRemitos++
             }
+            totalRacAL += lg.rac_al ? lg.rac_al : 0
         });
     }
 
     if(planes) {
-        if(lugaresCL.length > 0) {
-            lugaresCL.forEach(cl => {
-                planes.forEach(pln => {
-                    if(pln.plan_id === cl.planId && cl.rac_cl) {
-                        const racionesxplan = cl.rac_cl * pln.dias
-                        totalRacCL += racionesxplan
-                        pln.details.forEach((pld) => {
-                            insumos.forEach((ins) => {
-                                if(ins.ins_id === pld.ins_id) {
-                                    const racxplanxins = totalRacCL / pln.dias * pld.dias
-                                    const racxpalet = ins.raccaja ? ins.raccaja * ins.caja_palet : ins.racbolsa * ins.caja_palet
-                                    const palet = Math.floor(racxplanxins / racxpalet)
-                                    totalPalets += palet
-                                }
-                            })
-                        })
+        if(lugaresCL.length > 0 && lugaresCL[0].planId) {
+            let plan = planes[0]
+            planes.map((cl) => {
+                if(cl.plan_id === lugaresCL[0].planId) plan = cl
+            })
+            totalRacCL = totalRacCL * plan.dias
+            plan.details.forEach((d) => {
+                insumos.forEach((ins) => {
+                    if(ins.ins_id === d.ins_id) {
+                        const racxplanxins = totalRacCL / plan.dias * d.dias
+                        const racxpalet = ins.raccaja ? ins.raccaja * ins.caja_palet : ins.racbolsa * ins.caja_palet
+                        const palet = Math.floor(racxplanxins / racxpalet)
+                        console.log(ins.des)
+                        console.log(racxplanxins, racxpalet, palet)
+                        totalPalets += palet
                     }
-                });
-            });
+                })
+            })
         }
-        if(lugaresAL.length > 0) {
-            lugaresAL.forEach(al => {
-                planes.forEach(pln => {
-                    if(pln.plan_id === al.planId && al.rac_al) {
-                        const racionesxplan = al.rac_al * pln.dias
-                        totalRacAL += racionesxplan
-                        pln.details.forEach((pld) => {
-                            insumos.forEach((ins) => {
-                                if(ins.ins_id === pld.ins_id) {
-                                    const racxplanxins = totalRacAL / pln.dias * pld.dias
-                                    const racxpalet = ins.raccaja ? ins.raccaja * ins.caja_palet : ins.racbolsa * ins.caja_palet
-                                    const palet = Math.floor(racxplanxins / racxpalet)
-                                    totalPalets += palet
-                                }
-                            })
-                        })
+        if(lugaresAL.length > 0 && lugaresAL[0].planId) {
+            let plan = planes[0]
+            planes.map((cl) => {
+                if(cl.plan_id === lugaresAL[0].planId) plan = cl
+            })
+            totalRacAL = totalRacAL * plan.dias
+            plan.details.forEach((d) => {
+                insumos.forEach((ins) => {
+                    if(ins.ins_id === d.ins_id) {
+                        const racxplanxins = totalRacAL / plan.dias * d.dias
+                        const racxpalet = ins.raccaja ? ins.raccaja * ins.caja_palet : ins.racbolsa * ins.caja_palet
+                        const palet = Math.floor(racxplanxins / racxpalet)
+                        console.log(ins.des)
+                        console.log(racxplanxins, racxpalet, palet)
+                        totalPalets += palet
                     }
-                });
-            });
+                })
+            })
         }
     }
 
