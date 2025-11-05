@@ -944,7 +944,7 @@ export default function GlobalState(props: IPropsChildren) {
 
   async function getEnviosTanda(start: number, end: number, pv: number): Promise<IrequestEnvio[]> {
     try {
-      const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,start)
+      const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(8,start)
       const parsedEnd = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,end)
       const envios: IrequestEnvio[] = (await axios.get(SERVER+`/envios/tanda/${parsedStart}/${parsedEnd}`,authReturner())).data
       return envios
@@ -966,7 +966,7 @@ export default function GlobalState(props: IPropsChildren) {
   }
     async function getTxtEnvio(start: number, end: number, pv: number): Promise<ITxtEnvios> {
       try {
-        const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,start)
+        const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(8,start)
         const parsedEnd = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,end)
         const envios: ITxtEnvios = (await axios.get(SERVER+`/envios/txt/${parsedStart}/${parsedEnd}`,authReturner())).data
         return envios
@@ -978,7 +978,7 @@ export default function GlobalState(props: IPropsChildren) {
     }
     async function getRutaEnvio(start: number, end: number, pv: number): Promise<IResponseRutas | null> {
       try {
-        const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,start)
+        const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(8,start)
         const parsedEnd = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,end)
         const ruta: IResponseRutas = (await axios.get(SERVER+`/envios/ruta/${parsedStart}/${parsedEnd}`,authReturner())).data
         return ruta
@@ -1041,7 +1041,7 @@ export default function GlobalState(props: IPropsChildren) {
     }
     async function getConformidadEnvio(start: number, end: number, pv: number): Promise<IConformidad[]> {
       try {
-        const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,start)
+        const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(8,start)
         const parsedEnd = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,end)
         const ruta: IConformidad[] = (await axios.get(SERVER+`/envios/actas/${parsedStart}/${parsedEnd}`,authReturner())).data
         return ruta
@@ -1191,7 +1191,7 @@ export default function GlobalState(props: IPropsChildren) {
     }
 
     async function getRemitosData(start: number, end: number,pv: number): Promise<IRemitoEnvio[]> {
-        const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,start)
+        const parsedStart = refillEmptySpace(5,pv)+"-"+refillEmptySpace(8,start)
         const parsedEnd = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,end)
         try {
           const data: IRemitoEnvio[] = (await axios.get(SERVER+`/envios/remitos/${parsedStart}/${parsedEnd}`,authReturner())).data
