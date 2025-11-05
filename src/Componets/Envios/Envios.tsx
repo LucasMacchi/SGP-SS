@@ -318,7 +318,7 @@ export default function Envios () {
             }
         }
         const addRemito = () => {
-            const format = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,parseInt(Crt))
+            const format = refillEmptySpace(5,pv)+"-"+refillEmptySpace(8,parseInt(Crt))
             setCustomRt(rt => [...rt, format])
             setCRt("")
         }
@@ -919,7 +919,7 @@ export default function Envios () {
         }
 
         const searchRemitoFn = () => {
-            const format = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,parseInt(searchRemito))
+            const format = refillEmptySpace(5,pv)+"-"+refillEmptySpace(8,parseInt(searchRemito))
             console.log(format)
             setSearchRemito("")
             const totalRemitos: IRemitosEnvio[] = []
@@ -1087,7 +1087,7 @@ export default function Envios () {
 
         const addRt = async () => {
             if(parseInt(Crt) <= lastRt) {
-                const format = refillEmptySpace(5,pv)+"-"+refillEmptySpace(6,parseInt(Crt))
+                const format = refillEmptySpace(5,pv)+"-"+refillEmptySpace(8,parseInt(Crt))
                 const check = await global?.checkRemitoFacturacionFn(format)
                 const checkRt = customRt.includes(format)
                 if(check && !checkRt) {
@@ -1111,7 +1111,7 @@ export default function Envios () {
 
         const createFacturacion = () => {
             if(global && createFactura.factura_cod1.length > 0 && createFactura.factura_cod2.length > 0 && customRt.length > 0 && createFactura.fecha.length > 0){
-                const format = refillEmptySpace(5,parseInt(createFactura.factura_cod1))+"-"+refillEmptySpace(6,parseInt(createFactura.factura_cod2))
+                const format = refillEmptySpace(5,parseInt(createFactura.factura_cod1))+"-"+refillEmptySpace(8,parseInt(createFactura.factura_cod2))
                 if(confirm("¿Quieres facturar "+format+"?") && global) {
                     global.postFacturaRemito(format,createFactura.fecha,customRt)
                     setCustomRt([])
