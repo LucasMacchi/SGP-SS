@@ -1121,6 +1121,16 @@ export default function Envios () {
             else alert("Faltan datos.")
         }
 
+        const checkCountFactura = async () => {
+            if(global && createFactura.factura_cod1.length > 0 && createFactura.factura_cod2.length > 0) {
+                const format = refillEmptySpace(5,parseInt(createFactura.factura_cod1))+"-"+refillEmptySpace(8,parseInt(createFactura.factura_cod2))
+                const amount = await global.getFacturaCountFn(format)
+                alert(amount ? "Cantidad de Remitos facturados en "+format+" : "+amount : "No existen remitos facturados en "+format)
+            }
+            else alert("Ingrese una factura valida")
+
+        }
+
         return (
             <div>
                 <hr color='#3399ff' className='hr-line'/>
@@ -1130,9 +1140,10 @@ export default function Envios () {
                     <div>
                         <div style={{display: "flex", justifyContent: "center", height: 25, alignItems: "center"}}>
                             <h5 className='title-Homepage'>Factura: </h5>
-                            <input type="number" value={createFactura.factura_cod1} style={{width: 80}} onChange={(e) => setCreateFactura({...createFactura, factura_cod1:e.target.value})}/>
+                            <input type="number" value={createFactura.factura_cod1} style={{width: 40}} onChange={(e) => setCreateFactura({...createFactura, factura_cod1:e.target.value})}/>
                             <h5 className='title-Homepage'>-</h5>
-                            <input type="number" value={createFactura.factura_cod2} style={{width: 120}} onChange={(e) => setCreateFactura({...createFactura, factura_cod2:e.target.value})}/>
+                            <input type="number" value={createFactura.factura_cod2} style={{width: 80}} onChange={(e) => setCreateFactura({...createFactura, factura_cod2:e.target.value})}/>
+                            <button className='btn-export-pdf' onClick={() => checkCountFactura()}>?</button>
                         </div>
                         <div>
                             <h5 className='title-Homepage' style={{margin: 5}}>Fecha de facturacion: </h5>
