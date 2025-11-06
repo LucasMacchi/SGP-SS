@@ -1294,6 +1294,16 @@ export default function GlobalState(props: IPropsChildren) {
       }
     }
 
+    async function getFacturaCountFn(factura: string): Promise<number> {
+      try {
+        const count: number = (await axios.get(SERVER+`/envios/facturacion/count/${factura}`,authReturner())).data
+        return count
+      } catch (error) {
+        console.log(error);
+        return 0
+      }
+    }
+
   
   
   const innitialState: IGlobalContext = {
@@ -1445,7 +1455,8 @@ export default function GlobalState(props: IPropsChildren) {
     createReportesEnvio,
     postNewInsumoEnvio,
     postFacturaRemito,
-    checkRemitoFacturacionFn
+    checkRemitoFacturacionFn,
+    getFacturaCountFn
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1574,4 +1585,5 @@ interface IGlobalContext {
   postNewInsumoEnvio: (data: ICreateInsumo) => Promise<void>;
   postFacturaRemito: (fact: string, fecha: string, remitos: string[]) => Promise<void>;
   checkRemitoFacturacionFn: (remito: string) => Promise<boolean> ;
+  getFacturaCountFn: (factura: string) => Promise<number>;
 }
