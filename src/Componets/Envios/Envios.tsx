@@ -11,6 +11,7 @@ import ExcelParserEnvios from "../../Utils/excelParser";
 import { IChangeEnvioInsumo, IChangeEnvioInsumoPlan, ICreateFactura, ICreateInsumo, IDesglosesReturner, IEnvioInsumos, ILentrega, IPlanComplete, IRemitosEnvio, IReportEnvio, IrequestEnvioCom, rolesNum } from "../../Utils/Interfaces";
 import informeEnviosTxt from "../../Utils/informeEnviosTxt";
 import RemitoEnvioPdf from "../pdfs/remitoEnvio";
+import InformeFacturacionPDF from "../pdfs/facturacionInformepdf";
 import paletPrevisualizer from "../../Utils/paletPrevisualizer";
 import desglosesParser from "../../Utils/desglosesParser";
 import refillEmptySpace from "../../Utils/refillEmptySpace";
@@ -612,6 +613,27 @@ export default function Envios () {
                 informeEnviosTxt(lienas)
             }
         }
+        const informeFacturacion = async () => {
+            if(global && createFactura.factura_cod1.length > 0 && createFactura.factura_cod2.length > 0) {
+                const format = refillEmptySpace(5,parseInt(createFactura.factura_cod1))+"-"+refillEmptySpace(8,parseInt(createFactura.factura_cod2))
+                const informFac = await global.getFacturaInfFn(format)
+                if(informFac.length > 0){
+                    let checkCL = true
+                    informFac.forEach(fac => {if(fac.fortificado) checkCL=false});
+                    if(checkCL) {
+                        const titulo = 'Detalle de Relaciones de Refrigerios Fortificados Reforzados\nAnexo Factura Nro. FC B '+format
+                        const blob: Blob = await pdf(<InformeFacturacionPDF data={informFac} title={titulo} fecha={informFac[0].fecha}/>).toBlob()
+                        saveAs(blob, 'SGP_FACTURA_'+format)
+                    }
+                    else {
+                        const titulo = 'Detalle de Relaciones de Almuerzos Fortificados Reforzados\nAnexo Factura Nro. FC B '+format
+                        const blob: Blob = await pdf(<InformeFacturacionPDF data={informFac} title={titulo} fecha={informFac[0].fecha}/>).toBlob()
+                        saveAs(blob, 'SGP_FACTURA_'+format)
+                    }
+                }
+                else alert("No existe remitos en esta factura.")
+            }
+        }
         return(
             <div>
                 <hr color='#3399ff' className='hr-line'/>
@@ -625,9 +647,22 @@ export default function Envios () {
                         style={{width: "35%"}} onChange={(e) => setFecha(e.target.value)}/>
                     </div>
                     <div>
+                        {fecha && <button className='btn-big' onClick={() => getInformeFecha()}>Informe fecha</button>}
+                    </div>
+
+                </div>
+                <div>
+                    <h2 className='title-Homepage' >
+                        Generar informes de Facturacion 
+                    </h2>
+                    <div style={{display: "flex", justifyContent: "center", height: 25, alignItems: "center"}}>
+                        <h5 className='title-Homepage'>Factura: </h5>
+                        <input type="number" value={createFactura.factura_cod1} style={{width: 40}} onChange={(e) => setCreateFactura({...createFactura, factura_cod1:e.target.value})}/>
+                        <h5 className='title-Homepage'>-</h5>
+                        <input type="number" value={createFactura.factura_cod2} style={{width: 80}} onChange={(e) => setCreateFactura({...createFactura, factura_cod2:e.target.value})}/>
                     </div>
                     <div>
-                        {fecha && <button className='btn-big' onClick={() => getInformeFecha()}>Informe fecha</button>}
+                        {(createFactura.factura_cod1.length > 0 && createFactura.factura_cod2.length > 0) && <button className='btn-big' onClick={() => informeFacturacion()}>Informe Factura</button>}
                     </div>
 
                 </div>
@@ -1125,7 +1160,7 @@ export default function Envios () {
             if(global && createFactura.factura_cod1.length > 0 && createFactura.factura_cod2.length > 0) {
                 const format = refillEmptySpace(5,parseInt(createFactura.factura_cod1))+"-"+refillEmptySpace(8,parseInt(createFactura.factura_cod2))
                 const amount = await global.getFacturaCountFn(format)
-                alert(amount ? "Cantidad de Remitos facturados en "+format+" : "+amount : "No existen remitos facturados en "+format)
+                alert(amount ? "Cantidad de Remitos facturados en "+format+" : "+amount.count+"\nRaciones: "+amount.raciones+"\nFacturado: "+Intl.NumberFormat("es-AR",{style: "currency", currency: "ARS"}).format(amount.raciones * 1000) : "No existen remitos facturados en "+format)
             }
             else alert("Ingrese una factura valida")
 
