@@ -21,6 +21,8 @@ import {
   IEmailSender,
   IEnvio,
   IEnvioInsumos,
+  IFacturacionData,
+  IFacturacionDataInforme,
   IFilter,
   IInsumoComp,
   ILgarEntrega,
@@ -1294,13 +1296,23 @@ export default function GlobalState(props: IPropsChildren) {
       }
     }
 
-    async function getFacturaCountFn(factura: string): Promise<number> {
+    async function getFacturaCountFn(factura: string): Promise<IFacturacionData> {
       try {
-        const count: number = (await axios.get(SERVER+`/envios/facturacion/count/${factura}`,authReturner())).data
+        const count: IFacturacionData = (await axios.get(SERVER+`/envios/facturacion/count/${factura}`,authReturner())).data
         return count
       } catch (error) {
         console.log(error);
-        return 0
+        return {count: 0, raciones: 0}
+      }
+    }
+
+    async function getFacturaInfFn(factura: string): Promise<IFacturacionDataInforme[]> {
+      try {
+        const data: IFacturacionDataInforme[] = (await axios.get(SERVER+`/envios/facturacion/inf/${factura}`,authReturner())).data
+        return data
+      } catch (error) {
+        console.log(error);
+        return []
       }
     }
 
@@ -1456,7 +1468,8 @@ export default function GlobalState(props: IPropsChildren) {
     postNewInsumoEnvio,
     postFacturaRemito,
     checkRemitoFacturacionFn,
-    getFacturaCountFn
+    getFacturaCountFn,
+    getFacturaInfFn
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1585,5 +1598,6 @@ interface IGlobalContext {
   postNewInsumoEnvio: (data: ICreateInsumo) => Promise<void>;
   postFacturaRemito: (fact: string, fecha: string, remitos: string[]) => Promise<void>;
   checkRemitoFacturacionFn: (remito: string) => Promise<boolean> ;
-  getFacturaCountFn: (factura: string) => Promise<number>;
+  getFacturaCountFn: (factura: string) => Promise<IFacturacionData>;
+  getFacturaInfFn: (factura: string) => Promise<IFacturacionDataInforme[]>;
 }

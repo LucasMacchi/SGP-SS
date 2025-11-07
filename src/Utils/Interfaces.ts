@@ -590,4 +590,26 @@ export interface IRemitosEnvio {
     factura: string | null
 }
 
+export interface IFacturacionData {
+    count: number,
+    raciones: number
+}
+
+export interface IFacturacionDataInforme {
+    remito: string,
+    raciones: number,
+    localidad:string,
+    fecha: string,
+    departamento:string,
+    cabecera:string,
+    amount: number,
+    fortificado: boolean
+}
+
+export interface IFacturacionDataInformePDF {
+    data: IFacturacionDataInforme[],
+    title: string,
+    fecha: string
+}
+
 export type TRemitoEnvio = ""
