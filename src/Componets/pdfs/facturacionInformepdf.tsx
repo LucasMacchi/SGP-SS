@@ -114,14 +114,10 @@ const stylePedido = StyleSheet.create({
 })
 
 
-const insumosDisplayer = (remitos: IFacturacionDataInforme[]) => {
+const insumosDisplayer = (remitos: IFacturacionDataInforme[],count: number,last:boolean,totalAmount: number,totalRac: number) => {
     const elements = []
-    const amount = remitos.length > 30 ? remitos.length : 30
-    let racionesTotal = 0
-    let amountTotal = 0
+    const amount = remitos.length > count ? remitos.length : count
     for (let i = 0; i < amount; i++) {
-        racionesTotal += remitos[i] ? remitos[i].raciones : 0
-        amountTotal += remitos[i] ? remitos[i].amount : 0
         elements.push(
             <View style={stylePedido.tableRow}>
                 <View style={stylePedido.tableColcod2}>
@@ -140,6 +136,7 @@ const insumosDisplayer = (remitos: IFacturacionDataInforme[]) => {
         )
     
     }
+    if(last) {
     const wordsParser = new ToWords({
         localeCode: "es-AR",
         converterOptions: {
@@ -163,10 +160,10 @@ const insumosDisplayer = (remitos: IFacturacionDataInforme[]) => {
                 <Text style={stylePedido.tableCell}>{"Remitos: "+remitos.length}</Text>
             </View>
             <View style={stylePedido.tableColcod2}>
-                <Text style={stylePedido.tableCell2}>{racionesTotal}</Text>
+                <Text style={stylePedido.tableCell2}>{totalRac}</Text>
             </View>
             <View style={stylePedido.tableColcod2}>
-                <Text style={stylePedido.tableCell2}>{Intl.NumberFormat("es-AR",{style: "currency", currency: "ARS"}).format(amountTotal)}</Text>
+                <Text style={stylePedido.tableCell2}>{Intl.NumberFormat("es-AR",{style: "currency", currency: "ARS"}).format(totalAmount)}</Text>
             </View>
         </View>
     )
@@ -174,57 +171,103 @@ const insumosDisplayer = (remitos: IFacturacionDataInforme[]) => {
     elements.push(
         <View style={stylePedido.viewdataHeader}>
             <View >
-                <Text style={stylePedido.subtitle}>Son raciones: {wordsParserRac.convert(racionesTotal) + " Raciones"}</Text>
-                <Text style={stylePedido.subtitle}>Son pesos: {wordsParser.convert(amountTotal)}</Text>
+                <Text style={stylePedido.subtitle}>Son raciones: {wordsParserRac.convert(totalRac) + " Raciones"}</Text>
+                <Text style={stylePedido.subtitle}>Son pesos: {wordsParser.convert(totalAmount)}</Text>
             </View>
         </View>
     )
-    console.log()
+    }
     return elements
 }
 
 
-const informeFacturacionPDF: React.FC<IFacturacionDataInformePDF> = ({data,title,fecha}) => (
-    <Document>
-        <Page size={'A4'} style={stylePedido.page}>
-            <View style={{flexDirection: 'row', justifyContent: "center"}}>
-                <Image src={logoBig} style={stylePedido.logo}/>
-            </View>
-            <View style={stylePedido.viewdataHeader}>
-                <View >
-                    <Text style={stylePedido.title}>Soluciones & Servicios</Text>
-                    <Text style={stylePedido.subtitle}>Fecha: {fecha.split("T")[0]}</Text>
+const informeFacturacionPDF: React.FC<IFacturacionDataInformePDF> = ({data,title,fecha}) => {
+    let racionesTotal = 0
+    let amountTotal = 0
+    data.forEach(d => {
+        racionesTotal += d.raciones
+        amountTotal += d.amount
+    });
+    const paginasCount = 38
+    const pages: IFacturacionDataInforme[][] = []
+    for (let i = 0; i < data.length; i += paginasCount) {
+      const arr = data.slice(i,i + paginasCount)
+      pages.push(arr)
+    }
+    return (
+        <Document>
+            <Page size={'A4'} style={stylePedido.page}>
+                <View style={{flexDirection: 'row', justifyContent: "center"}}>
+                    <Image src={logoBig} style={stylePedido.logo}/>
                 </View>
-                <View >
-                    <Text style={stylePedido.subtitle}>Junin 766 Piso 2 Oficina 4</Text>
-                    <Text style={stylePedido.subtitle}>Corrientes, Corrientes, Argentina</Text>
-                    <Text style={stylePedido.subtitle}>Codigo Postal 3400</Text>
-                </View>
-            </View>
-            <View style={{flexDirection: 'row', justifyContent: "center"}}>
-                <Text style={stylePedido.title}>{title}</Text>
-            </View>
-            <View style={stylePedido.view}>
-                <View style={stylePedido.table}>
-                <View style={stylePedido.tableRow_header}>
-                    <View style={stylePedido.tableColcod}>
-                        <Text style={stylePedido.tableCellH}>REMITO</Text>
+                <View style={stylePedido.viewdataHeader}>
+                    <View >
+                        <Text style={stylePedido.title}>Soluciones & Servicios</Text>
+                        <Text style={stylePedido.subtitle}>Fecha: {fecha.split("T")[0]}</Text>
                     </View>
-                    <View style={stylePedido.tableColIns}>
-                        <Text style={stylePedido.tableCellH}>CABECERA</Text>
-                    </View>
-                    <View style={stylePedido.tableColcod}>
-                        <Text style={stylePedido.tableCellH}>RACIONES</Text>
-                    </View>
-                    <View style={stylePedido.tableColcod}>
-                        <Text style={stylePedido.tableCellH}>FACTURADO</Text>
+                    <View >
+                        <Text style={stylePedido.subtitle}>Junin 766 Piso 2 Oficina 4</Text>
+                        <Text style={stylePedido.subtitle}>Corrientes, Corrientes, Argentina</Text>
+                        <Text style={stylePedido.subtitle}>Codigo Postal 3400</Text>
                     </View>
                 </View>
+                <View style={{flexDirection: 'row', justifyContent: "center"}}>
+                    <Text style={stylePedido.title}>{title}</Text>
                 </View>
-                {insumosDisplayer(data)}
-            </View>
-        </Page>
-    </Document>
-)
+                <View style={stylePedido.view}>
+                    <View style={stylePedido.table}>
+                    <View style={stylePedido.tableRow_header}>
+                        <View style={stylePedido.tableColcod}>
+                            <Text style={stylePedido.tableCellH}>REMITO</Text>
+                        </View>
+                        <View style={stylePedido.tableColIns}>
+                            <Text style={stylePedido.tableCellH}>CABECERA</Text>
+                        </View>
+                        <View style={stylePedido.tableColcod}>
+                            <Text style={stylePedido.tableCellH}>RACIONES</Text>
+                        </View>
+                        <View style={stylePedido.tableColcod}>
+                            <Text style={stylePedido.tableCellH}>FACTURADO</Text>
+                        </View>
+                    </View>
+                    </View>
+                </View>
+                {insumosDisplayer(pages[0],paginasCount,false,amountTotal,racionesTotal)}
+            </Page>
+            {pages.map((d,i) => {
+                const isLast = i === pages.length - 1
+                if(i !== 0) {
+                    return (
+                        <Page size={'A4'} style={stylePedido.page}>
+                            {insumosDisplayer(d,paginasCount,isLast,amountTotal,racionesTotal)}
+                        </Page>
+                    )
+                }
+            })}
+        </Document>
+    )
+}
 
 export default informeFacturacionPDF
+
+/*
+                if(i === 0) {
+                    return (
+                        {insumosDisplayer(d,paginasCount,false)}
+                    )
+                }
+                else if (i === pages.length) {
+                    return (
+                        <Page size={'A4'} style={stylePedido.page}>
+                            {insumosDisplayer(d,paginasCount,false)}
+                        </Page>
+                    )
+                }
+                else {
+                    return (
+                        <Page size={'A4'} style={stylePedido.page}>
+                            {insumosDisplayer(d,paginasCount,false)}
+                        </Page>
+                    )
+                }
+*/
