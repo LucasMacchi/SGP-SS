@@ -100,6 +100,10 @@ export default function Envios () {
         setRemitoReport([])
         setSelectedReporte(10000)
         setCustomDate("")
+        setSearchFac(0)
+        setSearchPv("")
+        setSearchRemito("")
+        setSearchState("")
         setCreateIns({des: "",caja_palet: 0,unidades_caja: 0,gr_racion: 0,gr_total: 0,racbolsa: 0,raccaja: 0,cod1:"",cod2:""})
     },[display])
 
@@ -1224,8 +1228,8 @@ export default function Envios () {
     const displayFacturacion = () => {
 
         const addRt = async () => {
-            if(parseInt(Crt) <= lastRt) {
-                const format = refillEmptySpace(5,pv)+"-"+refillEmptySpace(8,parseInt(Crt))
+            if(searchPv.length > 0 && Crt.length > 0) {
+                const format = refillEmptySpace(5,parseInt(searchPv))+"-"+refillEmptySpace(8,parseInt(Crt))
                 const check = await global?.checkRemitoFacturacionFn(format)
                 const checkRt = customRt.includes(format)
                 if(check && !checkRt) {
@@ -1289,7 +1293,8 @@ export default function Envios () {
                         </div>
                         <div>
                             <h5 className='title-Homepage' style={{margin: 5}}>Remito: </h5>
-                            <input type="number" id='startrt' className="data-div-select" value={Crt} min={1} style={{width: "35%"}} onChange={(e) => setCRt(e.target.value)}/>
+                            <input type="number" id='startrt' className="data-div-select" value={searchPv} min={1} style={{width: "8%"}} onChange={(e) => setSearchPv(e.target.value)}/>
+                            <input type="number" id='startrt' className="data-div-select" value={Crt} min={1} style={{width: "15%"}} onChange={(e) => setCRt(e.target.value)}/>
                             <button className='btn-export-pdf' onClick={() => addRt()}>+</button>
                         </div>
                     </div>
