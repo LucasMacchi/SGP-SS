@@ -114,7 +114,7 @@ const stylePedido = StyleSheet.create({
 })
 
 
-const insumosDisplayer = (remitos: IFacturacionDataInforme[],count: number,last:boolean,totalAmount: number,totalRac: number) => {
+const insumosDisplayer = (remitos: IFacturacionDataInforme[],count: number,last:boolean,totalAmount: number,totalRac: number,totalRts: number) => {
     const elements = []
     const amount = remitos.length > count ? remitos.length : count
     for (let i = 0; i < amount; i++) {
@@ -157,7 +157,7 @@ const insumosDisplayer = (remitos: IFacturacionDataInforme[],count: number,last:
                 <Text style={stylePedido.tableCell}>{"Totales"}</Text>
             </View>
             <View style={stylePedido.tableColIns2}>
-                <Text style={stylePedido.tableCell}>{"Remitos: "+remitos.length}</Text>
+                <Text style={stylePedido.tableCell}>{"Remitos: "+totalRts}</Text>
             </View>
             <View style={stylePedido.tableColcod2}>
                 <Text style={stylePedido.tableCell2}>{totalRac}</Text>
@@ -232,14 +232,14 @@ const informeFacturacionPDF: React.FC<IFacturacionDataInformePDF> = ({data,title
                     </View>
                     </View>
                 </View>
-                {insumosDisplayer(pages[0],paginasCount,false,amountTotal,racionesTotal)}
+                {insumosDisplayer(pages[0],paginasCount,false,amountTotal,racionesTotal,data.length)}
             </Page>
             {pages.map((d,i) => {
                 const isLast = i === pages.length - 1
                 if(i !== 0) {
                     return (
                         <Page size={'A4'} style={stylePedido.page}>
-                            {insumosDisplayer(d,paginasCount,isLast,amountTotal,racionesTotal)}
+                            {insumosDisplayer(d,paginasCount,isLast,amountTotal,racionesTotal,data.length)}
                         </Page>
                     )
                 }

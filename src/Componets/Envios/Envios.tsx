@@ -1235,6 +1235,7 @@ export default function Envios () {
                 if(check && !checkRt) {
                     setCustomRt(rt => [...rt, format])
                     setCRt("")
+                    setSearchPv("")
                 }
                 else alert("Remito ya tiene asignada una factura o ya esta agregado en la lista.")
             }
