@@ -59,7 +59,7 @@ export default function Envios () {
     const [searchRemito, setSearchRemito] = useState("")
     const [searchPv, setSearchPv] = useState("")
     const [searchState, setSearchState] = useState("")
-    const [searchFac, setSearchFac] = useState(false)
+    const [searchFac, setSearchFac] = useState(0)
     const [Crt, setCRt] = useState("")
     const [createInsumo, setCreateIns] = useState<ICreateInsumo>({
         des: "",caja_palet: 0,unidades_caja: 0,gr_racion: 0,gr_total: 0,racbolsa: 0,raccaja: 0,cod1:"",cod2:""
@@ -971,11 +971,11 @@ export default function Envios () {
             if(searchState.length > 0) {
                 totalRemitos = totalRemitos.filter(rts => rts.estado === searchState)
             }
-            if(searchFac) {
+            if(searchFac === 1) {
                 totalRemitos = totalRemitos.filter(rts => rts.factura && rts.factura.length > 0)
             }
-            else {
-                totalRemitos = totalRemitos.filter(rts => !rts.factura)
+            if(searchFac === 2) {
+                totalRemitos = totalRemitos.filter(rts => rts.factura === null)
             }
             if(totalRemitos.length === 0) alert("No se encontraron remitos")
             setFilteredRemitosView(totalRemitos)
@@ -1163,7 +1163,13 @@ export default function Envios () {
                                 </div>
                                 <div style={{display: "flex", justifyContent: "center"}}>
                                     <h4 className='title-Homepage'>Facturado:</h4>
-                                    <input type="checkbox" checked={searchFac} onChange={(e) => setSearchFac(e.target.checked)}/>
+                                <div style={{display: "flex", justifyContent: "center"}}>
+                                    <select name="estados" value={searchFac} onChange={(e) => setSearchFac(parseInt(e.target.value))}>
+                                        <option value={0}>---</option>
+                                        <option value={1}>SI</option>
+                                        <option value={2}>NO</option>
+                                    </select>
+                                </div>
                                 </div>
                             <button className='btn-export-pdf' onClick={() => searchRemitoFn()}>BUSCAR</button>
                             <button className='btn-export-pdf' onClick={() => setFilteredRemitosView([])}>BORRAR</button>
@@ -1205,12 +1211,13 @@ export default function Envios () {
                         </tbody>
                     </table>
                     </div>
-
+                    {filteredRemitosView.length === 0 && (
                     <div style={{display: "flex", justifyContent: "center"}}>
                         {remitoPage > 0 && <button className='btn-export-pdf' onClick={() => setRemitoPage(remitoPage - 1)}>{"<---"}</button>}
                         <h4 className='title-Homepage'>{remitoPage + 1}</h4>
                         {remitoPage < remitosView.length - 1 && <button className='btn-export-pdf' onClick={() => setRemitoPage(remitoPage + 1)}>{"--->"}</button>}
                     </div>
+                    )}
             </div>
         )
     }
