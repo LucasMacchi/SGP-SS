@@ -1117,6 +1117,22 @@ export default function GlobalState(props: IPropsChildren) {
         alert("Error al cambiar el estado del remito "+remito)
       }
     }
+
+    async function changeEnviosStateRemitosMultiple (state: string, remitos: string[]) {
+      try {
+        const data = {
+          estado: state,
+          remitos
+        }
+        await axios.patch(SERVER+`/envios/remitos/multiple/estado`,data,authReturner())
+        alert(`Remitos han cambiado al estado ${state}`)
+        window.location.reload()
+      } catch (error) {
+        console.log(error);
+        alert("Error al cambiar el estado de los remitos")
+      }
+    }
+
     async function createEnvios (data: IrequestEnvioCom[], update: boolean): Promise<string> {
       try {
         const enviadosCL = data.filter(env => !env.fortificado)
@@ -1469,7 +1485,8 @@ export default function GlobalState(props: IPropsChildren) {
     postFacturaRemito,
     checkRemitoFacturacionFn,
     getFacturaCountFn,
-    getFacturaInfFn
+    getFacturaInfFn,
+    changeEnviosStateRemitosMultiple
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1600,4 +1617,5 @@ interface IGlobalContext {
   checkRemitoFacturacionFn: (remito: string) => Promise<boolean> ;
   getFacturaCountFn: (factura: string) => Promise<IFacturacionData>;
   getFacturaInfFn: (factura: string) => Promise<IFacturacionDataInforme[]>;
+  changeEnviosStateRemitosMultiple: (state: string, remitos: string[]) => Promise<void>;
 }
