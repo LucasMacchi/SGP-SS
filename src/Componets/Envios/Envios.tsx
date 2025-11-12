@@ -57,6 +57,9 @@ export default function Envios () {
     const [selectedReporte, setSelectedReporte] = useState(10000)
     const [createReporte, setCreateReporte] = useState({titulo: "", des: ""})
     const [searchRemito, setSearchRemito] = useState("")
+    const [searchPv, setSearchPv] = useState("")
+    const [searchState, setSearchState] = useState("")
+    const [searchFac, setSearchFac] = useState(false)
     const [Crt, setCRt] = useState("")
     const [createInsumo, setCreateIns] = useState<ICreateInsumo>({
         des: "",caja_palet: 0,unidades_caja: 0,gr_racion: 0,gr_total: 0,racbolsa: 0,raccaja: 0,cod1:"",cod2:""
@@ -513,7 +516,7 @@ export default function Envios () {
             </div>
         )
     }
-    const displayPlanes = () => {
+    const displayPlanes = () => { 
         const changeInsumoStats = async (detail_id: number, def: number) => {
             let newVal = prompt("Ingrese el nuevo valor: ", def.toString())
             if(newVal !== undefined && newVal !== null && global) {
@@ -531,7 +534,7 @@ export default function Envios () {
         const createPlan = async () => {
             const des = prompt("¿Ingrese la descripcion del nuevo plan?")
             if(des && confirm(`¿Quieres crear un nuevo plan llamado ${des}?`)){
-                const dias = prompt("¿Ingrese la descripcion del nuevo plan?")
+                const dias = prompt("Ingrese los dias habiles del plan:")
                 if(dias && parseInt(dias) && confirm(`¿Plan ${des} por ${dias} dias?`) && global){
                     await global.addPlan(des, parseInt(dias))
                 }
@@ -953,30 +956,66 @@ export default function Envios () {
             }
         }
 
+
         const searchRemitoFn = () => {
-            const format = refillEmptySpace(5,pv)+"-"+refillEmptySpace(8,parseInt(searchRemito))
-            console.log(format)
             setSearchRemito("")
-            const totalRemitos: IRemitosEnvio[] = []
+            let totalRemitos: IRemitosEnvio[] = []
             remitosView.forEach(rtv => {
                 rtv.forEach((rts) => totalRemitos.push(rts))
             });
-            const parsedRemitos = totalRemitos.filter(rts => rts.nro_remito === format)
-            setFilteredRemitosView(parsedRemitos)
+            if(searchRemito.length > 0 && searchPv.length > 0) {
+                const format = refillEmptySpace(5,parseInt(searchPv))+"-"+refillEmptySpace(8,parseInt(searchRemito))
+                console.log(format)
+                totalRemitos = totalRemitos.filter(rts => rts.nro_remito === format)
+            }
+            if(searchState.length > 0) {
+                totalRemitos = totalRemitos.filter(rts => rts.estado === searchState)
+            }
+            if(searchFac) {
+                totalRemitos = totalRemitos.filter(rts => rts.factura && rts.factura.length > 0)
+            }
+            else {
+                totalRemitos = totalRemitos.filter(rts => !rts.factura)
+            }
+            if(totalRemitos.length === 0) alert("No se encontraron remitos")
+            setFilteredRemitosView(totalRemitos)
         }
 
         const changeState = async (remito: string, newstate: string) => {
-            if(confirm("Quieres cambiar el estado del remito "+remito+"?") && global) {
-                global.changeEnviosStateRemitos(newstate,remito,customDate.length > 0 ? customDate : "" )
-                remitosView.forEach(rts => {
-                    rts.forEach(rt => {
-                        if(rt.nro_remito === remito) rt.estado = newstate
-                    });
-                });
-                setCustomDate("")
-                //setRemitosView(remitosView)
-                setUpdater(updater+1)
+            if(customCheck) {
+                if(confirm("Quieres cambiar el estado de los remitos a "+newstate+"?") && global && customDate.length > 0) {
+                    global.changeEnviosStateRemitosMultiple(newstate,customRt)
+                    setCustomDate("")
+                    setCustomRt([])
+                }
+                else alert("No se cambio el estado")
             }
+            else {
+                if(confirm("Quieres cambiar el estado del remito "+remito+"?") && global) {
+                    global.changeEnviosStateRemitos(newstate,remito,customDate.length > 0 ? customDate : "" )
+                    remitosView.forEach(rts => {
+                        rts.forEach(rt => {
+                            if(rt.nro_remito === remito) rt.estado = newstate
+                        });
+                    });
+                    setCustomDate("")
+                    //setRemitosView(remitosView)
+                    setUpdater(updater+1)
+                }
+            }
+
+        }
+
+        const addRt = (rt: string) => {
+            let check = false
+            customRt.forEach(ret => {
+                if(rt === ret){
+                    alert("Remito ya agregado")
+                    check = true
+                }
+            });
+            if(check) return 0
+            setCustomRt(rts => [...rts, rt])
         }
 
         const traerReportes = async () => {
@@ -992,6 +1031,12 @@ export default function Envios () {
                 setCreateReporte({titulo: "",des: ""})
                 setSelectedReporte(10000)
             }
+        }
+        const delRt = (index: number) => {
+            const arr = customRt
+            arr.splice(index,1)
+            setCustomRt(arr)
+            setUpdater(updater+1)
         }
 
         return (
@@ -1068,11 +1113,62 @@ export default function Envios () {
                     </div>
                     <hr color='#3399ff' className='hr-line'/>
                     <div style={{display: "flex", justifyContent: "center"}}>
-                        <h4 className='title-Homepage' style={{alignContent: "center"}}>REMITO</h4>
-                        <input type="number" value={searchRemito} className="data-div-select" style={{width: 50}} onChange={(e) => setSearchRemito(e.target.value)}/>
-                        <button className='btn-export-pdf' onClick={() => searchRemitoFn()}>BUSCAR</button>
-                        <button className='btn-export-pdf' onClick={() => setFilteredRemitosView([])}>BORRAR</button>
+                        <h4 className='title-Homepage'>Seleccion de remitos:</h4>
+                        <input type="checkbox" checked={customCheck} onChange={(e) => setCustomCheck(e.target.checked)}/>
                     </div>
+                    {customRt.length > 0 && (
+                        <div>
+                            <h5 className='title-Homepage'>Seleccion el nuevo estado:</h5>
+                                <div style={{display: "flex", justifyContent: "center"}}>
+                                    <select name="estados" value={customDate} onChange={(e) => setCustomDate(e.target.value)}>
+                                        <option value={""}>---</option>
+                                        <option value={"PREPARADO"}>PREPARADO</option>
+                                        <option value={"DESPACHADO"}>DESPACHADO</option>
+                                        <option value={"ENTRADA"}>ENTRADA</option>
+                                    </select>
+                                </div>
+                            <button className='btn-export-pdf' onClick={() => changeState("",customDate)}>CAMBIAR</button>
+                        </div>
+
+                    )}
+                    {customRt.length > 0 && (
+                    <div >
+                        <table style={{fontSize: "small", width: 380}}>
+                            <tbody>
+                                <tr><th style={{border: "1px solid", width: "25%"}}>Remitos Agregados</th></tr>
+                                {customRt.map((rt,i) => (<tr onClick={() => delRt(i)}><th style={{border: "1px solid", width: "25%"}}>{rt}</th></tr>))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    )}
+                    {!customCheck && (
+                        <div >
+                            <h4 className='title-Homepage' style={{alignContent: "center"}}>REMITO</h4>
+                            <input type="number" value={searchPv} className="data-div-select" style={{width: 30}} onChange={(e) => setSearchPv(e.target.value)}/>
+                            <input type="number" value={searchRemito} className="data-div-select" style={{width: 50}} onChange={(e) => setSearchRemito(e.target.value)}/>
+                            <h4 className='title-Homepage'>Estado:</h4>
+                                <div style={{display: "flex", justifyContent: "center"}}>
+                                    <select name="estados" value={searchState} onChange={(e) => setSearchState(e.target.value)}>
+                                        <option value={""}>---</option>
+                                        <option value={"PENDIENTE"}>PENDIENTE</option>
+                                        <option value={"PREPARADO"}>PREPARADO</option>
+                                        <option value={"DESPACHADO"}>DESPACHADO</option>
+                                        <option value={"ENTREGADO"}>ENTREGADO</option>
+                                        <option value={"NO ENTREGADO"}>NO ENTREGADO</option>
+                                        <option value={"EXTRAVIADO"}>EXTRAVIADO</option>
+                                        <option value={"DEVOLUCION"}>DEVOLUCION</option>
+                                        <option value={"ENTRADA"}>ENTRADA</option>
+                                    </select>
+                                </div>
+                                <div style={{display: "flex", justifyContent: "center"}}>
+                                    <h4 className='title-Homepage'>Facturado:</h4>
+                                    <input type="checkbox" checked={searchFac} onChange={(e) => setSearchFac(e.target.checked)}/>
+                                </div>
+                            <button className='btn-export-pdf' onClick={() => searchRemitoFn()}>BUSCAR</button>
+                            <button className='btn-export-pdf' onClick={() => setFilteredRemitosView([])}>BORRAR</button>
+                        </div>
+                    )}
                     <div style={{overflow: "scroll",width: "auto", minHeight: 600,maxHeight: 800}}>
                     <table style={{fontSize: 9, width: "100%", tableLayout: "fixed", textOverflow: "ellipsis"}}>
                         <tbody>
@@ -1086,7 +1182,7 @@ export default function Envios () {
                             </tr>
                             { filteredRemitosView.length > 0 ? 
                             filteredRemitosView.map((d) => (
-                            <tr key={d.nro_remito} onClick={() => setSelectedRemito(d)} style={{backgroundColor: colorChange(d.estado)}}>
+                            <tr key={d.nro_remito} onClick={() => customCheck ? addRt(d.nro_remito) : setSelectedRemito(d)} style={{backgroundColor: colorChange(d.estado)}}>
                                 <th style={{border: "1px solid", width: "20%"}}>{d.nro_remito}</th>
                                 <th style={{border: "1px solid", width: "20%"}}>{d.localidad.toUpperCase()}</th>
                                 <th style={{border: "1px solid", width: "20%"}}>{d.departamento}</th>
@@ -1096,7 +1192,7 @@ export default function Envios () {
                             </tr>
                             )) 
                             : remitosView[remitoPage] && remitosView[remitoPage].map((d) => (
-                            <tr key={d.nro_remito} onClick={() => setSelectedRemito(d)} style={{backgroundColor: colorChange(d.estado)}}>
+                            <tr key={d.nro_remito} onClick={() => customCheck ? addRt(d.nro_remito) : setSelectedRemito(d)} style={{backgroundColor: colorChange(d.estado)}}>
                                 <th style={{border: "1px solid", width: "20%"}}>{d.nro_remito}</th>
                                 <th style={{border: "1px solid", width: "20%"}}>{d.localidad.toUpperCase()}</th>
                                 <th style={{border: "1px solid", width: "20%"}}>{d.departamento}</th>
