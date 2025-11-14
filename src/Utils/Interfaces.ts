@@ -608,6 +608,30 @@ export interface IFacturacionDataInforme {
     fortificado: boolean
 }
 
+export interface IEXCELFacturacionDataInforme {
+    REMITO: string,
+    CABECERA:string,
+    LOCALIDAD:string,
+    DEPARTAMENTO:string,
+    FECHA: string,
+    FORTIFICADO: boolean
+    MONTO: number,
+    RACIONES: number,
+}
+
+export interface IEXCELRemitosEnvio {
+    REMITO:string,
+    COMPLETO: string,
+    DEPARTAMENTO: string,
+    LOCALIDAD: string,
+    ESTADO: string,
+    FECHA: string | null,
+    ULTIMA_MODIFICACION: string,
+    DIAS: number,
+    FORTIFICADO: boolean,
+    FACTURA: string | null
+}
+
 export interface IFacturacionDataInformePDF {
     data: IFacturacionDataInforme[],
     title: string,
