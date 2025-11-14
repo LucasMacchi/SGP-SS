@@ -66,8 +66,8 @@ const stylePedido = StyleSheet.create({
         borderTopWidth: 0,
       },
       tableCell: {
-        margin: 3,
-        fontSize:8,
+        margin: 2,
+        fontSize:7,
         textAlign: 'left',
       },
       viewdata: {

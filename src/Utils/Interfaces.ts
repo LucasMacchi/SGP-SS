@@ -587,6 +587,8 @@ export interface IRemitosEnvio {
     ultima_mod: string,
     dias: number,
     reportes: number,
+    fecha: string | null,
+    fortificado: boolean,
     factura: string | null
 }
 
