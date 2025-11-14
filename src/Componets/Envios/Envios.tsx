@@ -145,6 +145,7 @@ export default function Envios () {
     useEffect(() => {
         setUpdater(updater+1)
         setCustomDate("")
+        console.log(remitosView)
     },[remitosView])
 
     useEffect(() =>  {
@@ -1055,6 +1056,8 @@ export default function Envios () {
                             <div style={{textAlign:"left"}}>
                                 <h4 className='title-Homepage'>Remito: {selectedRemito.nro_remito}</h4>
                                 <h5 className='title-Homepage'>Estado: {selectedRemito.estado}</h5>
+                                <h5 className='title-Homepage'>Fecha de entrega: {selectedRemito.fecha ? selectedRemito.fecha.split("T")[0] : "No entregado"}</h5>
+                                <h5 className='title-Homepage'>{selectedRemito.fortificado ? "REMITO DE ALMUERZO" : "REMITO DE COPA DE LECHE"}</h5>
                                 {selectedRemito.factura && <h5 className='title-Homepage'>Factura: {selectedRemito.factura}</h5>}
                                 <h5 className='title-Homepage'>Dias habiles de cobertura: {selectedRemito.dias}</h5>
                                 <h5 className='title-Homepage'>Ultimo movimiento: {selectedRemito.ultima_mod.split("T")[0]}</h5>
@@ -1189,26 +1192,29 @@ export default function Envios () {
                                 <th style={{border: "1px solid", width: "20%"}}>Estado</th>
                                 <th style={{border: "1px solid", width: "8%"}}>Rep.</th>
                                 <th style={{border: "1px solid", width: "8%"}}>Fac.</th>
+                                <th style={{border: "1px solid", width: "8%"}}>Tipo</th>
                             </tr>
                             { filteredRemitosView.length > 0 ? 
-                            filteredRemitosView.map((d) => (
-                            <tr key={d.nro_remito} onClick={() => customCheck ? addRt(d.nro_remito) : setSelectedRemito(d)} style={{backgroundColor: colorChange(d.estado)}}>
+                            filteredRemitosView.map((d,i) => (
+                            <tr key={i} onClick={() => customCheck ? addRt(d.nro_remito) : setSelectedRemito(d)} style={{backgroundColor: colorChange(d.estado)}}>
                                 <th style={{border: "1px solid", width: "20%"}}>{d.nro_remito}</th>
                                 <th style={{border: "1px solid", width: "20%"}}>{d.localidad.toUpperCase()}</th>
                                 <th style={{border: "1px solid", width: "20%"}}>{d.departamento}</th>
                                 <th style={{border: "1px solid", width: "20%"}}>{d.estado}</th>
                                 <th style={{border: "1px solid", width: "8%"}}>{d.reportes}</th>
                                 <th style={{border: "1px solid", width: "8%"}}>{d.factura ? "SI" : "NO"}</th>
+                                <th style={{border: "1px solid", width: "8%"}}>{d.fortificado ? "AL" : "CL"}</th>
                             </tr>
                             )) 
-                            : remitosView[remitoPage] && remitosView[remitoPage].map((d) => (
-                            <tr key={d.nro_remito} onClick={() => customCheck ? addRt(d.nro_remito) : setSelectedRemito(d)} style={{backgroundColor: colorChange(d.estado)}}>
+                            : remitosView[remitoPage] && remitosView[remitoPage].map((d,i) => (
+                            <tr key={i} onClick={() => customCheck ? addRt(d.nro_remito) : setSelectedRemito(d)} style={{backgroundColor: colorChange(d.estado)}}>
                                 <th style={{border: "1px solid", width: "20%"}}>{d.nro_remito}</th>
                                 <th style={{border: "1px solid", width: "20%"}}>{d.localidad.toUpperCase()}</th>
                                 <th style={{border: "1px solid", width: "20%"}}>{d.departamento}</th>
                                 <th style={{border: "1px solid", width: "20%"}}>{d.estado}</th>
                                 <th style={{border: "1px solid", width: "8%"}}>{d.reportes}</th>
                                 <th style={{border: "1px solid", width: "8%"}}>{d.factura ? "SI" : "NO"}</th>
+                                <th style={{border: "1px solid", width: "8%"}}>{d.fortificado ? "AL" : "CL"}</th>
 
                             </tr>
                             ))}

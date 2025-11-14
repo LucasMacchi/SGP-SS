@@ -117,7 +117,7 @@ const insumosDisplayer = (insumos: IDetalleEnvio[]) => {
     return elements
 }
 
-const pageContruct = (e: IrequestEnvio, copia: boolean) => (
+const pageContruct = (e: IrequestEnvio, copia: boolean,page: number) => (
         <Page size={'A4'} style={stylePedido.page}>
             <Image src={logoBig} style={stylePedido.logo}/>
             <View style={stylePedido.viewdataHeader}>
@@ -127,6 +127,7 @@ const pageContruct = (e: IrequestEnvio, copia: boolean) => (
                 <View >
                     <Text style={stylePedido.subtitle}>Junin 766 Piso 2 Oficina 4</Text>
                     <Text style={stylePedido.subtitle}>Corrientes, Corrientes, Argentina</Text>
+                    <Text style={stylePedido.subtitle}>Hoja {page}</Text>
                 </View>
             </View>
             <View style={stylePedido.viewdata}>
@@ -172,10 +173,13 @@ const pageContruct = (e: IrequestEnvio, copia: boolean) => (
 
 const DesglosePdf: React.FC<desglosesDataPdf> = ({envios}) => (
     <Document>
-        {envios.flatMap((e) => [
-            pageContruct(e,false),
-            pageContruct(e,true)
-        ])}
+        {envios.flatMap((e,i) => {
+            const hojC = i + 1
+            return[
+            pageContruct(e,false,hojC),
+            pageContruct(e,true,hojC)
+            ]
+        })}
 
     </Document>
 )
