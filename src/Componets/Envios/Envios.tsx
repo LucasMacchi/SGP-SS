@@ -8,7 +8,7 @@ import createTxtEnvio from "../../Utils/createTxtEnvio";
 import RutaPdf from "../pdfs/rutaEnvioPdf";
 import ActaConformidadPDF from "../pdfs/actaConformidad";
 import ExcelParserEnvios from "../../Utils/excelParser";
-import { IChangeEnvioInsumo, IChangeEnvioInsumoPlan, ICreateFactura, ICreateInsumo, IDesglosesReturner, IEnvioInsumos, ILentrega, IPlanComplete, IRemitosEnvio, IReportEnvio, IrequestEnvioCom, rolesNum } from "../../Utils/Interfaces";
+import { IChangeEnvioInsumo, IChangeEnvioInsumoPlan, ICreateFactura, ICreateInsumo, IDesglosesReturner, IEnvioInsumos, IEXCELFacturacionDataInforme, IEXCELRemitosEnvio, ILentrega, IPlanComplete, IRemitosEnvio, IReportEnvio, IrequestEnvioCom, rolesNum } from "../../Utils/Interfaces";
 import informeEnviosTxt from "../../Utils/informeEnviosTxt";
 import RemitoEnvioPdf from "../pdfs/remitoEnvio";
 import InformeFacturacionPDF from "../pdfs/facturacionInformepdf";
@@ -16,6 +16,7 @@ import paletPrevisualizer from "../../Utils/paletPrevisualizer";
 import desglosesParser from "../../Utils/desglosesParser";
 import refillEmptySpace from "../../Utils/refillEmptySpace";
 import reportesCategoriasJSON from "./reporteCategorias.json";
+import * as XLSX from 'xlsx';
 
 
 export default function Envios () {
@@ -642,6 +643,34 @@ export default function Envios () {
                 else alert("No existe remitos en esta factura.")
             }
         }
+
+        const informeFacturacionEXCEL = async () => {
+            if(global && createFactura.factura_cod1.length > 0 && createFactura.factura_cod2.length > 0) {
+                const format = refillEmptySpace(5,parseInt(createFactura.factura_cod1))+"-"+refillEmptySpace(8,parseInt(createFactura.factura_cod2))
+                const informFac = await global.getFacturaInfFn(format)
+                if(informFac.length > 0) {
+                    const data: IEXCELFacturacionDataInforme[] = []
+                    informFac.forEach(inf => {
+                        data.push({
+                            REMITO: inf.remito,
+                            CABECERA: inf.cabecera,
+                            LOCALIDAD: inf.localidad,
+                            DEPARTAMENTO: inf.departamento,
+                            FORTIFICADO: inf.fortificado,
+                            RACIONES: inf.raciones,
+                            MONTO: inf.amount,
+                            FECHA: inf.fecha.split("T")[0]
+                        })
+                        
+                    });
+                    const worksheet = XLSX.utils.json_to_sheet(data)
+                    const workbook = XLSX.utils.book_new()
+                    XLSX.utils.book_append_sheet(workbook,worksheet,format)
+                    XLSX.writeFile(workbook,'INFORME_FACTURA.xlsx')
+                }
+            }
+            else alert("No existe remitos en esta factura.")
+        }
         return(
             <div>
                 <hr color='#3399ff' className='hr-line'/>
@@ -670,7 +699,8 @@ export default function Envios () {
                         <input type="number" value={createFactura.factura_cod2} style={{width: 80}} onChange={(e) => setCreateFactura({...createFactura, factura_cod2:e.target.value})}/>
                     </div>
                     <div>
-                        {(createFactura.factura_cod1.length > 0 && createFactura.factura_cod2.length > 0) && <button className='btn-big' onClick={() => informeFacturacion()}>Informe Factura</button>}
+                        {(createFactura.factura_cod1.length > 0 && createFactura.factura_cod2.length > 0) && <button className='btn-export-pdf' onClick={() => informeFacturacion()}>Informe Factura PDF</button>}
+                        {(createFactura.factura_cod1.length > 0 && createFactura.factura_cod2.length > 0) && <button className='btn-export-pdf' onClick={() => informeFacturacionEXCEL()}>Informe Factura EXCEL</button>}
                     </div>
 
                 </div>
@@ -961,6 +991,42 @@ export default function Envios () {
             }
         }
 
+        const parseRemitosExcel = (data: IRemitosEnvio[]) => {
+            const dataParsed: IEXCELRemitosEnvio[] = []
+            data.forEach(d => {
+                dataParsed.push({
+                    REMITO:d.nro_remito,
+                    COMPLETO: d.completo,
+                    DEPARTAMENTO: d.departamento,
+                    LOCALIDAD: d.localidad,
+                    ESTADO: d.estado,
+                    FECHA: d.fecha,
+                    ULTIMA_MODIFICACION: d.ultima_mod,
+                    DIAS: d.dias,
+                    FORTIFICADO: d.fortificado,
+                    FACTURA: d.factura
+                })
+            });
+            const worksheet = XLSX.utils.json_to_sheet(dataParsed)
+            const workbook = XLSX.utils.book_new()
+            XLSX.utils.book_append_sheet(workbook,worksheet,"REMITOS")
+            XLSX.writeFile(workbook,'INFORME_REMITOS.xlsx')
+        }
+
+        const donwloadExcel = () => {
+            if(filteredRemitosView.length > 0) {
+                parseRemitosExcel(filteredRemitosView)
+            }
+            else {
+                let totalRemitos: IRemitosEnvio[] = []
+                remitosView.forEach(rtv => {
+                    rtv.forEach((rts) => totalRemitos.push(rts))
+                });
+                parseRemitosExcel(totalRemitos)
+            }
+
+        }
+
 
         const searchRemitoFn = () => {
             setSearchRemito("")
@@ -1180,6 +1246,7 @@ export default function Envios () {
                                 </div>
                             <button className='btn-export-pdf' onClick={() => searchRemitoFn()}>BUSCAR</button>
                             <button className='btn-export-pdf' onClick={() => setFilteredRemitosView([])}>BORRAR</button>
+                            <button className='btn-export-pdf' onClick={() => donwloadExcel()}>EXCEL</button>
                         </div>
                     )}
                     <div style={{overflow: "scroll",width: "auto", minHeight: 600,maxHeight: 800}}>
