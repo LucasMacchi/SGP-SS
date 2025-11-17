@@ -64,6 +64,7 @@ export default function Envios () {
     const [currentPlan, setCurrentPlan] = useState(0)
     const [limitCallRts, setLimitCallRts] = useState(300)
     const [Crt, setCRt] = useState("")
+    const [loadingRts, setLoadingRts] = useState(false)
     const [createInsumo, setCreateIns] = useState<ICreateInsumo>({
         des: "",caja_palet: 0,unidades_caja: 0,gr_racion: 0,gr_total: 0,racbolsa: 0,raccaja: 0,cod1:"",cod2:""
     })
@@ -1174,9 +1175,13 @@ export default function Envios () {
             setCustomRt(arr)
             setUpdater(updater+1)
         }
-        const changeLimit = () => {
-            if(global) global.getEnviosRemitos(limitCallRts).then(rts => setRemitosView(rts))
-            setRemitoPage(0)
+        const changeLimit = async () => {
+            setLoadingRts(true)
+            if(global) {
+                await global.getEnviosRemitos(limitCallRts).then(rts => setRemitosView(rts))
+                setLoadingRts(false)
+                setRemitoPage(0)
+            }
         }
         return (
             <div>
@@ -1332,6 +1337,9 @@ export default function Envios () {
                             <button className='btn-export-pdf' onClick={() => donwloadExcel()}>EXCEL</button>
                         </div>
                     )}
+                    {loadingRts ? 
+                    <h4 className='title-Homepage'>CARGANDO...</h4>
+                    : (
                     <div style={{overflow: "scroll",width: "auto", minHeight: 600,maxHeight: 800}}>
                     <table style={{fontSize: 9, width: "100%", tableLayout: "fixed", textOverflow: "ellipsis"}}>
                         <tbody>
@@ -1371,6 +1379,8 @@ export default function Envios () {
                         </tbody>
                     </table>
                     </div>
+                    )}
+
                     {filteredRemitosView.length === 0 && (
                     <div style={{display: "flex", justifyContent: "center"}}>
                         {remitoPage > 0 && <button className='btn-export-pdf' onClick={() => setRemitoPage(remitoPage - 1)}>{"<---"}</button>}
