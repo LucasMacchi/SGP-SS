@@ -589,7 +589,8 @@ export interface IRemitosEnvio {
     reportes: number,
     fecha: string | null,
     fortificado: boolean,
-    factura: string | null
+    factura: string | null,
+    raciones: number
 }
 
 export interface IFacturacionData {
@@ -614,7 +615,7 @@ export interface IEXCELFacturacionDataInforme {
     LOCALIDAD:string,
     DEPARTAMENTO:string,
     FECHA: string,
-    FORTIFICADO: boolean
+    TIPO: string
     MONTO: number,
     RACIONES: number,
 }
@@ -628,14 +629,49 @@ export interface IEXCELRemitosEnvio {
     FECHA: string | null,
     ULTIMA_MODIFICACION: string,
     DIAS: number,
-    FORTIFICADO: boolean,
-    FACTURA: string | null
+    TIPO: string,
+    FACTURA: string | null,
+    RACIONES: number
 }
 
 export interface IFacturacionDataInformePDF {
     data: IFacturacionDataInforme[],
     title: string,
     fecha: string
+}
+
+export interface IMovimientos {
+    insumo: string,
+    raciones: string,
+    unidades: string
+}
+
+export interface IEXCELMovimientos {
+    INSUMO: string,
+    RACIONES: string,
+    UNIDADES: string
+}
+
+export interface ITotalEnviosInforme {
+    nro_remito: string,
+    lentrega_id: number,
+    completo: string,
+    dependencia: string,
+    fecha_created: string,
+    estado: string,
+    tanda: number,
+    fortificado: boolean | null
+}
+
+export interface IEXCELTotalEnviosInforme {
+    REMITO: string,
+    ENTREGA: number,
+    COMPLETO: string,
+    DEPENDENCIA: string,
+    FECHA: string,
+    ESTADO: string,
+    TANDA: number,
+    TIPO: string
 }
 
 export type TRemitoEnvio = ""

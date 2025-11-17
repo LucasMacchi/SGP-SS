@@ -21,12 +21,15 @@ import {
   IEmailSender,
   IEnvio,
   IEnvioInsumos,
+  IEXCELMovimientos,
+  IEXCELTotalEnviosInforme,
   IFacturacionData,
   IFacturacionDataInforme,
   IFilter,
   IInsumoComp,
   ILgarEntrega,
   ILugaresResponse,
+  IMovimientos,
   IOrderRemito,
   IPedido,
   IPersonal,
@@ -42,6 +45,7 @@ import {
   IResponseRutas,
   IServicio,
   IToken,
+  ITotalEnviosInforme,
   ITxtEnvios,
   IUser,
   rolesNum,
@@ -1331,6 +1335,45 @@ export default function GlobalState(props: IPropsChildren) {
         return []
       }
     }
+    async function getMovimientosFn(start: string, end: string): Promise<IEXCELMovimientos[]> {
+      try {
+        const data: IMovimientos[] = (await axios.get(SERVER+`/envios/movimientos/${start}/${end}`,authReturner())).data
+        const dataParsed:IEXCELMovimientos[] = []
+        data.forEach(d => {
+          dataParsed.push({
+            INSUMO: d.insumo,
+            RACIONES: d.raciones,
+            UNIDADES: d.unidades
+          })
+        });
+        return dataParsed
+      } catch (error) {
+        console.log(error);
+        return []
+      }
+    }
+    async function getEnviosTotalExclFn(): Promise<IEXCELTotalEnviosInforme[]> {
+      try {
+        const data: ITotalEnviosInforme[] = (await axios.get(SERVER+`/envios/total/informe`,authReturner())).data
+        const dataParsed:IEXCELTotalEnviosInforme[] = []
+        data.forEach(d => {
+          dataParsed.push({
+            REMITO: d.nro_remito,
+            ENTREGA: d.lentrega_id,
+            COMPLETO: d.completo,
+            DEPENDENCIA: d.dependencia,
+            FECHA: d.fecha_created.split("T")[0],
+            ESTADO: d.estado,
+            TANDA: d.tanda,
+            TIPO: d.fortificado ? "AL" : "CL"
+          })
+        });
+        return dataParsed
+      } catch (error) {
+        console.log(error);
+        return []
+      }
+    }
 
   
   
@@ -1486,7 +1529,9 @@ export default function GlobalState(props: IPropsChildren) {
     checkRemitoFacturacionFn,
     getFacturaCountFn,
     getFacturaInfFn,
-    changeEnviosStateRemitosMultiple
+    changeEnviosStateRemitosMultiple,
+    getMovimientosFn,
+    getEnviosTotalExclFn
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1618,4 +1663,6 @@ interface IGlobalContext {
   getFacturaCountFn: (factura: string) => Promise<IFacturacionData>;
   getFacturaInfFn: (factura: string) => Promise<IFacturacionDataInforme[]>;
   changeEnviosStateRemitosMultiple: (state: string, remitos: string[]) => Promise<void>;
+  getMovimientosFn: (start: string, end: string) => Promise<IEXCELMovimientos[]>;
+  getEnviosTotalExclFn: () => Promise<IEXCELTotalEnviosInforme[]>;
 }
