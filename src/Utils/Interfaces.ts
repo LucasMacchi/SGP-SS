@@ -674,4 +674,26 @@ export interface IEXCELTotalEnviosInforme {
     TIPO: string
 }
 
+export interface IDateExport {
+    lentrega_id: number,
+    completo: string,
+    dependencia: string,
+    localidad: string,
+    direccion: string,
+    nro_remito: string,
+    fecha_created: string,
+    tanda: number
+}
+
+export interface IEXCELDateExport {
+    REMITO: string,
+    ENTREGA: number,
+    COMPLETO: string,
+    DEPENDENCIA: string,
+    LOCALIDAD: string,
+    DIRECCION: string,
+    FECHA: string,
+    TANDA: number
+}
+
 export type TRemitoEnvio = ""
