@@ -17,10 +17,12 @@ import {
   ICompraDto,
   IConformidad,
   ICreateInsumo,
+  IDateExport,
   IDesglose,
   IEmailSender,
   IEnvio,
   IEnvioInsumos,
+  IEXCELDateExport,
   IEXCELMovimientos,
   IEXCELTotalEnviosInforme,
   IFacturacionData,
@@ -1013,6 +1015,15 @@ export default function GlobalState(props: IPropsChildren) {
         return null
       }
     }
+    async function getCurrentPlan(): Promise<number | null> {
+      try {
+        const ruta: number = (await axios.get(SERVER+`/envios/plan`,authReturner())).data
+        return ruta
+      } catch (error) {
+        console.log(error);
+        return null
+      }
+    }
     async function getLastRt(): Promise<number | null> {
       try {
         const ruta: number = (await axios.get(SERVER+`/envios/rt`,authReturner())).data
@@ -1095,9 +1106,9 @@ export default function GlobalState(props: IPropsChildren) {
         return []
       }
     }
-    async function getEnviosRemitos (): Promise<IRemitosEnvio[][]> {
+    async function getEnviosRemitos (limit: number): Promise<IRemitosEnvio[][]> {
       try {
-        const response: IRemitosEnvio[] = (await axios.get(SERVER+`/envios/remitos`,authReturner())).data
+        const response: IRemitosEnvio[] = (await axios.get(SERVER+`/envios/remitos/${limit}`,authReturner())).data
         const pages: IRemitosEnvio[][] = []
         const paginasCount = 100
         for (let i = 0; i < response.length; i += paginasCount) {
@@ -1202,10 +1213,23 @@ export default function GlobalState(props: IPropsChildren) {
         alert("Error al agregar insumo al plan.");
       }
     }
-    async function getInformeDate (fecha: string): Promise<string[]> {
+    async function getInformeDate (fecha: string): Promise<IEXCELDateExport[]> {
       try {
-        const response: string[] = (await axios.get(SERVER+`/envios/informe/${fecha}`,authReturner())).data
-        return response
+        const response: IDateExport[] = (await axios.get(SERVER+`/envios/informe/${fecha}`,authReturner())).data
+        const parsedData: IEXCELDateExport[] = []
+        response.forEach(r => {
+          parsedData.push({
+            REMITO: r.nro_remito,
+            ENTREGA: r.lentrega_id,
+            COMPLETO: r.completo,
+            DEPENDENCIA: r.dependencia,
+            LOCALIDAD: r.localidad,
+            DIRECCION: r.direccion,
+            FECHA: r.fecha_created.split("T")[0],
+            TANDA: r.tanda
+          })
+        });
+        return parsedData
       } catch (error) {
         console.log(error);
         return []
@@ -1531,7 +1555,8 @@ export default function GlobalState(props: IPropsChildren) {
     getFacturaInfFn,
     changeEnviosStateRemitosMultiple,
     getMovimientosFn,
-    getEnviosTotalExclFn
+    getEnviosTotalExclFn,
+    getCurrentPlan
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1641,7 +1666,7 @@ interface IGlobalContext {
   addPlan: (des: string, dias: number) => Promise<void>;
   getPv:() => Promise<number | null>;
   getLastRt:() => Promise<number | null>;
-  getInformeDate: (fecha: string) => Promise<string[]>;
+  getInformeDate: (fecha: string) => Promise<IEXCELDateExport[]>;
   getRemitosData: (start: number, end: number,pv: number) => Promise<IRemitoEnvio[]>;
   getCai: () => Promise<number | null>;
   getFinTalo: () => Promise<number | null>;
@@ -1652,7 +1677,7 @@ interface IGlobalContext {
   getRutaEnvioCustom: (remitos: string[]) => Promise<IResponseRutas | null>;
   getRemitosDataCustom: (remitos: string[]) => Promise<IRemitoEnvio[]>;
   getConformidadEnvioCustom: (remitos: string[]) => Promise<IConformidad[]>;
-  getEnviosRemitos: () => Promise<IRemitosEnvio[][]>;
+  getEnviosRemitos: (limit: number) => Promise<IRemitosEnvio[][]>;
   changeEnviosStateRemitos: (state: string, remito: string,date?:string) => void;
   lugaresDeEntrega: () => Promise<ILgarEntrega[]>;
   getReportesEnvio: (remito: string) => Promise<IReportEnvio[]>;
@@ -1665,4 +1690,5 @@ interface IGlobalContext {
   changeEnviosStateRemitosMultiple: (state: string, remitos: string[]) => Promise<void>;
   getMovimientosFn: (start: string, end: string) => Promise<IEXCELMovimientos[]>;
   getEnviosTotalExclFn: () => Promise<IEXCELTotalEnviosInforme[]>;
+  getCurrentPlan: () => Promise<number | null>;
 }

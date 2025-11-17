@@ -61,6 +61,8 @@ export default function Envios () {
     const [searchPv, setSearchPv] = useState("")
     const [searchState, setSearchState] = useState("")
     const [searchFac, setSearchFac] = useState(0)
+    const [currentPlan, setCurrentPlan] = useState(0)
+    const [limitCallRts, setLimitCallRts] = useState(300)
     const [Crt, setCRt] = useState("")
     const [createInsumo, setCreateIns] = useState<ICreateInsumo>({
         des: "",caja_palet: 0,unidades_caja: 0,gr_racion: 0,gr_total: 0,racbolsa: 0,raccaja: 0,cod1:"",cod2:""
@@ -80,7 +82,8 @@ export default function Envios () {
             global.getLastRt().then(rt => setLastRt(rt ? rt : 0))
             global.getFinTalo().then(end => setEndTal(end ? end : 0))
             global.getDepartamentos().then(dep => setDepartamentos(dep))
-            global.getEnviosRemitos().then(rts => setRemitosView(rts))
+            global.getEnviosRemitos(limitCallRts).then(rts => setRemitosView(rts))
+            global.getCurrentPlan().then(p => setCurrentPlan(p ? p : 0))
         }
     },[])
 
@@ -619,10 +622,12 @@ export default function Envios () {
     }
     const displayInformes = () => {
         const getInformeFecha = async () => {
-            const lienas = await global?.getInformeDate(fecha)
-            if(lienas) {
-                setFecha("")
-                informeEnviosTxt(lienas)
+            if(global) {
+                const data = await global.getInformeDate(fecha)
+                const worksheet = XLSX.utils.json_to_sheet(data)
+                const workbook = XLSX.utils.book_new()
+                XLSX.utils.book_append_sheet(workbook,worksheet,"ENVIOS")
+                XLSX.writeFile(workbook,`INFORME_${fecha}.xlsx`)
             }
         }
         const informeFacturacion = async () => {
@@ -711,7 +716,7 @@ export default function Envios () {
                         style={{width: "35%"}} onChange={(e) => setFecha(e.target.value)}/>
                     </div>
                     <div>
-                        {fecha && <button className='btn-big' onClick={() => getInformeFecha()}>Informe fecha</button>}
+                        {fecha && <button className='btn-export-pdf' onClick={() => getInformeFecha()}>Informe fecha</button>}
                     </div>
 
                 </div>
@@ -795,6 +800,10 @@ export default function Envios () {
                     <div>
                         <h4 className='title-Homepage'>Fecha de Vencimiento: {venc}</h4>
                         <button className='btn-export-pdf' onClick={() => modData(5)}>Modificar</button>
+                    </div>
+                    <div>
+                        <h4 className='title-Homepage'>Plan actual: {currentPlan}</h4>
+                        <button className='btn-export-pdf' onClick={() => modData(8)}>Modificar</button>
                     </div>
                 </div>
             </div>
@@ -1164,13 +1173,30 @@ export default function Envios () {
             setCustomRt(arr)
             setUpdater(updater+1)
         }
-
+        const changeLimit = () => {
+            if(global) global.getEnviosRemitos(limitCallRts).then(rts => setRemitosView(rts))
+        }
         return (
             <div>
                 <hr color='#3399ff' className='hr-line'/>
                     <h2 className='title-Homepage' >
                         Remitos 
                     </h2>
+                    <div>
+                        <h4 className='title-Homepage'>Categoria:</h4>
+                        <select name="plan" className='filter-sub' value={limitCallRts} onChange={(e) => setLimitCallRts(parseInt(e.target.value))}>
+                            <option key={50} value={50}>50</option>
+                            <option key={100} value={100}>100</option>
+                            <option key={300} value={300}>300</option>
+                            <option key={600} value={600}>600</option>
+                            <option key={900} value={900}>900</option>
+                            <option key={1200} value={1200}>1200</option>
+                            <option key={1500} value={1500}>1500</option>
+                            <option key={1800} value={1800}>1800</option>
+                            <option key={2100} value={2100}>2100</option>
+                        </select>
+                        <button className='btn-export-pdf' onClick={() => changeLimit()}>CAMBIAR</button>
+                    </div>
                     <hr color='#3399ff' className='hr-line'/>
                     <div style={{minHeight: 80, marginLeft: 80}}>
                         {selectedRemito && (
