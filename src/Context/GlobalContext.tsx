@@ -1111,10 +1111,18 @@ export default function GlobalState(props: IPropsChildren) {
         const response: IRemitosEnvio[] = (await axios.get(SERVER+`/envios/remitos/${limit}`,authReturner())).data
         const pages: IRemitosEnvio[][] = []
         const paginasCount = 100
-        for (let i = 0; i < response.length; i += paginasCount) {
-          const arr = response.slice(i,i + paginasCount)
-          pages.push(arr)
+        if(response.length > paginasCount) {
+          for (let i = 0; i < response.length; i += paginasCount) {
+            const arr = response.slice(i,i + paginasCount)
+            pages.push(arr)
+          }
         }
+        else {
+          for (let i = 0; i < response.length; i += paginasCount) {
+            pages.push(response)
+          }
+        }
+
         return pages
       } catch (error) {
         console.log(error);
