@@ -68,6 +68,7 @@ export default function Envios () {
     const [createFactura, setCreateFactura] = useState<ICreateFactura>({
         factura_cod1: "",factura_cod2:"",remitos:[],fecha:""
     })
+    const [movFechas,setMovFechas] = useState({start: "",end:""})
     useEffect(() => {
         if(global) {
             global?.sessionFn()
@@ -84,6 +85,8 @@ export default function Envios () {
     },[])
 
     useEffect(() => {
+        setMovFechas({start: "",end:""})
+        setCreateFactura({factura_cod1: "",factura_cod2:"",remitos:[],fecha:""})
         setDelkey("")
         setTanda(0)
         setSelectedPlan(1000)
@@ -656,7 +659,7 @@ export default function Envios () {
                             CABECERA: inf.cabecera,
                             LOCALIDAD: inf.localidad,
                             DEPARTAMENTO: inf.departamento,
-                            FORTIFICADO: inf.fortificado,
+                            TIPO: inf.fortificado ? "AL" : "CL",
                             RACIONES: inf.raciones,
                             MONTO: inf.amount,
                             FECHA: inf.fecha.split("T")[0]
@@ -666,18 +669,42 @@ export default function Envios () {
                     const worksheet = XLSX.utils.json_to_sheet(data)
                     const workbook = XLSX.utils.book_new()
                     XLSX.utils.book_append_sheet(workbook,worksheet,format)
-                    XLSX.writeFile(workbook,'INFORME_FACTURA.xlsx')
+                    XLSX.writeFile(workbook,'INFORME_FACTURA_'+format+'.xlsx')
                 }
             }
             else alert("No existe remitos en esta factura.")
+        }
+
+        const informeMovimientos = async () => {
+            if(global && movFechas.start.length > 0 && movFechas.end.length > 0) {
+                const data = await global.getMovimientosFn(movFechas.start,movFechas.end)
+                const worksheet = XLSX.utils.json_to_sheet(data)
+                worksheet["D1"] = {t: "s",v:"FECHA INICIO"}
+                worksheet["D2"] = {t: "s",v:movFechas.start}
+                worksheet["E1"] = {t: "s",v:"FECHA FINAL"}
+                worksheet["E2"] = {t: "s",v:movFechas.end}
+                const workbook = XLSX.utils.book_new()
+                XLSX.utils.book_append_sheet(workbook,worksheet,"MOVIMIENTOS")
+                XLSX.writeFile(workbook,'INFORME_MOV.xlsx')
+            }
+            else alert("Ingrese ambas fechas")
+        }
+        const informeEnviosTotal = async () => {
+            if(global) {
+                const data = await global.getEnviosTotalExclFn()
+                const worksheet = XLSX.utils.json_to_sheet(data)
+                const workbook = XLSX.utils.book_new()
+                XLSX.utils.book_append_sheet(workbook,worksheet,"ENVIOS")
+                XLSX.writeFile(workbook,'INFORME_ENVIOS.xlsx')
+            }
         }
         return(
             <div>
                 <hr color='#3399ff' className='hr-line'/>
                 <div>
-                    <h2 className='title-Homepage' >
+                    <h4 className='title-Homepage' >
                         Generar informes de Envio 
-                    </h2>
+                    </h4>
                     <div>
                         <h4 className='title-Homepage'>Ingrese la fecha</h4>
                         <input type="date" id='otherins' className="data-div-select" value={fecha}
@@ -688,10 +715,11 @@ export default function Envios () {
                     </div>
 
                 </div>
+                <hr color='#3399ff' className='hr-line'/>
                 <div>
-                    <h2 className='title-Homepage' >
+                    <h4 className='title-Homepage' >
                         Generar informes de Facturacion 
-                    </h2>
+                    </h4>
                     <div style={{display: "flex", justifyContent: "center", height: 25, alignItems: "center"}}>
                         <h5 className='title-Homepage'>Factura: </h5>
                         <input type="number" value={createFactura.factura_cod1} style={{width: 40}} onChange={(e) => setCreateFactura({...createFactura, factura_cod1:e.target.value})}/>
@@ -701,6 +729,32 @@ export default function Envios () {
                     <div>
                         {(createFactura.factura_cod1.length > 0 && createFactura.factura_cod2.length > 0) && <button className='btn-export-pdf' onClick={() => informeFacturacion()}>Informe Factura PDF</button>}
                         {(createFactura.factura_cod1.length > 0 && createFactura.factura_cod2.length > 0) && <button className='btn-export-pdf' onClick={() => informeFacturacionEXCEL()}>Informe Factura EXCEL</button>}
+                    </div>
+
+                </div>
+                <hr color='#3399ff' className='hr-line'/>
+                <div>
+                    <h4 className='title-Homepage' >
+                        Generar informes de Movimiento 
+                    </h4>
+                    <div style={{display: "flex", justifyContent: "center", height: 25, alignItems: "center"}}>
+                        <h5 className='title-Homepage'>Fechas: </h5>
+                        <input type="date" value={movFechas.start} style={{width: 80}} onChange={(e) => setMovFechas({...movFechas, start:e.target.value})}/>
+                        <h5 className='title-Homepage'>-</h5>
+                        <input type="date" value={movFechas.end} style={{width: 80}} onChange={(e) => setMovFechas({...movFechas, end:e.target.value})}/>
+                    </div>
+                    <div>
+                        {(movFechas.start.length > 0 && movFechas.end.length > 0) && <button className='btn-export-pdf' onClick={() => informeMovimientos()}>Informe Movimientos EXCEL</button>}
+                    </div>
+
+                </div>
+                <hr color='#3399ff' className='hr-line'/>
+                <div>
+                    <h4 className='title-Homepage' >
+                        Generar informes de Envios 
+                    </h4>
+                    <div>
+                        {<button className='btn-export-pdf' onClick={() => informeEnviosTotal()}>Informe de Envios EXCEL</button>}
                     </div>
 
                 </div>
@@ -1000,11 +1054,12 @@ export default function Envios () {
                     DEPARTAMENTO: d.departamento,
                     LOCALIDAD: d.localidad,
                     ESTADO: d.estado,
-                    FECHA: d.fecha,
+                    FECHA: d.fecha ? d.fecha.split("T")[0] : "",
                     ULTIMA_MODIFICACION: d.ultima_mod,
                     DIAS: d.dias,
-                    FORTIFICADO: d.fortificado,
-                    FACTURA: d.factura
+                    TIPO: d.fortificado ? "AL" : "CL",
+                    FACTURA: d.factura,
+                    RACIONES: d.raciones
                 })
             });
             const worksheet = XLSX.utils.json_to_sheet(dataParsed)
