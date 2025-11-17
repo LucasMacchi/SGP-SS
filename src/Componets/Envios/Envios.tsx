@@ -1063,8 +1063,9 @@ export default function Envios () {
                     DEPARTAMENTO: d.departamento,
                     LOCALIDAD: d.localidad,
                     ESTADO: d.estado,
-                    FECHA: d.fecha ? d.fecha.split("T")[0] : "",
-                    ULTIMA_MODIFICACION: d.ultima_mod,
+                    FECHA: d.fecha.split("T")[0],
+                    FECHA_ENTREGA: d.fecha_entrega ? d.fecha_entrega.split("T")[0] : "",
+                    ULTIMA_MODIFICACION: d.ultima_mod.split("T")[0],
                     DIAS: d.dias,
                     TIPO: d.fortificado ? "AL" : "CL",
                     FACTURA: d.factura,
@@ -1175,6 +1176,7 @@ export default function Envios () {
         }
         const changeLimit = () => {
             if(global) global.getEnviosRemitos(limitCallRts).then(rts => setRemitosView(rts))
+            setRemitoPage(0)
         }
         return (
             <div>

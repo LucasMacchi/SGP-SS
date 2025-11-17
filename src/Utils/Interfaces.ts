@@ -587,7 +587,8 @@ export interface IRemitosEnvio {
     ultima_mod: string,
     dias: number,
     reportes: number,
-    fecha: string | null,
+    fecha: string,
+    fecha_entrega: string | null,
     fortificado: boolean,
     factura: string | null,
     raciones: number
@@ -626,12 +627,13 @@ export interface IEXCELRemitosEnvio {
     DEPARTAMENTO: string,
     LOCALIDAD: string,
     ESTADO: string,
-    FECHA: string | null,
+    FECHA: string,
+    FECHA_ENTREGA: string | null,
     ULTIMA_MODIFICACION: string,
     DIAS: number,
     TIPO: string,
     FACTURA: string | null,
-    RACIONES: number
+    RACIONES: number,
 }
 
 export interface IFacturacionDataInformePDF {
