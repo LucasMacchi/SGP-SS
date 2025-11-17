@@ -1128,6 +1128,15 @@ export default function GlobalState(props: IPropsChildren) {
         return []
       }
     }
+    async function getEnvioRemitoUniq (remito: string): Promise<IRemitosEnvio | null> {
+      try {
+        const response: IRemitosEnvio = (await axios.get(SERVER+`/envios/uniq/remito/${remito}`,authReturner())).data
+        return response
+      } catch (error) {
+        console.log(error);
+        return null
+      }
+    }
     async function changeEnviosStateRemitos (state: string, remito: string,date?:string) {
       try {
         const dateP = (date && date.length > 0) ? "/"+date : "/non"
@@ -1563,7 +1572,8 @@ export default function GlobalState(props: IPropsChildren) {
     changeEnviosStateRemitosMultiple,
     getMovimientosFn,
     getEnviosTotalExclFn,
-    getCurrentPlan
+    getCurrentPlan,
+    getEnvioRemitoUniq
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1698,4 +1708,5 @@ interface IGlobalContext {
   getMovimientosFn: (start: string, end: string) => Promise<IEXCELMovimientos[]>;
   getEnviosTotalExclFn: () => Promise<IEXCELTotalEnviosInforme[]>;
   getCurrentPlan: () => Promise<number | null>;
+  getEnvioRemitoUniq: (remito: string) => Promise<IRemitosEnvio | null>
 }

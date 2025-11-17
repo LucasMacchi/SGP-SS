@@ -1100,11 +1100,6 @@ export default function Envios () {
             remitosView.forEach(rtv => {
                 rtv.forEach((rts) => totalRemitos.push(rts))
             });
-            if(searchRemito.length > 0 && searchPv.length > 0) {
-                const format = refillEmptySpace(5,parseInt(searchPv))+"-"+refillEmptySpace(8,parseInt(searchRemito))
-                console.log(format)
-                totalRemitos = totalRemitos.filter(rts => rts.nro_remito === format)
-            }
             if(searchState.length > 0) {
                 totalRemitos = totalRemitos.filter(rts => rts.estado === searchState)
             }
@@ -1181,6 +1176,18 @@ export default function Envios () {
                 await global.getEnviosRemitos(limitCallRts).then(rts => setRemitosView(rts))
                 setLoadingRts(false)
                 setRemitoPage(0)
+            }
+        }
+        const getUniqRemito = async () => {
+            if(searchRemito.length > 0 && searchPv.length > 0 && global) {
+                const format = refillEmptySpace(5,parseInt(searchPv))+"-"+refillEmptySpace(8,parseInt(searchRemito))
+                const response = await global.getEnvioRemitoUniq(format)
+                if(response) {
+                    setSelectedRemito(response)
+                }
+                else alert("Remito inexistente")
+                setSearchRemito("")
+                setSearchPv("")
             }
         }
         return (
@@ -1273,10 +1280,6 @@ export default function Envios () {
                         )}
                     </div>
                     <hr color='#3399ff' className='hr-line'/>
-                    <div style={{display: "flex", justifyContent: "center"}}>
-                        <h4 className='title-Homepage'>Seleccion de remitos:</h4>
-                        <input type="checkbox" checked={customCheck} onChange={(e) => setCustomCheck(e.target.checked)}/>
-                    </div>
                     {customRt.length > 0 && (
                         <div>
                             <h5 className='title-Homepage'>Seleccion el nuevo estado:</h5>
@@ -1304,10 +1307,12 @@ export default function Envios () {
 
                     )}
                     {!customCheck && (
-                        <div >
-                            <h4 className='title-Homepage' style={{alignContent: "center"}}>REMITO</h4>
+                        <div>
+                            <h4 className='title-Homepage' style={{alignContent: "center"}}>BUSCAR REMITO</h4>
                             <input type="number" value={searchPv} className="data-div-select" style={{width: 30}} onChange={(e) => setSearchPv(e.target.value)}/>
                             <input type="number" value={searchRemito} className="data-div-select" style={{width: 50}} onChange={(e) => setSearchRemito(e.target.value)}/>
+                            <button className='btn-export-pdf' onClick={() => getUniqRemito()}>BUSCAR</button>
+                            <hr color='#3399ff' className='hr-line'/>
                             <h4 className='title-Homepage'>Estado:</h4>
                                 <div style={{display: "flex", justifyContent: "center"}}>
                                     <select name="estados" value={searchState} onChange={(e) => setSearchState(e.target.value)}>
@@ -1337,6 +1342,10 @@ export default function Envios () {
                             <button className='btn-export-pdf' onClick={() => donwloadExcel()}>EXCEL</button>
                         </div>
                     )}
+                    <div style={{display: "flex", justifyContent: "center"}}>
+                        <h4 className='title-Homepage'>Seleccion de remitos:</h4>
+                        <input type="checkbox" checked={customCheck} onChange={(e) => setCustomCheck(e.target.checked)}/>
+                    </div>
                     {loadingRts ? 
                     <h4 className='title-Homepage'>CARGANDO...</h4>
                     : (
