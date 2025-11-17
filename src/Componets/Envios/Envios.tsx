@@ -1381,7 +1381,7 @@ export default function Envios () {
                     </div>
                     )}
 
-                    {filteredRemitosView.length === 0 && (
+                    {(filteredRemitosView.length === 0 && !loadingRts) && (
                     <div style={{display: "flex", justifyContent: "center"}}>
                         {remitoPage > 0 && <button className='btn-export-pdf' onClick={() => setRemitoPage(remitoPage - 1)}>{"<---"}</button>}
                         <h4 className='title-Homepage'>{remitoPage + 1}</h4>
