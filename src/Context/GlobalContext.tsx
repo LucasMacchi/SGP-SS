@@ -1355,6 +1355,16 @@ export default function GlobalState(props: IPropsChildren) {
         return false
       }
     }
+    async function getTxtOrdersRange(date1: string, date2:string): Promise<string[]> {
+      try {
+        const ruta: string[] = (await axios.get(SERVER+`/pedido/range/txt/${date1}/${date2}`,authReturner())).data
+
+        return ruta
+      } catch (error) {
+        console.log(error);
+        return []
+      }
+    }
 
     async function getFacturaCountFn(factura: string): Promise<IFacturacionData> {
       try {
@@ -1573,7 +1583,8 @@ export default function GlobalState(props: IPropsChildren) {
     getMovimientosFn,
     getEnviosTotalExclFn,
     getCurrentPlan,
-    getEnvioRemitoUniq
+    getEnvioRemitoUniq,
+    getTxtOrdersRange
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1708,5 +1719,6 @@ interface IGlobalContext {
   getMovimientosFn: (start: string, end: string) => Promise<IEXCELMovimientos[]>;
   getEnviosTotalExclFn: () => Promise<IEXCELTotalEnviosInforme[]>;
   getCurrentPlan: () => Promise<number | null>;
-  getEnvioRemitoUniq: (remito: string) => Promise<IRemitosEnvio | null>
+  getEnvioRemitoUniq: (remito: string) => Promise<IRemitosEnvio | null>;
+  getTxtOrdersRange: (date1: string, date2:string) => Promise<string[]>
 }
