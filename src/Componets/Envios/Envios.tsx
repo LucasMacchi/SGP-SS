@@ -1090,9 +1090,7 @@ export default function Envios () {
                 });
                 parseRemitosExcel(totalRemitos)
             }
-
         }
-
 
         const searchRemitoFn = () => {
             setSearchRemito("")
@@ -1116,20 +1114,21 @@ export default function Envios () {
         const changeState = async (remito: string, newstate: string) => {
             if(customCheck) {
                 if(confirm("Quieres cambiar el estado de los remitos a "+newstate+"?") && global && customDate.length > 0) {
-                    global.changeEnviosStateRemitosMultiple(newstate,customRt)
+                    await global.changeEnviosStateRemitosMultiple(newstate,customRt)
                     setCustomDate("")
                     setCustomRt([])
                 }
                 else alert("No se cambio el estado")
             }
             else {
-                if(confirm("Quieres cambiar el estado del remito "+remito+"?") && global) {
-                    global.changeEnviosStateRemitos(newstate,remito,customDate.length > 0 ? customDate : "" )
+                if(confirm("Quieres cambiar el estado del remito "+remito+"?") && global && selectedRemito) {
+                    await global.changeEnviosStateRemitos(newstate,remito,customDate.length > 0 ? customDate : "" )
                     remitosView.forEach(rts => {
                         rts.forEach(rt => {
                             if(rt.nro_remito === remito) rt.estado = newstate
                         });
                     });
+                    setSelectedRemito({...selectedRemito, estado: newstate})
                     setCustomDate("")
                     //setRemitosView(remitosView)
                     setUpdater(updater+1)
