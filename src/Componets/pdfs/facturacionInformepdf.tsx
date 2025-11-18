@@ -232,7 +232,7 @@ const informeFacturacionPDF: React.FC<IFacturacionDataInformePDF> = ({data,title
                     </View>
                     </View>
                 </View>
-                {insumosDisplayer(pages[0],paginasCount,false,amountTotal,racionesTotal,data.length)}
+                {insumosDisplayer(pages[0],paginasCount,pages.length === 1 ? true : false,amountTotal,racionesTotal,data.length)}
             </Page>
             {pages.map((d,i) => {
                 const isLast = i === pages.length - 1
