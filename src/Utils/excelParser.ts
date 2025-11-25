@@ -71,6 +71,7 @@ export default async function ExcelParserEnvios ( excel: File,insumos: IEnvioIns
             envio.entregaId = linea.lentrega
             envio.cue = linea.cue
             envio.dias = plan.dias
+            console.log(plan.dias)
             hojaData.push(envio)
         }
         else console.log("DATO NO VALIDO ",linea)
