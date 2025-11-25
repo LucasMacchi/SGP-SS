@@ -64,13 +64,13 @@ export default async function ExcelParserEnvios ( excel: File,insumos: IEnvioIns
                         })
                         
                     }
-                    envio.dias = p.dias
                 }
             });
         })
             envio.desglose = parsedDependencia
             envio.entregaId = linea.lentrega
             envio.cue = linea.cue
+            envio.dias = plan.dias
             hojaData.push(envio)
         }
         else console.log("DATO NO VALIDO ",linea)
