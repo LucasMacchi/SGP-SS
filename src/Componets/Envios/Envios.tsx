@@ -743,6 +743,20 @@ export default function Envios () {
                     <h4 className='title-Homepage' >
                         Generar informes de Movimiento 
                     </h4>
+                    <h4 className='title-Homepage'>Estado:</h4>
+                    <div style={{display: "flex", justifyContent: "center"}}>
+                        <select name="estados" value={searchState} onChange={(e) => setSearchState(e.target.value)}>
+                            <option value={""}>---</option>
+                            <option value={"PENDIENTE"}>PENDIENTE</option>
+                            <option value={"PREPARADO"}>PREPARADO</option>
+                            <option value={"DESPACHADO"}>DESPACHADO</option>
+                            <option value={"ENTREGADO"}>ENTREGADO</option> 
+                            <option value={"NO ENTREGADO"}>NO ENTREGADO</option>
+                            <option value={"EXTRAVIADO"}>EXTRAVIADO</option>
+                            <option value={"DEVOLUCION"}>DEVOLUCION</option>
+                            <option value={"ENTRADA"}>ENTRADA</option>
+                        </select>
+                    </div>
                     <div style={{display: "flex", justifyContent: "center", height: 25, alignItems: "center"}}>
                         <h5 className='title-Homepage'>Fechas: </h5>
                         <input type="date" value={movFechas.start} style={{width: 80}} onChange={(e) => setMovFechas({...movFechas, start:e.target.value})}/>
@@ -997,7 +1011,7 @@ export default function Envios () {
             if(state === "PENDIENTE") {
                 return "gold"
             }
-            else if(state === "PREPARADO") {
+            else if(state === "PREPARA  DO") {
                 return "lightgreen"
             }
             else if(state === "DESPACHADO") {

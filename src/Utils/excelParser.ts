@@ -27,10 +27,11 @@ export default async function ExcelParserEnvios ( excel: File,insumos: IEnvioIns
         if(linea.dependencia && linea.lentrega && linea.raciones) {
         const parsedDependencia = linea.dependencia.replace(/\"/g,"").replace("'","")
         plan.details.forEach((p) => {
+            const raciones = linea.raciones * plan.dias
             insumos.forEach(ins => {
                 if(ins.ins_id === p.ins_id) {
                     if(ins.unidades_caja > 0) {
-                        const value: number = linea.raciones / 30 * p.dias
+                        const value: number = raciones / 30 * p.dias
                         const unidades = Math.ceil(value / ins.racbolsa)
                         const cajas = value >= ins.unidades_caja ?  Math.floor(value / ins.raccaja) : 0
                         const bolsas = Math.ceil((value - cajas * ins.raccaja) / ins.racbolsa)
@@ -47,7 +48,7 @@ export default async function ExcelParserEnvios ( excel: File,insumos: IEnvioIns
                         })
                     }
                     else {
-                        const value: number = linea.raciones / 30 * p.dias
+                        const value: number = raciones / 30 * p.dias
                         const unidades = Math.ceil(value / ins.racbolsa)
                         const cajas = 0
                         const bolsas = Math.ceil(value / ins.racbolsa)
