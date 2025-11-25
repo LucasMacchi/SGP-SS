@@ -32,9 +32,9 @@ export default async function ExcelParserEnvios ( excel: File,insumos: IEnvioIns
                 if(ins.ins_id === p.ins_id) {
                     if(ins.unidades_caja > 0) {
                         const value: number = raciones / 30 * p.dias
-                        const unidades = Math.ceil(value / ins.racbolsa)
+                        const unidades = Math.floor(value / ins.racbolsa)
                         const cajas = value >= ins.unidades_caja ?  Math.floor(value / ins.raccaja) : 0
-                        const bolsas = Math.ceil((value - cajas * ins.raccaja) / ins.racbolsa)
+                        const bolsas = Math.floor((value - cajas * ins.raccaja) / ins.racbolsa)
                         const kilos = unidades * ins.gr_total / 1000
                         envio.detalles.push({
                             kilos: kilos,
@@ -49,9 +49,9 @@ export default async function ExcelParserEnvios ( excel: File,insumos: IEnvioIns
                     }
                     else {
                         const value: number = raciones / 30 * p.dias
-                        const unidades = Math.ceil(value / ins.racbolsa)
+                        const unidades = Math.floor(value / ins.racbolsa)
                         const cajas = 0
-                        const bolsas = Math.ceil(value / ins.racbolsa)
+                        const bolsas = Math.floor(value / ins.racbolsa)
                         const kilos = unidades * ins.gr_total / 1000
                         envio.detalles.push({
                             kilos: kilos,
