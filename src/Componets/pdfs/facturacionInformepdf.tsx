@@ -31,7 +31,7 @@ const stylePedido = StyleSheet.create({
     },
     table: {
         width: 'auto',
-        marginTop: 35,
+        marginTop: 45,
         borderBottomWidth: 1,
         borderTopWidth: 1,
       },
