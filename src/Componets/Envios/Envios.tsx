@@ -1326,7 +1326,20 @@ export default function Envios () {
                             <input type="number" value={searchRemito} className="data-div-select" style={{width: 50}} onChange={(e) => setSearchRemito(e.target.value)}/>
                             <button className='btn-export-pdf' onClick={() => getUniqRemito()}>BUSCAR</button>
                             <hr color='#3399ff' className='hr-line'/>
-
+                            <h4 className='title-Homepage'>Estado:</h4>
+                                <div style={{display: "flex", justifyContent: "center"}}>
+                                    <select name="estados" value={searchState} onChange={(e) => setSearchState(e.target.value)}>
+                                        <option value={""}>---</option>
+                                        <option value={"PENDIENTE"}>PENDIENTE</option>
+                                        <option value={"PREPARADO"}>PREPARADO</option>
+                                        <option value={"DESPACHADO"}>DESPACHADO</option>
+                                        <option value={"ENTREGADO"}>ENTREGADO</option>
+                                        <option value={"NO ENTREGADO"}>NO ENTREGADO</option>
+                                        <option value={"EXTRAVIADO"}>EXTRAVIADO</option>
+                                        <option value={"DEVOLUCION"}>DEVOLUCION</option>
+                                        <option value={"ENTRADA"}>ENTRADA</option>
+                                    </select>
+                                </div>
                                 <div style={{display: "flex", justifyContent: "center"}}>
                                     <h4 className='title-Homepage'>Facturado:</h4>
                                 <div style={{display: "flex", justifyContent: "center"}}>
