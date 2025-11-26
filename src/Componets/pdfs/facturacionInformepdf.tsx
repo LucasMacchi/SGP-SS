@@ -31,6 +31,7 @@ const stylePedido = StyleSheet.create({
     },
     table: {
         width: 'auto',
+        marginTop: 35,
         borderBottomWidth: 1,
         borderTopWidth: 1,
       },
@@ -208,7 +209,7 @@ const informeFacturacionPDF: React.FC<IFacturacionDataInformePDF> = ({data,title
         racionesTotal += d.raciones
         amountTotal += d.amount
     });
-    const paginasCount = 35
+    const paginasCount = 32
     const pages: IFacturacionDataInforme[][] = []
     for (let i = 0; i < data.length; i += paginasCount) {
       const arr = data.slice(i,i + paginasCount)
