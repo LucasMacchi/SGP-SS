@@ -117,6 +117,26 @@ const stylePedido = StyleSheet.create({
 const insumosDisplayer = (remitos: IFacturacionDataInforme[],count: number,last:boolean,totalAmount: number,totalRac: number,totalRts: number) => {
     const elements = []
     const amount = remitos.length > count ? remitos.length : count
+    elements.push(
+        <View style={stylePedido.view}>
+            <View style={stylePedido.table}>
+            <View style={stylePedido.tableRow_header}>
+                <View style={stylePedido.tableColcod}>
+                    <Text style={stylePedido.tableCellH}>REMITO</Text>
+                </View>
+                <View style={stylePedido.tableColIns}>
+                    <Text style={stylePedido.tableCellH}>CABECERA</Text>
+                </View>
+                <View style={stylePedido.tableColcod}>
+                    <Text style={stylePedido.tableCellH}>RACIONES</Text>
+                </View>
+                <View style={stylePedido.tableColcod}>
+                    <Text style={stylePedido.tableCellH}>FACTURADO</Text>
+                </View>
+            </View>
+            </View>
+        </View>
+    )
     for (let i = 0; i < amount; i++) {
         elements.push(
             <View style={stylePedido.tableRow}>
@@ -213,24 +233,6 @@ const informeFacturacionPDF: React.FC<IFacturacionDataInformePDF> = ({data,title
                 </View>
                 <View style={{flexDirection: 'row', justifyContent: "center"}}>
                     <Text style={stylePedido.title}>{title}</Text>
-                </View>
-                <View style={stylePedido.view}>
-                    <View style={stylePedido.table}>
-                    <View style={stylePedido.tableRow_header}>
-                        <View style={stylePedido.tableColcod}>
-                            <Text style={stylePedido.tableCellH}>REMITO</Text>
-                        </View>
-                        <View style={stylePedido.tableColIns}>
-                            <Text style={stylePedido.tableCellH}>CABECERA</Text>
-                        </View>
-                        <View style={stylePedido.tableColcod}>
-                            <Text style={stylePedido.tableCellH}>RACIONES</Text>
-                        </View>
-                        <View style={stylePedido.tableColcod}>
-                            <Text style={stylePedido.tableCellH}>FACTURADO</Text>
-                        </View>
-                    </View>
-                    </View>
                 </View>
                 {insumosDisplayer(pages[0],paginasCount,pages.length === 1 ? true : false,amountTotal,racionesTotal,data.length)}
             </Page>
