@@ -209,7 +209,7 @@ const informeFacturacionPDF: React.FC<IFacturacionDataInformePDF> = ({data,title
         racionesTotal += d.raciones
         amountTotal += d.amount
     });
-    const paginasCount = 32
+    const paginasCount = 28
     const pages: IFacturacionDataInforme[][] = []
     for (let i = 0; i < data.length; i += paginasCount) {
       const arr = data.slice(i,i + paginasCount)
