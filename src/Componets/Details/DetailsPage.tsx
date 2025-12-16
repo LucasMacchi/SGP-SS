@@ -34,6 +34,7 @@ export default function DetailsPage () {
     const [collection, setCollectionArr] = useState('')
     const [searchIns, setSearchIns] = useState('')
     const [filteredIns, setFilteredIns] = useState<string[]>([])
+    const [addPer, setAddPer] = useState(false)
 
     useEffect(() => {
       if(global && id && !tokenExpireChecker()){
@@ -583,22 +584,33 @@ export default function DetailsPage () {
                     {addIns &&
                         <div>
                             <div>
+                                <h4>Personalizado: <input type="checkbox" checked={addPer} onChange={(e) => setAddPer(e.target.checked)}/></h4>
+                                {addPer ? 
                                 <div>
-                                    <h6>Busqueda</h6>
                                     <input type="text" id='otherins' className="data-div-select" 
-                                    onChange={(e) => setSearchIns(e.target.value)} value={searchIns}/>
-                                    <button className="info-popup" onClick={() => infoMsg(5)}>?</button>
+                                    onChange={(e) => setNewAdd(e.target.value)} value={newIns}/>
                                 </div>
-                                <h6>Insumo - {filteredIns && filteredIns.length > 0 ? filteredIns.length + " Encontrados" : 0 + " Encontrados"}</h6>
-                                <select defaultValue={''} value={newIns} className="data-div-select"
-                                onChange={e => setNewAdd(e.target.value)}>
-                                <option value={''}>---</option>
-                                {
-                                    filteredIns.map((i, index) => (
-                                        <option key={index} value={i}>{i}</option>
-                                    ))
+                                :
+                                <div>
+                                    <div>
+                                        <h6>Busqueda</h6>
+                                        <input type="text" id='otherins' className="data-div-select" 
+                                        onChange={(e) => setSearchIns(e.target.value)} value={searchIns}/>
+                                        <button className="info-popup" onClick={() => infoMsg(5)}>?</button>
+                                    </div>
+                                    <h6>Insumo - {filteredIns && filteredIns.length > 0 ? filteredIns.length + " Encontrados" : 0 + " Encontrados"}</h6>
+                                    <select defaultValue={''} value={newIns} className="data-div-select"
+                                    onChange={e => setNewAdd(e.target.value)}>
+                                    <option value={''}>---</option>
+                                    {
+                                        filteredIns.map((i, index) => (
+                                            <option key={index} value={i}>{i}</option>
+                                        ))
+                                    }
+                                    </select>
+                                </div>
                                 }
-                                </select>
+
                                 <input type="number" step='any' id='amount' min={0}
                                 value={newAmount} onChange={(e) => setNewAmount(parseFloat(e.target.value))}
                                 className="data-div-textfield-amount"/>
