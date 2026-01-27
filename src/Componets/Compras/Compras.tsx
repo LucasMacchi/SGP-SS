@@ -17,6 +17,7 @@ export default function Compras () {
     const [proveedor, setProveedor] = useState("")
     const [fullnameF, setFullnameF] = useState("")
     const [areaF, setAreaF] = useState("")
+    const [viajes, setViajes] = useState<string[]>([])
     const [filterDate, setFilterDate] = useState({
         start: "",
         end: ""
@@ -41,6 +42,7 @@ export default function Compras () {
             if(global.login === false) global?.sessionFn()
             global.getInsumosComplete().then(ins => setInsumosComp(ins))
             global.getAreasFn().then(ars => setAreas(ars))
+            global.getViajesFn().then(vjs => setViajes(vjs))
         }
 
     },[])
@@ -104,6 +106,7 @@ export default function Compras () {
         if(compra.tipo === "Insumo" || compra.tipo === "Indumentaria") {
             setCustom(false)
         }
+
     },[compra.tipo])
 
     useEffect(() => {
@@ -139,6 +142,19 @@ export default function Compras () {
             alert("Ingrese una descripcion mas larga y una cantidad")
         }
     }
+    const addInsumoV = (viaje:string) => {
+        if(viaje.length > 0){
+            const insum: IinsumoCompra = {
+                descripcion: viaje,
+                cantidad: 1
+            }
+            compra.compras.push(insum)
+            setCompra({...compra})
+        }
+        else {
+            alert("Ingrese un viaje valido")
+        }
+    }
 
     const deleteInsumo = (index: number) => {
         if(confirm("Quieres eliminar el insumo/servicio?")) {
@@ -149,6 +165,11 @@ export default function Compras () {
     }
 
     const registrarCompra = () => {
+        if(compra.area === 'Logistica/Deposito') {
+            compra.tipo = "TRANSPORTE"
+            compra.lugar = "RIACHUELO"
+            compra.date = new Date().toISOString()
+        }
         if(compra.area.length>0 && compra.tipo.length>0 && compra.lugar.length>0 && 
             compra.compras.length >0 && global && compra.date.length > 0){
             if(compra.proveedor.length === 0) compra.proveedor = "A eleccion"
@@ -257,16 +278,20 @@ export default function Compras () {
                             ))}
                         </select>
                     </div>
-                    <div className='data-div-add'>
-                        <h5 style={{margin: "2px"}}>Fecha a entregar*: </h5>
-                        <input type='date' id='date_start' className='date-input'
-                        value={compra.date} onChange={e => setCompra({...compra, date: e.target.value})}/>
-                    </div>
-                    <div className='data-div-add'>
-                        <h5 style={{margin: "2px"}}>Lugar*: </h5>
-                        <input type='text' className='textfield-search'
-                        value={compra.lugar} onChange={e => setCompra({...compra, lugar: e.target.value})}/>
-                    </div>
+                    {compra.area !== 'Logistica/Deposito' && (
+                        <div className='data-div-add'>
+                            <h5 style={{margin: "2px"}}>Fecha a entregar*: </h5>
+                            <input type='date' id='date_start' className='date-input'
+                            value={compra.date} onChange={e => setCompra({...compra, date: e.target.value})}/>
+                        </div>
+                    )}
+                    {compra.area !== 'Logistica/Deposito' && (
+                        <div className='data-div-add'>
+                            <h5 style={{margin: "2px"}}>Lugar*: </h5>
+                            <input type='text' className='textfield-search'
+                            value={compra.lugar} onChange={e => setCompra({...compra, lugar: e.target.value})}/>
+                        </div>
+                    )}
                     <div className='data-div-add'>
                         <h5 style={{margin: "2px"}}>Proveedor sugerido: </h5>
                         <input type='text' className='textfield-search'
@@ -278,40 +303,59 @@ export default function Compras () {
                         onChange={(e) => setCompra({...compra, descripcion: e.target.value})}/>
                     </div>
                     <hr color='#3399ff' className='hr-line'/>
-                    <h4 className='title-Homepage'>Agregue los insumos/servicios</h4>
-                    <div className='data-div-add'>
-                        <h5 style={{margin: "2px"}}>Tipo*: </h5>
-                        <select name="area" className='filter-sub' value={compra.tipo}
-                        onChange={(e) => setCompra({...compra, tipo: e.target.value})}>
-                            <option value={""}>---</option>
-                            <option value={"Servicio"}>Servicio</option>
-                            <option value={"Insumo"}>Insumo</option>
-                            <option value={"Maquinaria"}>Maquinaria</option>
-                            <option value={"Equipamiento"}>Equipamiento</option>
-                            <option value={"Indumentaria"}>Indumentaria</option>
-                            <option value={"Racionamiento"}>Racionamiento/Cocina</option>
-                        </select>
-                    </div>
-                    <div className='data-div-add'>
-                        {descripcionChange()}
-                        <h5 style={{margin: "2px"}}>Cantidad: </h5>
-                        <input type='number' className='textfield-search' style={{width: "80px"}}
-                        value={insumo.cantidad} onChange={e => setInsumo({...insumo, cantidad: parseInt(e.target.value)})}/>
-                        <button className='btn-small-logout' style={{width: "80px"}} onClick={() => addInsumo()}>
-                            Agregar
-                        </button>
-                    </div>
+                    {compra.area !== 'Logistica/Deposito' && (
+                        <h4 className='title-Homepage'>Agregue los insumos/servicios</h4>
+                    )}
+                    {compra.area !== 'Logistica/Deposito' && (
+                        <div className='data-div-add'>
+                            <h5 style={{margin: "2px"}}>Tipo*: </h5>
+                            <select name="area" className='filter-sub' value={compra.tipo}
+                            onChange={(e) => setCompra({...compra, tipo: e.target.value})}>
+                                <option value={""}>---</option>
+                                <option value={"Servicio"}>Servicio</option>
+                                <option value={"Insumo"}>Insumo</option>
+                                <option value={"Maquinaria"}>Maquinaria</option>
+                                <option value={"Equipamiento"}>Equipamiento</option>
+                                <option value={"Indumentaria"}>Indumentaria</option>
+                                <option value={"Racionamiento"}>Racionamiento/Cocina</option>
+                            </select>
+                        </div>
+                    )}
+                    {compra.area !== 'Logistica/Deposito' && (
+                        <div className='data-div-add'>
+                            {descripcionChange()}
+                            <h5 style={{margin: "2px"}}>Cantidad: </h5>
+                            <input type='number' className='textfield-search' style={{width: "80px"}}
+                            value={insumo.cantidad} onChange={e => setInsumo({...insumo, cantidad: parseInt(e.target.value)})}/>
+                            <button className='btn-small-logout' style={{width: "80px"}} onClick={() => addInsumo()}>
+                                Agregar
+                            </button>
+                        </div>
+                    )}
+                    {compra.area === 'Logistica/Deposito' && (
+                        <div className='data-div-add'>
+                            <h5 style={{margin: "2px"}}>Area*: </h5>
+                            <select name="area" className='filter-sub'
+                            onChange={(e) => addInsumoV(e.target.value)}>
+                                <option value={""}>---</option>
+                                <option value={"Entrega"}>Entrega</option>
+                                {viajes.map((ar) => (
+                                    <option value={ar} key={ar}>{ar}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
                     <div>
                         <table style={{fontSize: "small", width: "100%"}}>
                             <tbody>
                                 <tr>
                                     <th style={{border: "1px solid", width: "92%"}}>Descripcion</th>
-                                    <th style={{border: "1px solid", width: "8%"}}>Cant</th>
+                                    {compra.area !== 'Logistica/Deposito' && <th style={{border: "1px solid", width: "8%"}}>Cant</th>}
                                 </tr>
                                 {compra.compras.map((c,i) => (
                                 <tr key={i} onClick={() => deleteInsumo(i)}>
                                     <th style={{border: "1px solid"}}>{c.descripcion}</th>
-                                    <th style={{border: "1px solid"}}>{c.cantidad}</th>
+                                    {compra.area !== 'Logistica/Deposito' && <th style={{border: "1px solid"}}>{c.cantidad}</th>}
                                 </tr>
                                 ))}
                             </tbody>

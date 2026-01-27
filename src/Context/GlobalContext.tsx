@@ -50,6 +50,7 @@ import {
   ITotalEnviosInforme,
   ITxtEnvios,
   IUser,
+  IViaje,
   rolesNum,
 } from "../Utils/Interfaces";
 import ac from "./Actions";
@@ -727,6 +728,18 @@ export default function GlobalState(props: IPropsChildren) {
   async function getAreasFn(): Promise<string[]> {
     const areas: string[] = (await axios.get(SERVER+"/compras/areas", authReturner())).data
     return areas
+  }
+
+  //Get areas for compras
+  async function getViajesFn(): Promise<string[]> {
+    const areas: IViaje[] = (await axios.get(SERVER+"/compras/viajes", authReturner())).data
+    console.log("VIAJES----------------")
+    console.log(areas)
+    const res:string[] = []
+    areas.forEach(e => {
+      res.push(e.viaje_id+"-"+e.des)
+    });
+    return res
   }
 
   //Register Compra
@@ -1584,7 +1597,8 @@ export default function GlobalState(props: IPropsChildren) {
     getEnviosTotalExclFn,
     getCurrentPlan,
     getEnvioRemitoUniq,
-    getTxtOrdersRange
+    getTxtOrdersRange,
+    getViajesFn
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1661,6 +1675,7 @@ interface IGlobalContext {
   deletePersonal: (legajo: number) => void;
   getCategoriasInsumos: () => void;
   getAreasFn: () => Promise<string[]>;
+  getViajesFn: () => Promise<string[]>;
   eliminarPedido: (id: number) => void;
   checkExistsPedido: (nro: string) => Promise<boolean>;
   collectionOrders: (orders:string []) => Promise<ICollectionoRes>;

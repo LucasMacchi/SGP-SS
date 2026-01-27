@@ -13,6 +13,11 @@ export interface IToken {
     token: string
 };
 
+export interface IViaje {
+    viaje_id: number,
+    des:string
+}
+
 export interface IPropsChildren {
     children: React.ReactNode | JSX.Element | JSX.Element[]
 };
