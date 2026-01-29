@@ -14,7 +14,15 @@ export interface IToken {
 };
 
 export interface IViaje {
-    viaje_id: number,
+    reparto_id:number,
+    numero:number,
+    periodo:number,
+    viajes: IViajeRes[]
+}
+
+export interface IViajeRes {
+    viaje_id:number,
+    compra:boolean,
     des:string
 }
 
