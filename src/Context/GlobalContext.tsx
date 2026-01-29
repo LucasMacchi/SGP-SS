@@ -731,15 +731,10 @@ export default function GlobalState(props: IPropsChildren) {
   }
 
   //Get areas for compras
-  async function getViajesFn(): Promise<string[]> {
+  async function getViajesFn(): Promise<IViaje[]> {
     const areas: IViaje[] = (await axios.get(SERVER+"/compras/viajes", authReturner())).data
-    console.log("VIAJES----------------")
     console.log(areas)
-    const res:string[] = []
-    areas.forEach(e => {
-      res.push(e.viaje_id+"-"+e.des)
-    });
-    return res
+    return areas
   }
 
   //Register Compra
@@ -1675,7 +1670,7 @@ interface IGlobalContext {
   deletePersonal: (legajo: number) => void;
   getCategoriasInsumos: () => void;
   getAreasFn: () => Promise<string[]>;
-  getViajesFn: () => Promise<string[]>;
+  getViajesFn: () => Promise<IViaje[]>;
   eliminarPedido: (id: number) => void;
   checkExistsPedido: (nro: string) => Promise<boolean>;
   collectionOrders: (orders:string []) => Promise<ICollectionoRes>;

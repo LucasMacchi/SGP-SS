@@ -1,12 +1,14 @@
 import { useContext, useEffect, useState } from "react"
 import Header from "../Header/Header"
 import { GlobalContext } from "../../Context/GlobalContext"
-import { ICompra, ICompraDto, IInsumoComp, IinsumoCompra, rolesNum } from "../../Utils/Interfaces"
+import { ICompra, ICompraDto, IInsumoComp, IinsumoCompra, IViaje, rolesNum } from "../../Utils/Interfaces"
 
 export default function Compras () {
     
     const global = useContext(GlobalContext)
     const [display, setDisplay] = useState(0)
+    const [selectedReparto,setSelectedReparto] = useState(999)
+    const [showComprados, setShowComprados] = useState(false)
     const [custom, setCustom] = useState(false)
     const [areas, setAreas] = useState<string[]>([])
     const [insumosComp, setInsumosComp] = useState<IInsumoComp[]>([])
@@ -17,7 +19,7 @@ export default function Compras () {
     const [proveedor, setProveedor] = useState("")
     const [fullnameF, setFullnameF] = useState("")
     const [areaF, setAreaF] = useState("")
-    const [viajes, setViajes] = useState<string[]>([])
+    const [viajes, setViajes] = useState<IViaje[]>([])
     const [filterDate, setFilterDate] = useState({
         start: "",
         end: ""
@@ -334,14 +336,39 @@ export default function Compras () {
                     )}
                     {compra.area === 'Logistica/Deposito' && (
                         <div className='data-div-add'>
-                            <h5 style={{margin: "2px"}}>Area*: </h5>
+                            <div>
+                                <h5 style={{margin: "2px"}}>Mostrar ya solicitados: 
+                                <input type="checkbox" checked={showComprados} onChange={(e) => setShowComprados(e.target.checked)}/>
+                                </h5>
+                            </div>
+                            <div>
+                                <h5 style={{margin: "2px"}}>Reparto: </h5>
+                                <select name="area" className='filter-sub'
+                                onChange={(e) => setSelectedReparto(parseInt(e.target.value))}>
+                                    <option value={999}>---</option>
+                                    {viajes.map((ar,i) => (
+                                        <option value={i} key={i}>{ar.numero+"-"+ar.periodo}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                    )}
+                    {(compra.area === 'Logistica/Deposito' && selectedReparto < 999) && (
+                        <div className='data-div-add'>
+                            <h5 style={{margin: "2px"}}>Viaje: </h5>
                             <select name="area" className='filter-sub'
                             onChange={(e) => addInsumoV(e.target.value)}>
-                                <option value={""}>---</option>
-                                <option value={"Entrega"}>Entrega</option>
-                                {viajes.map((ar) => (
-                                    <option value={ar} key={ar}>{ar}</option>
-                                ))}
+                                <option value={999}>---</option>
+                                {showComprados ? 
+                                    viajes[selectedReparto].viajes.map((ar) => (
+                                        <option value={ar.viaje_id+"-"+ar.des} key={ar.viaje_id}>{ar.compra ? ar.viaje_id+"-"+ar.des+"*" : ar.viaje_id+"-"+ar.des}</option>
+                                    ))
+                                :
+                                    viajes[selectedReparto].viajes.map((ar) => (
+                                        !ar.compra && <option value={ar.viaje_id+"-"+ar.des} key={ar.viaje_id}>{ar.viaje_id+"-"+ar.des}</option>
+                                    ))
+                                }
+                                {}
                             </select>
                         </div>
                     )}
