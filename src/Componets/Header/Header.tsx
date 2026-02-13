@@ -83,7 +83,7 @@ export default function Header () {
                     navigatorFn(parseInt(e.target.value))
                     console.log(e.target.value)
                 }}>
-                    <option className='dropdown-txt-none' value={99}>MENU</option>
+                    <option className='dropdown-txt-none' value={99}>MENU - USUARIO {global?.user.username ? global?.user.username : "NaN"}</option>
                     <option className='dropdown-txt' value={0}>CERRAR SESION</option>
                     <option className='dropdown-txt' style={hidderHeader([5])} value={1}>PEDIDOS</option>
                     <option className='dropdown-txt' style={hidderHeader([5])} value={2}>NUEVO PEDIDO</option>
