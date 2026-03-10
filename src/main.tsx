@@ -19,6 +19,7 @@ import Soporte from './Componets/Soporte/Soporte.tsx'
 import Compras from './Componets/Compras/Compras.tsx'
 import CompraDetail from './Componets/Compras/CompraDetail.tsx'
 import Envios from './Componets/Envios/Envios.tsx'
+import FumigacionesPage from './Componets/Fumigaciones/FumigacionesPage.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -42,6 +43,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path='/add' element={<AddOrder/>}/>
           <Route path='/add/:orderId' element={<AddOrder/>}/>
           <Route path='/envio' element={<Envios/>}/>
+          <Route path='/fumigaciones' element={<FumigacionesPage/>}/>
         </Routes>
       </StrictMode>
     </GlobalState>
