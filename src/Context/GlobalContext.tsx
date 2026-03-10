@@ -27,7 +27,9 @@ import {
   IEXCELTotalEnviosInforme,
   IFacturacionData,
   IFacturacionDataInforme,
+  IFCliente,
   IFilter,
+  IFVeh,
   IInsumoComp,
   ILgarEntrega,
   ILugaresResponse,
@@ -46,6 +48,7 @@ import {
   IResponseInsumo,
   IResponseRutas,
   IServicio,
+  ITalonario,
   IToken,
   ITotalEnviosInforme,
   ITxtEnvios,
@@ -1432,6 +1435,59 @@ export default function GlobalState(props: IPropsChildren) {
         return []
       }
     }
+  
+  async function getClientesFumi():Promise<IFCliente[]> {
+    try {
+      const data: IFCliente[] = (await axios.get(SERVER+`/fumigacion/clientes`,authReturner())).data
+      return data
+    } catch (error) {
+      console.log(error);
+      return []
+    }
+  }
+
+  async function getVehFumi():Promise<IFVeh[]> {
+    try {
+      const data: IFVeh[] = (await axios.get(SERVER+`/fumigacion/vehiculos`,authReturner())).data
+      return data
+    } catch (error) {
+      console.log(error);
+      return []
+    }
+  }
+
+  async function getRubrosFumi():Promise<string[]> {
+    try {
+      const data: string[] = (await axios.get(SERVER+`/fumigacion/rubros`,authReturner())).data
+      return data
+    } catch (error) {
+      console.log(error);
+      return []
+    }
+  }
+
+  async function getTalonariosFumi(id: number):Promise<ITalonario[]> {
+    try {
+      const data: ITalonario[] = (await axios.get(SERVER+`/fumigacion/talonarios/`+id,authReturner())).data
+      return data
+    } catch (error) {
+      console.log(error);
+      return []
+    }
+  }
+
+  async function createServicioFumi (id:number,user:number,veh:number|null,talo:string,of:boolean):Promise<string> {
+    try {
+      if(of) {
+        await axios.patch(SERVER+`/fumigacion/serviciotq/${id}/${user}/${veh}/${talo}`,{},authReturner())
+      }
+      else await axios.patch(SERVER+`/fumigacion/serviciofumi/${id}/${user}/${veh}/${talo}`,{},authReturner())
+      return "SERVICIO REALIZADO"
+    } catch (error) {
+      console.log(error);
+      return "ERROR AL REALIZAR SERVICIO"
+    }
+  }
 
   
   
@@ -1593,7 +1649,12 @@ export default function GlobalState(props: IPropsChildren) {
     getCurrentPlan,
     getEnvioRemitoUniq,
     getTxtOrdersRange,
-    getViajesFn
+    getViajesFn,
+    getClientesFumi,
+    getVehFumi,
+    getRubrosFumi,
+    getTalonariosFumi,
+    createServicioFumi
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1730,5 +1791,10 @@ interface IGlobalContext {
   getEnviosTotalExclFn: () => Promise<IEXCELTotalEnviosInforme[]>;
   getCurrentPlan: () => Promise<number | null>;
   getEnvioRemitoUniq: (remito: string) => Promise<IRemitosEnvio | null>;
-  getTxtOrdersRange: (date1: string, date2:string) => Promise<string[]>
+  getTxtOrdersRange: (date1: string, date2:string) => Promise<string[]>;
+  getClientesFumi: () => Promise<IFCliente[]>;
+  getVehFumi: () => Promise<IFVeh[]>;
+  getRubrosFumi: () => Promise<string[]>;
+  getTalonariosFumi: (id: number) => Promise<ITalonario[]>;
+  createServicioFumi: (id:number,user:number,veh:number|null,talo:string,of:boolean) => Promise<string>;
 }

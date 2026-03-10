@@ -711,4 +711,31 @@ export interface IEXCELDateExport {
     TANDA: number
 }
 
+export interface IFCliente {
+    cliente_id: number,
+    razon_soc:string,
+    cotizacion:number,
+    servicio:string,
+    ultimo_serv:string,
+    prox_serv:string,
+    forma_pago:string,
+    contacto:string,
+    rubro:string,
+    empresa:boolean
+}
+
+export interface IFVeh {
+    veh_id: number,
+    patente: string
+}
+
+export interface ITalonario {
+    numero: string,
+    cliente_id: number,
+    patente: string | null,
+    oficial: boolean,
+    fecha: string,
+    talonario_id: number
+}
+
 export type TRemitoEnvio = ""

@@ -66,6 +66,9 @@ export default function Header () {
             case 9:
                 navigateTo('/admin/users')
                 break;
+            case 10:
+                navigateTo('/fumigaciones')
+                break;
             default:
                 navigateTo('/pedidos')
                 break;
@@ -89,6 +92,7 @@ export default function Header () {
                     <option className='dropdown-txt' style={hidderHeader([5])} value={2}>NUEVO PEDIDO</option>
                     <option className='dropdown-txt' value={3}>GENERAR INFORME</option>
                     <option className='dropdown-txt' style={hidderHeader([5])} value={4}>SERVICIOS / INSUMOS</option>
+                    <option className='dropdown-txt' style={hidderHeader([5])} value={10}>FUMIGACIONES</option>
                     <option className='dropdown-txt' value={5}>CORREO</option>
                     <option className='dropdown-txt' style={hidderHeader([5])} value={6}>BUSCAR REPORTES</option>
                     <option className='dropdown-txt' value={7}>SOPORTE TECNICO</option>
