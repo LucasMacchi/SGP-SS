@@ -1,14 +1,20 @@
 import { useContext, useEffect, useState } from "react";
 import Header from "../Header/Header";
 import { GlobalContext } from "../../Context/GlobalContext";
-import { IFCliente, IFDroga, IFVeh, ITalonario } from "../../Utils/Interfaces";
+import { IFCliente, IFDroga, IFRubro, IFVeh, ITalonario } from "../../Utils/Interfaces";
 
 
 export default function FumigacionesPage () {
 
     const global = useContext(GlobalContext)
     const [clientes, setClientes] = useState<IFCliente[]>([])
+    const [rubros, setRubros] = useState<IFRubro[]>([])
+    const [filteredClientes, setFilteredClientes] = useState<IFCliente[]>([])
     const [vehiculos, setVehiculos] = useState<IFVeh[]>([])
+    const [servicios, setServicios] = useState<string[]>([])
+    const [searchServicio, setSearchSetvicio] = useState("")
+    const [searchCliente, setSearchCliente] = useState("")
+    const [searchRubro, setSearchRubro] = useState("")
     const [vehiculo, setVehiculo] = useState(0)
     const [talonario, setTalonario] = useState("")
     const [talonarios, setTalonarios] = useState<ITalonario[]>([])
@@ -20,8 +26,11 @@ export default function FumigacionesPage () {
     useEffect(() =>{
         if(global) {
             global.getClientesFumi().then(cls => setClientes(cls))
+            global.getClientesFumi().then(cls => setFilteredClientes(cls))
             global.getVehFumi().then(vhs => setVehiculos(vhs))
             global.getDrogasFumi().then(drg => setDrogas(drg))
+            global.getServiciosFumi().then(srvs => setServicios(srvs))
+            global.getRubrosFumi().then(rbr => setRubros(rbr))
         }
     },[])
 
@@ -36,6 +45,14 @@ export default function FumigacionesPage () {
         setServicio(false)
         setTalonarios([])
     },[selectedCliente])
+
+    useEffect(() => {
+        let arr = clientes
+        if(searchCliente.length > 3) arr = arr.filter(c => c.razon_soc.toLocaleLowerCase().includes(searchCliente.toLocaleLowerCase()))
+        if(searchServicio.length > 0) arr = arr.filter(c => c.servicio === searchServicio)
+        if(searchRubro.length > 0) arr = arr.filter(c => c.rubro === searchRubro)
+        setFilteredClientes(arr)
+    },[searchCliente,searchServicio,searchRubro])
 
     const getTaloraniosCliente = async (id:number) => {
         if(id && global) {
@@ -79,9 +96,38 @@ export default function FumigacionesPage () {
                 <Header/>
             </div>
             <hr color='#3399ff' className='hr-line'/>
+            <h4 className='title-Homepage'>CLIENTES</h4>
+            <div style={{display:"flex",justifyContent: "space-evenly"}}>
+                <div>
+                     <h5 className='title-Homepage' style={{margin:2}}>Nombre:</h5>
+                     <input type="text" value={searchCliente} style={{width: 80}} onChange={(e) => setSearchCliente(e.target.value)}/>
+                </div>
+                <div>
+                    <h5 className='title-Homepage' style={{margin:2}}>Servicio:</h5>
+                    <div style={{display: "flex", justifyContent: "center"}}>
+                        <select name="estados" value={searchServicio} onChange={(e) => setSearchSetvicio(e.target.value)}>
+                            <option value={""} key={"none"}>----</option>
+                            {servicios.map((v) => (
+                                <option value={v} key={v}>{v}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <h5 className='title-Homepage' style={{margin:2}}>Rubro:</h5>
+                    <div style={{display: "flex", justifyContent: "center"}}>
+                        <select name="estados" value={searchRubro} onChange={(e) => setSearchRubro(e.target.value)}>
+                            <option value={""} key={"none"}>----</option>
+                            {rubros.map((v) => (
+                                <option value={v.rubro} key={v.rubro}>{v.rubro}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <hr color='#3399ff' className='hr-line'/>
             <div style={{maxHeight: 450,overflow:"scroll"}}>
-                <h4 className='title-Homepage'>CLIENTES</h4>
-                <table style={{fontSize: "small", width: 500,tableLayout: "fixed"}}>
+                <table style={{fontSize: "small", width: 500}}>
                     <tbody>
                         <tr >
                             <th style={{border: "1px solid", width: "20%"}}>CLIENTE</th>
@@ -90,7 +136,7 @@ export default function FumigacionesPage () {
                             <th style={{border: "1px solid", width: "20%"}}>ULT. SERV</th>
                             <th style={{border: "1px solid", width: "20%"}}>PROX. SERV</th>
                         </tr>
-                        {clientes.map((c,i) => (
+                        {filteredClientes.map((c,i) => (
                         <tr key={i} style={{backgroundColor: c.empresa ? "Highlight": "white"}}
                         onClick={() => setSelectedCliente(i)}>
                             <th style={{border: "1px solid", width: "20%"}}>{c.razon_soc}</th>
@@ -113,6 +159,7 @@ export default function FumigacionesPage () {
                         <h5 className='title-Homepage'>RUBRO: {clientes[selectedCliente].rubro}</h5>
                         <h5 className='title-Homepage'>COTIZACION: {clientes[selectedCliente].cotizacion}</h5>
                         <h5 className='title-Homepage'>FORMA DE PAGO: {clientes[selectedCliente].forma_pago}</h5>
+                        <h5 className='title-Homepage'>DIRECCION: {clientes[selectedCliente].direccion}</h5>
                         <h5 className='title-Homepage'>CONTACTO: {clientes[selectedCliente].contacto}</h5>
                     </div>
                     <div style={{display: "flex",justifyContent:"space-evenly"}}>

@@ -1488,6 +1488,16 @@ export default function GlobalState(props: IPropsChildren) {
     }
   }
 
+  async function getServiciosFumi():Promise<string[]> {
+    try {
+      const data: string[] = (await axios.get(SERVER+`/fumigacion/servicios`,authReturner())).data
+      return data
+    } catch (error) {
+      console.log(error);
+      return []
+    }
+  }
+
   async function createServicioFumi (id:number,user:number,veh:number|null,talo:string,of:boolean,droga:string):Promise<string> {
     try {
       if(of) {
@@ -1667,7 +1677,8 @@ export default function GlobalState(props: IPropsChildren) {
     getRubrosFumi,
     getTalonariosFumi,
     createServicioFumi,
-    getDrogasFumi
+    getDrogasFumi,
+    getServiciosFumi
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1811,4 +1822,5 @@ interface IGlobalContext {
   getTalonariosFumi: (id: number) => Promise<ITalonario[]>;
   createServicioFumi: (id:number,user:number,veh:number|null,talo:string,of:boolean,droga:string) => Promise<string>;
   getDrogasFumi: () => Promise<IFDroga[]>;
+  getServiciosFumi: () => Promise<string[]>;
 }

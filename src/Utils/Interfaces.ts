@@ -722,7 +722,8 @@ export interface IFCliente {
     contacto:string,
     rubro:string,
     empresa:boolean,
-    oficial: boolean
+    oficial: boolean,
+    direccion: string
 }
 
 export interface IFVeh {
