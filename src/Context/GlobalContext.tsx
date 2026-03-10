@@ -28,7 +28,9 @@ import {
   IFacturacionData,
   IFacturacionDataInforme,
   IFCliente,
+  IFDroga,
   IFilter,
+  IFRubro,
   IFVeh,
   IInsumoComp,
   ILgarEntrega,
@@ -1456,9 +1458,19 @@ export default function GlobalState(props: IPropsChildren) {
     }
   }
 
-  async function getRubrosFumi():Promise<string[]> {
+  async function getRubrosFumi():Promise<IFRubro[]> {
     try {
-      const data: string[] = (await axios.get(SERVER+`/fumigacion/rubros`,authReturner())).data
+      const data: IFRubro[] = (await axios.get(SERVER+`/fumigacion/rubros`,authReturner())).data
+      return data
+    } catch (error) {
+      console.log(error);
+      return []
+    }
+  }
+
+  async function getDrogasFumi():Promise<IFDroga[]> {
+    try {
+      const data: IFDroga[] = (await axios.get(SERVER+`/fumigacion/drogas`,authReturner())).data
       return data
     } catch (error) {
       console.log(error);
@@ -1476,12 +1488,12 @@ export default function GlobalState(props: IPropsChildren) {
     }
   }
 
-  async function createServicioFumi (id:number,user:number,veh:number|null,talo:string,of:boolean):Promise<string> {
+  async function createServicioFumi (id:number,user:number,veh:number|null,talo:string,of:boolean,droga:string):Promise<string> {
     try {
       if(of) {
-        await axios.patch(SERVER+`/fumigacion/serviciotq/${id}/${user}/${veh}/${talo}`,{},authReturner())
+        await axios.patch(SERVER+`/fumigacion/serviciotq/${id}/${user}/${veh}/${talo}/${droga}`,{},authReturner())
       }
-      else await axios.patch(SERVER+`/fumigacion/serviciofumi/${id}/${user}/${veh}/${talo}`,{},authReturner())
+      else await axios.patch(SERVER+`/fumigacion/serviciofumi/${id}/${user}/${veh}/${talo}/${droga}`,{},authReturner())
       return "SERVICIO REALIZADO"
     } catch (error) {
       console.log(error);
@@ -1654,7 +1666,8 @@ export default function GlobalState(props: IPropsChildren) {
     getVehFumi,
     getRubrosFumi,
     getTalonariosFumi,
-    createServicioFumi
+    createServicioFumi,
+    getDrogasFumi
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1794,7 +1807,8 @@ interface IGlobalContext {
   getTxtOrdersRange: (date1: string, date2:string) => Promise<string[]>;
   getClientesFumi: () => Promise<IFCliente[]>;
   getVehFumi: () => Promise<IFVeh[]>;
-  getRubrosFumi: () => Promise<string[]>;
+  getRubrosFumi: () => Promise<IFRubro[]>;
   getTalonariosFumi: (id: number) => Promise<ITalonario[]>;
-  createServicioFumi: (id:number,user:number,veh:number|null,talo:string,of:boolean) => Promise<string>;
+  createServicioFumi: (id:number,user:number,veh:number|null,talo:string,of:boolean,droga:string) => Promise<string>;
+  getDrogasFumi: () => Promise<IFDroga[]>;
 }

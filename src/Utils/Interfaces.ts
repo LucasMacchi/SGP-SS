@@ -721,12 +721,24 @@ export interface IFCliente {
     forma_pago:string,
     contacto:string,
     rubro:string,
-    empresa:boolean
+    empresa:boolean,
+    oficial: boolean
 }
 
 export interface IFVeh {
     veh_id: number,
     patente: string
+}
+
+export interface IFRubro {
+    rubro_id: number,
+    rubro: string
+}
+
+export interface IFDroga {
+    droga_id: number,
+    d1: string,
+    d2: string
 }
 
 export interface ITalonario {
@@ -735,7 +747,8 @@ export interface ITalonario {
     patente: string | null,
     oficial: boolean,
     fecha: string,
-    talonario_id: number
+    talonario_id: number,
+    droga:string
 }
 
 export type TRemitoEnvio = ""

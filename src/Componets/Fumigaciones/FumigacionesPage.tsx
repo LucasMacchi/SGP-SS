@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import Header from "../Header/Header";
 import { GlobalContext } from "../../Context/GlobalContext";
-import { IFCliente, IFVeh, ITalonario } from "../../Utils/Interfaces";
+import { IFCliente, IFDroga, IFVeh, ITalonario } from "../../Utils/Interfaces";
 
 
 export default function FumigacionesPage () {
@@ -14,11 +14,14 @@ export default function FumigacionesPage () {
     const [talonarios, setTalonarios] = useState<ITalonario[]>([])
     const [servicio, setServicio] = useState(false)
     const [selectedCliente, setSelectedCliente] = useState(-1)
+    const [drogas, setDrogas] = useState<IFDroga[]>([])
+    const [selectedDroga, setSelectedDroga] = useState(0)
 
     useEffect(() =>{
         if(global) {
             global.getClientesFumi().then(cls => setClientes(cls))
             global.getVehFumi().then(vhs => setVehiculos(vhs))
+            global.getDrogasFumi().then(drg => setDrogas(drg))
         }
     },[])
 
@@ -46,16 +49,24 @@ export default function FumigacionesPage () {
         let talo = talonario
         const id = clientes[selectedCliente].cliente_id
         const veh = vehiculo ? vehiculo : 0
+        const drogaToTalonario = drogas[selectedDroga].d2 ? drogas[selectedDroga].d1+"-"+drogas[selectedDroga].d2 : drogas[selectedDroga].d1
         if(global && confirm("¿Quieres confirmar el servicio?")) {
-            if(clientes[selectedCliente].servicio === "TANQUE") {
+            if(!clientes[selectedCliente].oficial && clientes[selectedCliente].servicio === "TANQUE") {
                 const currentDate = new Date()
                 const dateToAddd = ""+currentDate.getMonth()+1+currentDate.getDate()
                 talo = "TQ"+clientes[selectedCliente].cliente_id+""+dateToAddd
-                const res = await global.createServicioFumi(id,global.user.rol,veh,talo,true)
+                const res = await global.createServicioFumi(id,global.user.rol,veh,talo,true,drogaToTalonario)
+                alert(res)
+            }
+            else if(!clientes[selectedCliente].oficial && clientes[selectedCliente].servicio === "ESCUELA") {
+                const currentDate = new Date()
+                const dateToAddd = ""+currentDate.getMonth()+1+currentDate.getDate()
+                talo = "ES"+clientes[selectedCliente].cliente_id+""+dateToAddd
+                const res = await global.createServicioFumi(id,global.user.rol,veh,talo,true,drogaToTalonario)
                 alert(res)
             }
             else {
-                const res = await global.createServicioFumi(id,global.user.rol,veh,talo,false)
+                const res = await global.createServicioFumi(id,global.user.rol,veh,talo,false,drogaToTalonario)
                 alert(res)
             }
         }
@@ -118,12 +129,14 @@ export default function FumigacionesPage () {
                                         <th style={{border: "1px solid", width: "20%"}}>TALONARIO</th>
                                         <th style={{border: "1px solid", width: "20%"}}>VEHICULO ASOCIADO</th>
                                         <th style={{border: "1px solid", width: "20%"}}>FECHA</th>
+                                        <th style={{border: "1px solid", width: "20%"}}>DROGA</th>
                                     </tr>
                                     {talonarios.map((c,i) => (
                                     <tr key={i}>
                                         <th style={{border: "1px solid", width: "20%"}}>{c.numero}</th>
                                         <th style={{border: "1px solid", width: "20%"}}>{c.patente ? c.patente : "Ninguno"}</th>
                                         <th style={{border: "1px solid", width: "20%"}}>{c.fecha.split("T")[0]}</th>
+                                        <th style={{border: "1px solid", width: "20%"}}>{c.droga}</th>
                                     </tr>
                                     ))}
                                 </tbody>
@@ -132,7 +145,7 @@ export default function FumigacionesPage () {
                     )}
                     {servicio && (
                         <div>
-                            {clientes[selectedCliente].servicio !== "TANQUE" && (
+                            {clientes[selectedCliente].oficial && (
                                 <div>
                                     <h5 className='title-Homepage'>Ingrese el talonario del certificado:</h5>
                                     <input type="text" value={talonario} style={{width: 80}} onChange={(e) => setTalonario(e.target.value)}/>
@@ -151,6 +164,16 @@ export default function FumigacionesPage () {
                                         </div>
                                 </div>
                             )}
+                            <div>
+                                <h5 className='title-Homepage'>Selecciona la droga:</h5>
+                                    <div style={{display: "flex", justifyContent: "center"}}>
+                                        <select name="estados" value={selectedDroga} onChange={(e) => setSelectedDroga(parseInt(e.target.value))}>
+                                            {drogas.map((v,i) => (
+                                                <option value={i}>{v.d2 ? v.d1+"-"+v.d2 : v.d1}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                            </div>
                             <button className='btn-export-pdf' onClick={() => confirmarServicio()}>REGISTRAR SERVICIO</button>
                         </div>
                     )}
