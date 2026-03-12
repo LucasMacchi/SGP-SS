@@ -749,7 +749,8 @@ export interface ITalonario {
     oficial: boolean,
     fecha: string,
     talonario_id: number,
-    droga:string
+    droga:string,
+    fac: string
 }
 
 export type TRemitoEnvio = ""

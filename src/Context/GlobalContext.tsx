@@ -1511,6 +1511,16 @@ export default function GlobalState(props: IPropsChildren) {
     }
   }
 
+  async function facturarTalonarioFumi (id:number,fac:string):Promise<string> {
+    try {
+      await axios.patch(SERVER+`/fumigacion/facturar/${id}/${fac}`,{},authReturner())
+      return "SERVICIO FACTURADO"
+    } catch (error) {
+      console.log(error);
+      return "ERROR AL FACTURAR SERVICIO"
+    }
+  }
+
   
   
   const innitialState: IGlobalContext = {
@@ -1678,7 +1688,8 @@ export default function GlobalState(props: IPropsChildren) {
     getTalonariosFumi,
     createServicioFumi,
     getDrogasFumi,
-    getServiciosFumi
+    getServiciosFumi,
+    facturarTalonarioFumi
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1823,4 +1834,5 @@ interface IGlobalContext {
   createServicioFumi: (id:number,user:number,veh:number|null,talo:string,of:boolean,droga:string) => Promise<string>;
   getDrogasFumi: () => Promise<IFDroga[]>;
   getServiciosFumi: () => Promise<string[]>;
+  facturarTalonarioFumi: (id:number,fac:string) => Promise<string>
 }
