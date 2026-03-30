@@ -164,7 +164,9 @@ export default function FumigacionesPage () {
             <button className='btn-export-pdf' onClick={() => exportPdfPlanilla()}>CERTIFICADO</button>
             <button className='btn-export-pdf' onClick={() => exportPdfPlanillaTanque()}>AVISO TANQUE</button>
             <button className='btn-export-pdf' onClick={() => exportPdfPlanillaFum()}>AVISO FUMIGACION</button>
-            <button className='btn-export-pdf' onClick={() => window.open("/Control_rode.pdf", "_blank")}>RODEODORES</button>
+            <a href="/Control_rode.pdf" target="_blank" rel="noopener noreferrer">
+                <button className='btn-export-pdf' >RODEODORES</button>
+            </a>
             <button className='btn-export-pdf' onClick={() => window.open("/controlfumigacion.pdf", "_blank")}>CONTROL</button>
             <button className='btn-export-pdf' onClick={() => window.open("/grido.pdf", "_blank")}>GRIDO</button>
             <hr color='#3399ff' className='hr-line'/>
