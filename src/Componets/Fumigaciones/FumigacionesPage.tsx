@@ -125,6 +125,12 @@ export default function FumigacionesPage () {
         }
     }
 
+    const pdfGrido = async () => {
+        const response = await fetch('/grido.pdf')
+        const blob: Blob = await response.blob()
+        saveAs(blob,'grido-Plantilla.pdf')
+    }
+
 
     return(
         <div>
@@ -164,11 +170,9 @@ export default function FumigacionesPage () {
             <button className='btn-export-pdf' onClick={() => exportPdfPlanilla()}>CERTIFICADO</button>
             <button className='btn-export-pdf' onClick={() => exportPdfPlanillaTanque()}>AVISO TANQUE</button>
             <button className='btn-export-pdf' onClick={() => exportPdfPlanillaFum()}>AVISO FUMIGACION</button>
-            <a href="/Control_rode.pdf" target="_blank" rel="noopener noreferrer">
-                <button className='btn-export-pdf' >RODEODORES</button>
-            </a>
+            <button className='btn-export-pdf' >RODEODORES</button>
             <button className='btn-export-pdf' onClick={() => window.open("/controlfumigacion.pdf", "_blank")}>CONTROL</button>
-            <button className='btn-export-pdf' onClick={() => window.open("/grido.pdf", "_blank")}>GRIDO</button>
+            <button className='btn-export-pdf' onClick={() => pdfGrido()}>GRIDO</button>
             <hr color='#3399ff' className='hr-line'/>
             <div style={{maxHeight: 450,overflow:"scroll"}}>
                 <table style={{fontSize: "small", width: 550}}>
