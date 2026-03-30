@@ -27,6 +27,7 @@ export default function FumigacionesPage () {
     const [selectedCliente, setSelectedCliente] = useState<IFCliente>()
     const [drogas, setDrogas] = useState<IFDroga[]>([])
     const [selectedDroga, setSelectedDroga] = useState(0)
+    const [fecha, setFecha] = useState("")
 
     useEffect(() =>{
         if(global) {
@@ -42,6 +43,7 @@ export default function FumigacionesPage () {
     useEffect(() =>{
         setTalonario("")
         setVehiculo(0)
+        setFecha("")
     },[servicio,selectedCliente])
 
     useEffect(() =>{
@@ -49,6 +51,7 @@ export default function FumigacionesPage () {
         setVehiculo(0)
         setServicio(false)
         setTalonarios([])
+        setFecha("")
     },[selectedCliente])
 
     useEffect(() => {
@@ -84,7 +87,7 @@ export default function FumigacionesPage () {
 
     const confirmarServicio = async () => {
         let talo = talonario
-        if(selectedCliente) {
+        if(selectedCliente && fecha.length > 0) {
             const id = selectedCliente.cliente_id
             const veh = vehiculo ? vehiculo : 0
             const drogaToTalonario = drogas[selectedDroga].d2 ? drogas[selectedDroga].d1+"-"+drogas[selectedDroga].d2 : drogas[selectedDroga].d1
@@ -93,18 +96,18 @@ export default function FumigacionesPage () {
                     const currentDate = new Date()
                     const dateToAddd = ""+currentDate.getMonth()+1+currentDate.getDate()
                     talo = "TQ"+selectedCliente.cliente_id+""+dateToAddd
-                    const res = await global.createServicioFumi(id,global.user.rol,veh,talo,true,drogaToTalonario)
+                    const res = await global.createServicioFumi(id,global.user.rol,veh,talo,true,drogaToTalonario,fecha)
                     alert(res)
                 }
                 else if(!selectedCliente.oficial && selectedCliente.servicio === "ESCUELA") {
                     const currentDate = new Date()
                     const dateToAddd = ""+currentDate.getMonth()+1+currentDate.getDate()
                     talo = "ES"+selectedCliente.cliente_id+""+dateToAddd
-                    const res = await global.createServicioFumi(id,global.user.rol,veh,talo,true,drogaToTalonario)
+                    const res = await global.createServicioFumi(id,global.user.rol,veh,talo,true,drogaToTalonario,fecha)
                     alert(res)
                 }
                 else {
-                    const res = await global.createServicioFumi(id,global.user.rol,veh,talo,false,drogaToTalonario)
+                    const res = await global.createServicioFumi(id,global.user.rol,veh,talo,false,drogaToTalonario,fecha)
                     alert(res)
                 }
                 window.location.reload()
@@ -282,6 +285,11 @@ export default function FumigacionesPage () {
                                             ))}
                                         </select>
                                     </div>
+                            </div>
+                            <div>
+                                <h4 className='title-Homepage'>Ingrese la fecha</h4>
+                                <input type="date" id='otherins' className="data-div-select" value={fecha}
+                                style={{width: "35%"}} onChange={(e) => setFecha(e.target.value)}/>
                             </div>
                             <button className='btn-export-pdf' onClick={() => confirmarServicio()}>REGISTRAR SERVICIO</button>
                         </div>
