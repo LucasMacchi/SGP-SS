@@ -1498,12 +1498,12 @@ export default function GlobalState(props: IPropsChildren) {
     }
   }
 
-  async function createServicioFumi (id:number,user:number,veh:number|null,talo:string,of:boolean,droga:string):Promise<string> {
+  async function createServicioFumi (id:number,user:number,veh:number|null,talo:string,of:boolean,droga:string,fecha:string):Promise<string> {
     try {
       if(of) {
-        await axios.patch(SERVER+`/fumigacion/serviciotq/${id}/${user}/${veh}/${talo}/${droga}`,{},authReturner())
+        await axios.patch(SERVER+`/fumigacion/serviciotq/${id}/${user}/${veh}/${talo}/${droga}/${fecha}`,{},authReturner())
       }
-      else await axios.patch(SERVER+`/fumigacion/serviciofumi/${id}/${user}/${veh}/${talo}/${droga}`,{},authReturner())
+      else await axios.patch(SERVER+`/fumigacion/serviciofumi/${id}/${user}/${veh}/${talo}/${droga}/${fecha}`,{},authReturner())
       return "SERVICIO REALIZADO"
     } catch (error) {
       console.log(error);
@@ -1831,7 +1831,7 @@ interface IGlobalContext {
   getVehFumi: () => Promise<IFVeh[]>;
   getRubrosFumi: () => Promise<IFRubro[]>;
   getTalonariosFumi: (id: number) => Promise<ITalonario[]>;
-  createServicioFumi: (id:number,user:number,veh:number|null,talo:string,of:boolean,droga:string) => Promise<string>;
+  createServicioFumi: (id:number,user:number,veh:number|null,talo:string,of:boolean,droga:string,fecha:string) => Promise<string>;
   getDrogasFumi: () => Promise<IFDroga[]>;
   getServiciosFumi: () => Promise<string[]>;
   facturarTalonarioFumi: (id:number,fac:string) => Promise<string>
