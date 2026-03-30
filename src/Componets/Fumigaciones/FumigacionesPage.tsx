@@ -131,6 +131,18 @@ export default function FumigacionesPage () {
         saveAs(blob,'grido-Plantilla.pdf')
     }
 
+    const pdfControlRodeo = async () => {
+        const response = await fetch('/Control_rode.pdf')
+        const blob: Blob = await response.blob()
+        saveAs(blob,'control-roedor-Plantilla.pdf')
+    }
+
+    const pdfControlFumigacion = async () => {
+        const response = await fetch('/controlfumigacion.pdf')
+        const blob: Blob = await response.blob()
+        saveAs(blob,'control-fumigacion-Plantilla.pdf')
+    }
+
 
     return(
         <div>
@@ -170,8 +182,8 @@ export default function FumigacionesPage () {
             <button className='btn-export-pdf' onClick={() => exportPdfPlanilla()}>CERTIFICADO</button>
             <button className='btn-export-pdf' onClick={() => exportPdfPlanillaTanque()}>AVISO TANQUE</button>
             <button className='btn-export-pdf' onClick={() => exportPdfPlanillaFum()}>AVISO FUMIGACION</button>
-            <button className='btn-export-pdf' >RODEODORES</button>
-            <button className='btn-export-pdf' onClick={() => window.open("/controlfumigacion.pdf", "_blank")}>CONTROL</button>
+            <button className='btn-export-pdf' onClick={() => pdfControlRodeo()}>RODEODORES</button>
+            <button className='btn-export-pdf' onClick={() => pdfControlFumigacion()}>CONTROL</button>
             <button className='btn-export-pdf' onClick={() => pdfGrido()}>GRIDO</button>
             <hr color='#3399ff' className='hr-line'/>
             <div style={{maxHeight: 450,overflow:"scroll"}}>
