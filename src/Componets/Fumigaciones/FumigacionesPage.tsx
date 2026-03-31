@@ -242,7 +242,7 @@ export default function FumigacionesPage () {
                                         <th style={{border: "1px solid", width: "20%"}}>DROGA</th>
                                         <th style={{border: "1px solid", width: "20%"}}>FACTURA</th>
                                     </tr>
-                                    {talonarios.map((c,i) => (
+                                    {talonarios.length > 0 && talonarios.map((c,i) => (
                                     <tr key={i} onClick={() => c.fac ? alert("Talonario ya facturado.") : facturarTalo(c.talonario_id)}>
                                         <th style={{border: "1px solid", width: "20%"}}>{c.numero}</th>
                                         <th style={{border: "1px solid", width: "20%"}}>{c.patente ? c.patente : "Ninguno"}</th>
