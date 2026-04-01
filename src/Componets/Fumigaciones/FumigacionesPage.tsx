@@ -146,6 +146,15 @@ export default function FumigacionesPage () {
         saveAs(blob,'control-fumigacion-Plantilla.pdf')
     }
 
+    const checkDate = (nextServ: Date) => {
+        const currentDate = new Date()
+        const nextServiceDate = new Date(nextServ)
+        const timeDiff = nextServiceDate.getTime() - currentDate.getTime()
+        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24))
+        console.log(daysDiff)
+        if(daysDiff < 7 && daysDiff >= 0) return "red"
+        else return "white"
+    }
 
     return(
         <div>
@@ -206,7 +215,7 @@ export default function FumigacionesPage () {
                             <th style={{border: "1px solid", width: "20%"}}>{c.servicio}</th>
                             <th style={{border: "1px solid", width: "20%"}}>{c.rubro}</th>
                             <th style={{border: "1px solid", width: "20%"}}>{c.ultimo_serv.split("T")[0]}</th>
-                            <th style={{border: "1px solid", width: "20%"}}>{c.prox_serv.split("T")[0]}</th>
+                            <th style={{border: "1px solid", width: "20%",backgroundColor: checkDate(new Date(c.prox_serv))}}>{c.prox_serv.split("T")[0]}</th>
                         </tr>
                         ))}
                     </tbody>
@@ -248,7 +257,7 @@ export default function FumigacionesPage () {
                                         <th style={{border: "1px solid", width: "20%"}}>{c.patente ? c.patente : "Ninguno"}</th>
                                         <th style={{border: "1px solid", width: "20%"}}>{c.fecha.split("T")[0]}</th>
                                         <th style={{border: "1px solid", width: "20%"}}>{c.droga}</th>
-                                        <th style={{border: "1px solid", width: "20%"}}>{c.fac ? c.fac : "NaN"}</th>
+                                        <th style={{border: "1px solid", width: "20%",backgroundColor: c.fac ? "#c8e6c9" : "#d14056"}}>{c.fac ? c.fac : "NaN"}</th>
                                     </tr>
                                     ))}
                                 </tbody>
