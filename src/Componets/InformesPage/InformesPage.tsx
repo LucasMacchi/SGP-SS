@@ -27,19 +27,8 @@ export default function InformesPage () {
     const [serviceF, setServiceF] = useState<IServicio[]>([])
     const [orders, setOrders] = useState<string[]>([])
     const [remit, setRemit] = useState(false)
+    const [aprobados, setAprobados] = useState(false)
     const [txtDate, setTxtDate] = useState({start:"",end:""})
-    /*const [remito, setRemito] = useState<IOrderRemito>({
-        order_id: 0,
-        numero: 0,
-        client_des: "-",
-        service_des: "",
-        localidad: "-",
-        insumos: []
-    })
-    const [insRemito, setInsRemito] = useState<IInsumo>({
-        amount: 1,
-        insumo_des: ""
-    })*/
 
     useEffect(() => {
         setStartDate(lastMonth())
@@ -177,14 +166,17 @@ export default function InformesPage () {
 
     const getInsumosTotal = async () => {
         if(global && startDate && endDate) {
-            const totales = await global.getSumatoriaInsumos(startDate, endDate)
+            const totales = await global.getSumatoriaInsumos(startDate, endDate,aprobados)
+            const totalesCCo = await global.getSumatoriaInsumosCCo(startDate, endDate, aprobados)
             setStartDate('')
             setEndDate('')
-            if(totales.length > 0) {
+            if(totales.length > 0 && totalesCCo.length > 0) {
                 const worksheet = XLSX.utils.json_to_sheet(totales)
+                const worksheetCCo = XLSX.utils.json_to_sheet(totalesCCo)
                 const workbook = XLSX.utils.book_new()
                 XLSX.utils.book_append_sheet(workbook,worksheet,"INSUMOS")
-                XLSX.writeFile(workbook,'INSUMOS_'+startDate+'.xlsx')
+                XLSX.utils.book_append_sheet(workbook,worksheetCCo,"INSUMOS_CCO")
+                aprobados ? XLSX.writeFile(workbook,'INSUMOS_APROBADOS_'+startDate+'.xlsx') : XLSX.writeFile(workbook,'INSUMOS_ENTREGADOS_'+startDate+'.xlsx')
             }
             else alert('No existen datos en el rango de fechas seleccionado.')
         }
@@ -368,14 +360,13 @@ export default function InformesPage () {
                     {displaySelection()}
                 </div>
                 }
-
-                <hr color='#3399ff' className='hr-line'/>
-                {displayTxtGen()}
                 <hr color='#3399ff' className='hr-line'/>
                 <div>
                     <h2 className='title-Homepage' >
                         Informe de Insumos enviados
                     </h2>
+                    <label htmlFor='aprobados' className='filter-sub'>Incluir Insumos Aprobados</label>
+                    <input type='checkbox' id='aprobados' checked={aprobados} onChange={(e) => setAprobados(e.target.checked)} />
                     <h5 className='filter-sub'>Fecha de inicio y Final</h5>
                     <input type='date' id='date_start' className='date-input'
                     value={startDate} onChange={e => setStartDate(e.target.value)}/>
@@ -386,6 +377,9 @@ export default function InformesPage () {
                         Generar
                     </button>
                 </div>
+                <hr color='#3399ff' className='hr-line'/>
+                {global && global.user.rol === 1 ? displayTxtGen() : null}
+                <hr color='#3399ff' className='hr-line'/>
             </div>
         </div>
     )

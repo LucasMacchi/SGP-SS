@@ -758,4 +758,10 @@ export interface ISumatoriaInsumos {
     cantidad: number
 }
 
+export interface IInsumosxCco {
+    cco: number,
+    insumo: string,
+    cantidad: number
+}
+
 export type TRemitoEnvio = ""
