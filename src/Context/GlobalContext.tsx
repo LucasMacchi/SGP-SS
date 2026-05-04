@@ -33,6 +33,7 @@ import {
   IFRubro,
   IFVeh,
   IInsumoComp,
+  IInsumosxCco,
   ILgarEntrega,
   ILugaresResponse,
   IMovimientos,
@@ -1499,9 +1500,31 @@ export default function GlobalState(props: IPropsChildren) {
     }
   }
 
-  async function getSumatoriaInsumos(fecha1: string, fecha2: string):Promise<ISumatoriaInsumos[]> {
+  async function getSumatoriaInsumos(fecha1: string, fecha2: string,aprobado:boolean):Promise<ISumatoriaInsumos[]> {
     try {
-      const data: ISumatoriaInsumos[] = (await axios.get(SERVER+`/data/sumatoria/${fecha1}/${fecha2}`,authReturner())).data
+      let data:ISumatoriaInsumos[] = []
+      if(aprobado) {
+        data = (await axios.get(SERVER+`/data/sumatoria/aprobados/${fecha1}/${fecha2}`,authReturner())).data
+      }
+      else {
+        data = (await axios.get(SERVER+`/data/sumatoria/entregados/${fecha1}/${fecha2}`,authReturner())).data
+      }
+      return data
+    } catch (error) {
+      console.log(error);
+      return []
+    }
+  }
+
+  async function getSumatoriaInsumosCCo(fecha1: string, fecha2: string,aprobado:boolean):Promise<IInsumosxCco[]> {
+    try {
+      let data:IInsumosxCco[] = []
+      if(aprobado) {
+        data = (await axios.get(SERVER+`/data/sumatoriacco/aprobados/${fecha1}/${fecha2}`,authReturner())).data
+      }
+      else {
+        data = (await axios.get(SERVER+`/data/sumatoriacco/entregados/${fecha1}/${fecha2}`,authReturner())).data
+      }
       return data
     } catch (error) {
       console.log(error);
@@ -1701,7 +1724,8 @@ export default function GlobalState(props: IPropsChildren) {
     createServicioFumi,
     getDrogasFumi,
     getServiciosFumi,
-    facturarTalonarioFumi
+    facturarTalonarioFumi,
+    getSumatoriaInsumosCCo
   };
 
   const [state, dispatch] = useReducer(globalReducer, innitialState);
@@ -1847,6 +1871,7 @@ interface IGlobalContext {
   getDrogasFumi: () => Promise<IFDroga[]>;
   getServiciosFumi: () => Promise<string[]>;
   facturarTalonarioFumi: (id:number,fac:string) => Promise<string>;
-  getSumatoriaInsumos: (fecha1: string, fecha2: string) => Promise<ISumatoriaInsumos[]>;
+  getSumatoriaInsumos: (fecha1: string, fecha2: string, aprobado: boolean) => Promise<ISumatoriaInsumos[]>;
+  getSumatoriaInsumosCCo: (fecha1: string, fecha2: string, aprobado: boolean) => Promise<IInsumosxCco[]>;
   
 }
