@@ -50,6 +50,7 @@ import {
   IResponseInsumo,
   IResponseRutas,
   IServicio,
+  ISumatoriaInsumos,
   ITalonario,
   IToken,
   ITotalEnviosInforme,
@@ -1498,6 +1499,16 @@ export default function GlobalState(props: IPropsChildren) {
     }
   }
 
+  async function getSumatoriaInsumos(fecha1: string, fecha2: string):Promise<ISumatoriaInsumos[]> {
+    try {
+      const data: ISumatoriaInsumos[] = (await axios.get(SERVER+`/data/sumatoria/${fecha1}/${fecha2}`,authReturner())).data
+      return data
+    } catch (error) {
+      console.log(error);
+      return []
+    }
+  }
+
   async function createServicioFumi (id:number,user:number,veh:number|null,talo:string,of:boolean,droga:string,fecha:string):Promise<string> {
     try {
       if(of) {
@@ -1586,6 +1597,7 @@ export default function GlobalState(props: IPropsChildren) {
     logoutFn,
     sessionFn,
     pedidosFn,
+    getSumatoriaInsumos,
     getConformidadEnvio,
     getInsumosComplete,
     insumosFn,
@@ -1834,5 +1846,7 @@ interface IGlobalContext {
   createServicioFumi: (id:number,user:number,veh:number|null,talo:string,of:boolean,droga:string,fecha:string) => Promise<string>;
   getDrogasFumi: () => Promise<IFDroga[]>;
   getServiciosFumi: () => Promise<string[]>;
-  facturarTalonarioFumi: (id:number,fac:string) => Promise<string>
+  facturarTalonarioFumi: (id:number,fac:string) => Promise<string>;
+  getSumatoriaInsumos: (fecha1: string, fecha2: string) => Promise<ISumatoriaInsumos[]>;
+  
 }

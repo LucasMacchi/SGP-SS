@@ -753,4 +753,9 @@ export interface ITalonario {
     fac: string
 }
 
+export interface ISumatoriaInsumos {
+    insumo: string,
+    cantidad: number
+}
+
 export type TRemitoEnvio = ""

@@ -12,6 +12,8 @@ import RemitoDocument, { divisionTable} from '../pdfs/remito'
 import infoMsg from '../../Utils/infoMsg'
 import RemitoDocumentCol from '../pdfs/remitoColeccion'
 import txtOrdersGen from '../../Utils/txtOrdersGen'
+import * as XLSX from 'xlsx';
+
 
 
 export default function InformesPage () {
@@ -44,6 +46,7 @@ export default function InformesPage () {
         if(global?.ccos.length === 0) global.ccosFn()
         if(global?.sysUsers.length === 0) global.sysUsersFn()
         setServiceS("")
+        setRemit(false)
         console.log(serviceF)
     },[])
 
@@ -172,12 +175,20 @@ export default function InformesPage () {
         }
     }
 
-    /*const deleteInsumoRowRemito = (index: number, ins: string) => {
-        if(confirm('¿Quiere eliminar el insumo '+ins+ "?")){
-            remito.insumos.splice(index, 1)
-            setRemito(remito)
+    const getInsumosTotal = async () => {
+        if(global && startDate && endDate) {
+            const totales = await global.getSumatoriaInsumos(startDate, endDate)
+            setStartDate('')
+            setEndDate('')
+            if(totales.length > 0) {
+                const worksheet = XLSX.utils.json_to_sheet(totales)
+                const workbook = XLSX.utils.book_new()
+                XLSX.utils.book_append_sheet(workbook,worksheet,"INSUMOS")
+                XLSX.writeFile(workbook,'INSUMOS_'+startDate+'.xlsx')
+            }
+            else alert('No existen datos en el rango de fechas seleccionado.')
         }
-    }*/
+    }
 
     const deleteCollection = () => {
         if(collection && confirm('Quieres eliminar los pedidos de la coleccion?')) {
@@ -233,74 +244,7 @@ export default function InformesPage () {
         const blob: Blob = await pdf(<CollectionDocument collection={data.collection}/>).toBlob()
         saveAs(blob, 'SGP_'+collection)
     }
-    /*
-    const addIns = () => {
-        remito.insumos.push(insRemito)
-        setRemito({...remito})
-        setInsRemito({amount: 0, insumo_des: ""})
-    }
 
-    const generateCustomRemito = async () => {
-        const blob: Blob = await pdf(<RemitoDocumentCol c={[remito]} />).toBlob()
-        saveAs(blob, 'REMITO_'+remito.service_des)
-        setRemito({order_id: 0,numero: 0,client_des: "-",
-        service_des: "",localidad: "-",insumos: []})
-
-    }
-    
-    const displayRemitosGeneretor = () => {
-        return(
-                <div>
-                    <h2 className='title-Homepage' >
-                        Generador de Remitos
-                    </h2>
-                    <div >
-                        <h4 className='title-Homepage'>Servicio: </h4>
-                        <input type="text" id='otherins' className="data-div-select" value={remito.service_des}
-                        style={{width: "90%"}} onChange={(e) => setRemito({...remito, service_des: e.target.value})}/>
-                    </div>
-                    <div >
-                        <h4 className='title-Homepage'>Localidad (Opcional): </h4>
-                        <input type="text" id='otherins' className="data-div-select" value={remito.localidad}
-                        style={{width: "90%"}} onChange={(e) => setRemito({...remito, localidad: e.target.value})}/>
-                    </div>
-                    <div >
-                        <h4 className='title-Homepage'>Cliente (Opcional): </h4>
-                        <input type="text" id='otherins' className="data-div-select" value={remito.client_des}
-                        style={{width: "90%"}} onChange={(e) => setRemito({...remito, client_des: e.target.value})}/>
-                    </div>
-                    <div style={{flexDirection: "row"}}>
-                        <h4 className='title-Homepage'>Insumo: </h4>
-                        <input type="text" id='otherins' className="data-div-select" value={insRemito.insumo_des}
-                        style={{width: "68%"}} onChange={(e) => setInsRemito({...insRemito, insumo_des: e.target.value})}/>
-                        <input type="number" id='otherins' className="data-div-select" value={insRemito.amount} min={1}
-                        style={{width: "10%"}} onChange={(e) => setInsRemito({...insRemito, amount: parseInt(e.target.value) ? parseInt(e.target.value) : 0})}/>
-                        <button className="info-popup" style={{ margin: 5}} onClick={() => addIns()}>+</button>
-                    </div>
-                    <div>
-                        <h5 className='filter-sub'>Presione en un insumo para eliminarlo.</h5>
-                        <table style={{width: 400, alignItems: "center"}}>
-                            <tbody>
-                                <tr >
-                                    <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 320}}>Insumo</th>
-                                    <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 80}}>Cantidad</th>
-                                </tr>
-                                {remito.insumos.map((ins,i) => (
-                                    <tr onClick={() => deleteInsumoRowRemito(i, ins.insumo_des)}>
-                                        <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 320}}>{ins.insumo_des}</th>
-                                        <th style={{borderWidth: 1, borderColor: "black", borderStyle: "solid", width: 80}} >{ins.amount}</th>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        <button className='btn-big' onClick={() => generateCustomRemito()}>
-                            Generar
-                        </button>
-                    </div>
-                </div>
-        )
-    }
-    */
    const displayTxtGen = () => {
 
         const exportFn = async () => {
@@ -383,7 +327,6 @@ export default function InformesPage () {
                     <div>
                 <h5 className='filter-sub'>Los informes generados son sobre los pedidos </h5>
                 <h5 className='filter-sub'>que ya estan Aprobados, Listos o Entregados.</h5>
-                <h5 className='filter-sub'>Generar Remitos: <input type="checkbox" checked={remit} onChange={(e) => setRemit(e.target.checked)}/></h5>
                 <hr color='#3399ff' className='hr-line'/>
                 <div>
                     <h2 className='title-Homepage' >
@@ -410,12 +353,12 @@ export default function InformesPage () {
                     }
                     </select>
                     <div>
-                    <h5 className='filter-sub'>Fecha de inicio y Final</h5>
-                    <input type='date' id='date_start' className='date-input'
-                    value={startDate} onChange={e => setStartDate(e.target.value)}/>
-                    <a> - </a>
-                    <input type='date' id='date_end' className='date-input'
-                    value={endDate} onChange={e => setEndDate(e.target.value)}/>
+                        <h5 className='filter-sub'>Fecha de inicio y Final</h5>
+                        <input type='date' id='date_start' className='date-input'
+                        value={startDate} onChange={e => setStartDate(e.target.value)}/>
+                        <a> - </a>
+                        <input type='date' id='date_end' className='date-input'
+                        value={endDate} onChange={e => setEndDate(e.target.value)}/>
                     </div>
                     <button className='btn-export-pdf' onClick={() => generateClientPDF()}>
                         Generar
@@ -428,6 +371,21 @@ export default function InformesPage () {
 
                 <hr color='#3399ff' className='hr-line'/>
                 {displayTxtGen()}
+                <hr color='#3399ff' className='hr-line'/>
+                <div>
+                    <h2 className='title-Homepage' >
+                        Informe de Insumos enviados
+                    </h2>
+                    <h5 className='filter-sub'>Fecha de inicio y Final</h5>
+                    <input type='date' id='date_start' className='date-input'
+                    value={startDate} onChange={e => setStartDate(e.target.value)}/>
+                    <a> - </a>
+                    <input type='date' id='date_end' className='date-input'
+                    value={endDate} onChange={e => setEndDate(e.target.value)}/>
+                    <button className='btn-export-pdf' onClick={() => getInsumosTotal()}>
+                        Generar
+                    </button>
+                </div>
             </div>
         </div>
     )
