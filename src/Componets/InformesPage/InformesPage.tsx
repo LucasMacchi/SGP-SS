@@ -242,6 +242,7 @@ export default function InformesPage () {
         const exportFn = async () => {
             if(txtDate.end.length > 0 && txtDate.start.length > 0 && global) {
                 const lineas = await global.getTxtOrdersRange(txtDate.start,txtDate.end)
+                console.log(lineas)
                 txtOrdersGen(lineas)
                 setTxtDate({start:"",end:""})
             } else alert("Ingrese las fechas correctamente")
