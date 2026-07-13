@@ -32,6 +32,8 @@ export default function CompraDetail () {
                 else{
                     global?.changeStateCompra(aprobar, global.compraDetail.compra_id,comentarios)
                 }
+                alert("Operacion realizada con exito.")
+                window.location.reload()
             }
         } else alert("Comentario con un minimo de 25 caracteres es necesario.")
 
