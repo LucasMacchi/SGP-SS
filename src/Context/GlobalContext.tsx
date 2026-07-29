@@ -1807,7 +1807,7 @@ interface IGlobalContext {
   checkExistsPedido: (nro: string) => Promise<boolean>;
   collectionOrders: (orders:string []) => Promise<ICollectionoRes>;
   registerCompra: (data: ICompraDto) => void;
-  changeStateCompra: (aprobar:boolean, id: number,comentario: string) => void;
+  changeStateCompra: (aprobar:boolean, id: number,comentario: string) => Promise<void>;
   preaproveCompraFn: (id: number, comentario: string) => void;
   getAllCompras: (revised:boolean, fullname?: string) => void;
   getUniqCompra: (id:number) => void;
