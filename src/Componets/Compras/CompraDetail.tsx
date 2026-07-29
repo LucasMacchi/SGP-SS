@@ -27,10 +27,10 @@ export default function CompraDetail () {
         if(comentarios.length > 24) {
             if(confirm(msg)){
                 if(aprobar) {
-                    global?.changeStateCompra(aprobar, global.compraDetail.compra_id, comentarios)
+                    await global?.changeStateCompra(aprobar, global.compraDetail.compra_id, comentarios)
                 }
                 else{
-                    global?.changeStateCompra(aprobar, global.compraDetail.compra_id,comentarios)
+                    await global?.changeStateCompra(aprobar, global.compraDetail.compra_id,comentarios)
                 }
                 alert("Operacion realizada con exito.")
                 window.location.reload()
