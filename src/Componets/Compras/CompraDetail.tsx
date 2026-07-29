@@ -24,7 +24,7 @@ export default function CompraDetail () {
 
     const changeEstado = async (aprobar: boolean) => {
         const msg = aprobar ? "Quieres aprobar esta compra?" : "Quieres rechazar esta compra?"
-        if(comentarios.length > 24) {
+        if(comentarios.length > 0) {
             if(confirm(msg)){
                 if(aprobar) {
                     await global?.changeStateCompra(aprobar, global.compraDetail.compra_id, comentarios)
@@ -40,7 +40,7 @@ export default function CompraDetail () {
     }
 
     const preaproveCompra = async () => {
-        if(comentarios.length > 24) {
+        if(comentarios.length > 0) {
             if(confirm("¿Quieres preaprobar esta compra?")){
                 global?.preaproveCompraFn(global.compraDetail.compra_id, comentarios)
             }
@@ -173,7 +173,6 @@ export default function CompraDetail () {
                 <div>
                     <div className='data-div-info'>
                         <h4>Comentarios:</h4>
-                        <h6>Comentario con un minimo de 25 caracteres es necesario</h6>
                         <h6>Actuales {comentarios.length}</h6>
                         <textarea value={comentarios} className='texarea-details'
                         onChange={(e) => setComentarios(e.target.value)}/>
@@ -191,7 +190,6 @@ export default function CompraDetail () {
                     <div className='data-div-info' >
                         <button className="info-popup" style={{marginTop: 15, marginBottom: 15}} onClick={() => addPorducto()}>Agregar Producto</button>
                         <h4>Comentarios:</h4>
-                        <h6>Comentario con un minimo de 25 caracteres es necesario</h6>
                         <h6>Actuales {comentarios.length}</h6>
                         <textarea value={comentarios} className='texarea-details'
                         onChange={(e) => setComentarios(e.target.value)}/>
