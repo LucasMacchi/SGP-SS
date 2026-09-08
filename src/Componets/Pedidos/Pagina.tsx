@@ -20,6 +20,7 @@ export default function PaginaPedidos () {
     const global = useContext(GlobalContext)
     const [limit, setLimit] = useState(50)
     const [cco, setCco] = useState(0)
+    const [ccoDes, setCcoDes] = useState("")
     const [client, setClient] = useState(0)
     const [nro, setNro] = useState('')
     const [req, setReq] = useState(0)
@@ -86,16 +87,20 @@ export default function PaginaPedidos () {
             if(client) {
                 arr = arr.filter((s) => s.client_id === client)
             }
+            if(ccoDes.length > 3) {
+                arr = arr.filter((s) => s.service_des.toLowerCase().includes(ccoDes.toLowerCase()))
+            }
             setCcoArr(arr)
         }
 
-    },[client, cco])
+    },[client, cco,ccoDes])
 
     useEffect(() => {
         setDateEnd("")
         setDateStart("")
         setReq(0)
         setCco(0)
+        setCcoDes("")
         setClient(0)
         setState("")
     },[nro])
@@ -218,6 +223,11 @@ export default function PaginaPedidos () {
                             ))
                         }
                     </select>
+                </div>
+                <div>
+                    <h5 className='filter-sub'>CCO POR NOMBRE</h5>
+                    <input disabled={nro.length > 0 ? true : false}
+                    value={ccoDes} onChange={(e) => setCcoDes(e.target.value)} className='textfield-search' />
                 </div>
                 <div>
                     <h5 className='filter-sub'>CCO</h5>
