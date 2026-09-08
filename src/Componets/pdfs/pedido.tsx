@@ -115,7 +115,17 @@ const PedidoDocument: React.FC<IPedidoPDF> = ({pedido}) => (
                     <Text style={stylePedido.body}>Email: {pedido.solicitante_email}</Text>
                 </View>
             </View>
-
+            <View >
+                <View style={{marginTop:20}}>
+                    <Text style={stylePedido.body}>FIRMA_____________________</Text>
+                </View>
+                <View style={{marginTop:20}}>
+                    <Text style={stylePedido.body}>ACLARACION___________________________</Text>
+                </View>
+                <View style={{marginTop:20,marginBottom:10}}>
+                    <Text style={stylePedido.body}>TELEFONO_____________________</Text>
+                </View>
+            </View>
             <View style={stylePedido.view}>
                 <View style={stylePedido.table}>
                 <View style={stylePedido.tableRow_header}>
@@ -160,8 +170,7 @@ const PedidoDocument: React.FC<IPedidoPDF> = ({pedido}) => (
                             <Text style={stylePedido.tableCell}>{i.amount}</Text>
                         </View>
                     </View>
-                ))}
-                
+                ))}               
             </View>
         </Page>
     </Document>
